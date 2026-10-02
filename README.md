@@ -1,6 +1,6 @@
 # motion-video-production
 
-모션 그래픽과 영상(30~90초)을 처음부터 끝까지 만드는 순서와 점검 기준을 담은 **Claude Code 스킬**입니다. 대표 사례는 캐릭터가 나오는 애니 영상입니다.
+모션 그래픽과 영상(30~90초)을 처음부터 끝까지 만드는 순서와 점검 기준을 담은 **Claude Code 스킬**입니다.
 제작 6단계마다 산출물을 측정해 통과 여부를 종료 코드로 판정하는 검사 스크립트(`harness/gate.py`, 이하 게이트)와, 자주 생기는 함정 29가지의 예방법(`references/gotchas.md`)이 들어 있습니다.
 
 ![제작 6단계와 단계별 게이트](docs/assets/workflow.png)
@@ -18,7 +18,7 @@ cp -r motion-video-skill/skills/motion-video-production ~/.claude/skills/
 특정 프로젝트에서만 쓰려면 프로젝트 폴더의 `.claude/skills/` 아래에 같은 폴더를 복사합니다.
 복사한 뒤 Claude Code를 새로 시작하고 아래처럼 요청하면 스킬이 호출됩니다.
 
-> 30초짜리 애니 오프닝 영상을 만들고 싶어.
+> 캐릭터가 나오는 30초짜리 오프닝 영상을 만들고 싶어.
 
 Claude가 먼저 4가지(공개 방식, 길이와 화면비, 쓸 수 있는 도구, 금지 요소)를 묻고, `STORY.md`부터 단계 순서대로 진행합니다.
 
