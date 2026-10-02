@@ -1,0 +1,31 @@
+# 환경 변수와 키
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# 의존성
+node_modules/
+
+# 출력 영상·음원·프레임 (용량이 크고 재생성 가능)
+*.mp4
+*.mov
+*.webm
+*.wav
+*.mp3
+out/
+renders/
+frames/
+**/qa/sheets/
+**/plates/
+*.contact.png
+
+# 개인 작업물
+kf/
+clips/
+charsheet*.png
+*.log
+
+# OS
+.DS_Store
