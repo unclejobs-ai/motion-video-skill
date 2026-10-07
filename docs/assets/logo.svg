@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Motion Video Production</title>
+  <desc id="desc">Three offset video frames converge on an orange frame with a play symbol.</desc>
+  <rect width="160" height="160" rx="28" fill="#FAF9F6"/>
+  <path d="M30 95V38H108" stroke="#171714" stroke-width="7" stroke-linecap="square"/>
+  <path d="M42 108V51H120" stroke="#171714" stroke-width="7" stroke-linecap="square"/>
+  <rect x="54" y="64" width="78" height="57" fill="#FF5D0A"/>
+  <path d="M83 78L107 92.5L83 107V78Z" fill="#171714"/>
+</svg>

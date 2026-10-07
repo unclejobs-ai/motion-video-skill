@@ -1,6 +1,6 @@
 ---
 name: motion-video-production
-description: 모션 그래픽과 영상(캐릭터 오프닝·홍보 영상 등)을 처음부터 끝까지 만드는 제작 스킬. 스토리·장면 기획, 캐릭터 시트, 장면별 키프레임 이미지, 키프레임의 영상 변환, 음악·목소리, Remotion 모션 그래픽 조립까지 6단계를 안내하고, 장면이 바뀌어도 얼굴과 목소리가 같은 캐릭터를 유지하는 7가지 기준과 무료 도구 우선·유료 도구 최소 사용 규칙을 적용한다. "영상 만들어줘", "모션 그래픽", "캐릭터 영상", "오프닝 영상", "키프레임", "캐릭터 일관성", "Grok Imagine 영상", "Remotion 영상 조립" 같은 요청에 사용한다.
+description: Plan and assemble 30–90 second motion graphics and character videos with six production stages, media gates, and visual review. Use for video production, keyframes, character consistency, and Remotion assembly. 모션 그래픽·캐릭터 영상·오프닝 영상 제작에 사용한다.
 ---
 
 # 모션 그래픽·영상 제작 스킬 (motion-video-production)
@@ -9,6 +9,17 @@ description: 모션 그래픽과 영상(캐릭터 오프닝·홍보 영상 등)�
 이 스킬을 따라가면 STORY.md, 캐릭터 시트, 키프레임, 장면 영상, 음악·목소리, 최종 mp4를 얻어가십니다.
 
 모든 답변은 사용자의 언어(기본 한국어)로 합니다. 도구를 대신 로그인하거나 결제하지 않습니다. 로그인·결제·대용량 다운로드가 필요한 시점에서는 사용자에게 먼저 묻습니다.
+
+## 실행 환경과 경로
+
+이 스킬은 Agent Skills 형식의 공통 지침입니다. Codex, Claude Code 및 다른 스킬 지원 런타임에서 같은 폴더를 사용합니다. 특정 모델의 API나 생성 도구 연결을 포함하지 않습니다.
+
+- 런타임이 알려 준 이 `SKILL.md`의 실제 경로에서 부모 폴더를 `SKILL_ROOT`로 정합니다. `~/.claude/skills` 같은 특정 설치 경로를 가정하지 않습니다. 아래 `references/`, `templates/`, `harness/`, `scripts/`는 모두 이 폴더 기준입니다.
+- 산출물 폴더의 절대 경로를 `PROJECT_ROOT`로 정합니다. 두 경로를 구분하고, 스크립트는 `python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"`처럼 절대 경로로 실행합니다. 보조 스크립트는 산출물 폴더에서 `bash "$SKILL_ROOT/scripts/<파일>.sh" ...`로 실행합니다.
+- Python 3, ffmpeg, ffprobe가 필요합니다. `.sh` 스크립트에는 Bash가 필요합니다(macOS/Linux 또는 Windows의 WSL). Remotion은 Node.js와 별도 설치가 필요합니다.
+- 시작할 때 실제로 제공된 파일 읽기·터미널·이미지 보기·생성 도구를 확인합니다. 생성 도구가 없으면 프롬프트와 저장 위치를 제공하고 사용자가 만든 파일을 받아 이어갑니다. 구독만으로 API 접근이나 자동 생성을 할 수 있다고 가정하지 않습니다.
+- 이미지를 볼 수 없는 런타임은 사용자의 실제 눈 검수 결과를 요청합니다. 보지 않은 프레임의 검수 기록을 대신 만들지 않습니다. 검사 스크립트 실행이 불가능하면 명령을 전달하고 실제 종료 코드·보고서를 받은 뒤에만 결과를 판단합니다.
+- `STORY.md`는 제공된 템플릿의 한국어 항목명과 표 구조를 유지하고, 내용은 사용자 언어로 채웁니다. 게이트가 이 항목명을 읽습니다. 한국어 외의 `character.txt`에는 색 이름과 함께 `#RRGGBB` 색상 코드를 적습니다(현재 색 검사에서 인식 가능).
 
 ## 0. 시작하기 전에 정할 것
 
@@ -25,7 +36,7 @@ description: 모션 그래픽과 영상(캐릭터 오프닝·홍보 영상 등)�
 
 | 단계 | 하는 일 | 쓰는 도구(예시) | 산출물 |
 |---|---|---|---|
-| 1. 스토리·장면 기획 | 한 줄 줄거리, 장면 목록(시간·장소·행동·대사), 음악 싱크 지점 확정 | Claude | `STORY.md`, 장면 목록 |
+| 1. 스토리·장면 기획 | 한 줄 줄거리, 장면 목록(시간·장소·행동·대사), 음악 싱크 지점 확정 | 현재 에이전트 | `STORY.md`, 장면 목록 |
 | 2. 캐릭터 시트 | 정면·측면·표정·의상을 한 장에 고정한 기준 이미지 | 이미지 생성 도구 | 캐릭터 시트 PNG, 외형 고정문 |
 | 3. 키프레임 | 장면마다 시작 화면 1장씩 생성 | 이미지 생성 도구 | 키프레임 PNG |
 | 4. 영상 변환 | 키프레임을 시작 화면으로 고정하고 3~6초 클립 생성 | 영상 생성 도구 | 장면별 mp4 |
@@ -50,7 +61,7 @@ description: 모션 그래픽과 영상(캐릭터 오프닝·홍보 영상 등)�
 단계의 산출물은 `harness/gate.py`가 측정해서 종료 코드로 판정합니다. 게이트가 통과(종료 코드 0)하기 전에는 다음 단계로 넘어가지 않고, 완료라고 보고하지 않습니다.
 
 ```
-python3 harness/gate.py <단계> <프로젝트폴더>
+python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 ```
 
 | 제작 단계 | 게이트 | 하는 검사 |
@@ -65,11 +76,11 @@ python3 harness/gate.py <단계> <프로젝트폴더>
 
 - 프로젝트 폴더 규칙은 `harness/gate.py` 첫머리에 있습니다. (`STORY.md`, `character.txt`, `voices.json`, `edit.json`, `sheet/`, `key/`, `clip/`, `out/final.mp4`, `qa/`) 클립 이름, 키프레임 이름, `edit.json`의 `clip:<이름>@<시작초>`는 같은 이름을 씁니다.
 - 게이트는 `qa/gate-<단계>.txt`에 보고서를 남깁니다. 보고할 때는 이 파일의 `BLOCK`, `WARN` 줄을 그대로 인용합니다.
-- 눈으로 봐야 하는 검사는 기록 파일을 요구합니다. Claude는 프레임 스트립과 컨택트 시트를 실제로 본 뒤에만 아래 줄을 씁니다.
+- 눈으로 봐야 하는 검사는 기록 파일을 요구합니다. 에이전트가 프레임 스트립과 컨택트 시트를 실제로 보거나 사용자의 실제 검수 결과를 받은 뒤에만 아래 줄을 씁니다.
   - `qa/clips-review.md`: `REVIEWED: <이름> <YYYY-MM-DD>` 줄과, 클립마다 `<클립 이름>: ok|trim|redo|replace` 줄. `redo`, `replace`가 남아 있으면 통과하지 못합니다. 키프레임이 없는 클립은 `nokey: <클립 이름>` 줄로 허용합니다.
   - `qa/review.md`: `REVIEWED: <이름> <YYYY-MM-DD>` 줄과, 본 결과를 적은 줄. 최종본(`out/final.mp4`)보다 나중에 작성해야 합니다.
 - 임계값은 환경 변수로 바꿉니다. (`GATE_SSIM_START`, `GATE_LUFS`, `GATE_LUFS_TOL`, `GATE_TP_MAX`)
-- 게이트를 고치거나 새 검사를 더하면 `bash harness/selftest.sh`가 종료 코드 0으로 끝나야 합니다. 막아야 할 사례를 합성 프로젝트로 실제로 막는지 확인하는 셀프테스트이고, 새 검사에는 막아야 할 사례를 함께 추가합니다.
+- 게이트를 고치거나 새 검사를 더하면 `bash "$SKILL_ROOT/harness/selftest.sh"`가 종료 코드 0으로 끝나야 합니다. 막아야 할 사례를 합성 프로젝트로 실제로 막는지 확인하는 셀프테스트이고, 새 검사에는 막아야 할 사례를 함께 추가합니다.
 
 ## 단계별 상세
 

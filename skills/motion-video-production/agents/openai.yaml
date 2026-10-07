@@ -1,0 +1,4 @@
+interface:
+  display_name: "Motion Video Production"
+  short_description: "Plan, assemble, and review motion graphics and character videos"
+  default_prompt: "Use $motion-video-production to plan a 30-second character opening video and check available tools before production."
