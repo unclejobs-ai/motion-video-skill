@@ -154,6 +154,10 @@ skills/motion-video-production/        설치하는 스킬 폴더 (아래 전체
 
 Remotion 컴포지션 코드는 이 저장소에 포함되어 있지 않습니다. Remotion을 직접 설치해 사용합니다.
 
+## 만든 곳
+
+이 스킬은 [SceneSteller](https://www.scenesteller.com/?utm_source=github&utm_medium=readme&utm_campaign=motion-video-skill)를 만드는 팀이 영상 제작 과정에서 쌓은 점검 기준을 정리한 것입니다. 스토리에서 영상까지 브라우저에서 바로 만들어 보고 싶다면 SceneSteller를 사용해 보세요.
+
 ## 책임 범위
 
 생성물의 권리와 책임은 `NOTICE.md`와 `skills/motion-video-production/references/licensing.md`에 있습니다.

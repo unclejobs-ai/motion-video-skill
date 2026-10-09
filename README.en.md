@@ -154,6 +154,10 @@ skills/motion-video-production/        Skill folder to install (everything below
 
 Remotion composition code is not included in this repository. Install Remotion separately to use it.
 
+## Built by
+
+This skill distills the review criteria the team behind [SceneSteller](https://www.scenesteller.com/?utm_source=github&utm_medium=readme&utm_campaign=motion-video-skill) built up while producing videos. If you'd rather go from story to finished video right in your browser, try it in SceneSteller.
+
 ## Rights and responsibilities
 
 Rights and responsibilities for generated outputs are described in `NOTICE.md` and `skills/motion-video-production/references/licensing.md`.
