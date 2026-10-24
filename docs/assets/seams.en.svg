@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1010" viewBox="0 0 720 1010" role="img" aria-labelledby="seams-title seams-desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="884" viewBox="0 0 720 884" role="img" aria-labelledby="seams-title seams-desc">
   <title id="seams-title">Where consistency checks belong</title>
-  <desc id="seams-desc">Seven consistency criteria mapped to production stages. Story has none; criteria 01 and 06 apply at two seams.</desc>
+  <desc id="seams-desc">Seven consistency criteria mapped to production stages. Only applicable stages are shown; criteria 01 and 06 apply at two stages.</desc>
   <defs>
     <style>
       text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
@@ -15,49 +15,45 @@
     </style>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
   </defs>
-  <rect width="720" height="1010" fill="#FFFFFF"/>
+  <rect width="720" height="884" fill="#FFFFFF"/>
   <text x="40" y="68" class="title">Where consistency checks belong</text>
-  <text x="40" y="112" class="muted">One criterion can apply at more than one seam.</text>
+  <text x="40" y="112" class="muted">One criterion can apply at more than one stage.</text>
   <text x="40" y="168" class="label">STAGE</text>
   <text x="350" y="168" class="label">APPLICABLE CRITERIA</text>
   <path d="M40 192H680" class="rule"/>
-  <text x="40" y="232" class="mono muted">1</text>
-  <text x="100" y="232" class="heading">Story</text>
-  <text x="100" y="270" class="muted">STORY.md</text>
-  <text x="350" y="232" class="muted">None</text>
-  <path d="M56 250v50" class="flow"/>
-  <path d="M40 318H680" class="rule"/>
+  <g transform="translate(0 -126)">
   <text x="40" y="358" class="mono muted">2</text>
   <text x="100" y="358" class="heading">Character sheet</text>
   <text x="100" y="396" class="muted">PNG</text>
-  <text x="350" y="358">Rule 01 · Character sheet</text>
+  <text x="350" y="358">Criterion 01 · Sheet</text>
   <path d="M56 376v50" class="flow"/>
   <path d="M40 444H680" class="rule"/>
   <text x="40" y="484" class="mono muted">3</text>
   <text x="100" y="484" class="heading">Keyframes</text>
   <text x="100" y="522" class="muted">One per scene</text>
-  <text x="350" y="484">Rule 01 · Character sheet</text>
-  <text x="350" y="520">Rule 02 · Appearance text</text>
+  <text x="350" y="484">Criterion 01 · Sheet</text>
+  <text x="350" y="520">Criterion 02 · Look text</text>
   <path d="M56 502v50" class="flow"/>
   <path d="M40 570H680" class="rule"/>
   <text x="40" y="610" class="mono muted">4</text>
   <text x="100" y="610" class="heading">Video clips</text>
   <text x="100" y="648" class="muted">Clips</text>
-  <text x="350" y="610">Rule 03 · Start frame</text>
+  <text x="350" y="610">Criterion 03 · Start frame</text>
   <path d="M56 628v50" class="flow"/>
   <path d="M40 696H680" class="rule"/>
   <text x="40" y="736" class="mono muted">5</text>
   <text x="100" y="736" class="heading">Music and voice</text>
   <text x="100" y="774" class="muted">BPM · voice ID</text>
-  <text x="350" y="736">Rule 04 · Voice ID</text>
-  <text x="350" y="772">Rule 06 · Music beats</text>
+  <text x="350" y="736">Criterion 04 · Voice ID</text>
+  <text x="350" y="772">Criterion 06 · Music beats</text>
   <path d="M56 754v50" class="flow"/>
   <path d="M40 822H680" class="rule"/>
   <text x="40" y="862" class="mono muted">6</text>
   <text x="100" y="862" class="heading">Assembly</text>
   <text x="100" y="900" class="muted">Either engine</text>
-  <text x="350" y="862">Rule 05 · Lip timing</text>
-  <text x="350" y="898">Rule 06 · Music beats</text>
-  <text x="350" y="934">Rule 07 · Quality review</text>
+  <text x="350" y="862">Criterion 05 · Lip timing</text>
+  <text x="350" y="898">Criterion 06 · Music beats</text>
+  <text x="350" y="934">Criterion 07 · Review</text>
   <path d="M40 970H680" class="rule"/>
+  </g>
 </svg>

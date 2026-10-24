@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1010" viewBox="0 0 720 1010" role="img" aria-labelledby="seams-title seams-desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="884" viewBox="0 0 720 884" role="img" aria-labelledby="seams-title seams-desc">
   <title id="seams-title">일관성 7가지가 놓이는 자리</title>
-  <desc id="seams-desc">제작 단계별로 걸리는 일관성 기준이에요. 스토리 단계에는 없어요. 기준 01과 06은 두 이음새에 걸려요.</desc>
+  <desc id="seams-desc">제작 단계별로 걸리는 일관성 기준이에요. 기준이 있는 단계만 보여요. 기준 01과 06은 두 단계에 걸려요.</desc>
   <defs>
     <style>
       text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
@@ -15,18 +15,13 @@
     </style>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
   </defs>
-  <rect width="720" height="1010" fill="#FFFFFF"/>
+  <rect width="720" height="884" fill="#FFFFFF"/>
   <text x="40" y="68" class="title">일관성 7가지가 놓이는 자리</text>
-  <text x="40" y="112" class="muted">같은 기준이 두 이음새에 놓일 수 있어요.</text>
+  <text x="40" y="112" class="muted">같은 기준이 두 단계에 놓일 수 있어요.</text>
   <text x="40" y="168" class="label">제작 단계</text>
   <text x="350" y="168" class="label">걸리는 기준</text>
   <path d="M40 192H680" class="rule"/>
-  <text x="40" y="232" class="mono muted">1</text>
-  <text x="100" y="232" class="heading">스토리</text>
-  <text x="100" y="270" class="muted">STORY.md</text>
-  <text x="350" y="232" class="muted">없음</text>
-  <path d="M56 250v50" class="flow"/>
-  <path d="M40 318H680" class="rule"/>
+  <g transform="translate(0 -126)">
   <text x="40" y="358" class="mono muted">2</text>
   <text x="100" y="358" class="heading">캐릭터 시트</text>
   <text x="100" y="396" class="muted">PNG</text>
@@ -60,4 +55,5 @@
   <text x="350" y="898">기준 06 · 음악 박자</text>
   <text x="350" y="934">기준 07 · 품질 검수</text>
   <path d="M40 970H680" class="rule"/>
+  </g>
 </svg>

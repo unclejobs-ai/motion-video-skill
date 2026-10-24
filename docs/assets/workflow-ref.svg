@@ -18,11 +18,9 @@
   <rect width="720" height="1324" fill="#FFFFFF"/>
   <text x="40" y="68" class="title">제작 단계와 단계별 게이트</text>
   <text x="40" y="112" class="muted">만들고 검사한 뒤 다음 단계로 가요.</text>
-  <text x="680" y="112" class="mono muted" text-anchor="end">gate.py</text>
   <path d="M40 152H680" class="rule"/>
   <text x="40" y="192" class="mono muted">0</text>
   <text x="100" y="192" class="heading">레퍼런스 분석</text>
-  <text x="680" y="192" class="mono accent" text-anchor="end">ref</text>
   <text x="100" y="228" class="muted">OpenCV</text>
   <text x="100" y="262" class="mono">ref/ANALYSIS.md</text>
   <text x="100" y="294" class="mono">ref/targets.json</text>
@@ -30,42 +28,36 @@
   <path d="M40 316H680" class="rule"/>
   <text x="40" y="356" class="mono muted">1</text>
   <text x="100" y="356" class="heading">스토리·장면</text>
-  <text x="680" y="356" class="mono accent" text-anchor="end">story</text>
   <text x="100" y="392" class="muted">에이전트</text>
   <text x="100" y="426" class="mono">STORY.md</text>
   <path d="M56 376v50" class="flow"/>
   <path d="M40 448H680" class="rule"/>
   <text x="40" y="488" class="mono muted">2</text>
   <text x="100" y="488" class="heading">캐릭터 시트</text>
-  <text x="680" y="488" class="mono accent" text-anchor="end">character</text>
   <text x="100" y="524" class="muted">이미지 생성</text>
   <text x="100" y="558" class="mono">character.txt · sheet/*.png</text>
   <path d="M56 508v50" class="flow"/>
   <path d="M40 580H680" class="rule"/>
   <text x="40" y="620" class="mono muted">3</text>
   <text x="100" y="620" class="heading">키프레임</text>
-  <text x="680" y="620" class="mono accent" text-anchor="end">keyframes</text>
   <text x="100" y="656" class="muted">이미지 생성</text>
   <text x="100" y="690" class="mono">key/*.png</text>
   <path d="M56 640v50" class="flow"/>
   <path d="M40 712H680" class="rule"/>
   <text x="40" y="752" class="mono muted">4</text>
   <text x="100" y="752" class="heading">영상 변환</text>
-  <text x="680" y="752" class="mono accent" text-anchor="end">clips</text>
   <text x="100" y="788" class="muted">영상 생성</text>
   <text x="100" y="822" class="mono">clip/*.mp4</text>
   <path d="M56 772v50" class="flow"/>
   <path d="M40 844H680" class="rule"/>
   <text x="40" y="884" class="mono muted">5</text>
   <text x="100" y="884" class="heading">음악·목소리</text>
-  <text x="680" y="884" class="mono accent" text-anchor="end">audio</text>
   <text x="100" y="920" class="muted">composio · score</text>
   <text x="100" y="954" class="mono">voices.json · audio/*.wav</text>
   <path d="M56 904v50" class="flow"/>
   <path d="M40 976H680" class="rule"/>
   <text x="40" y="1016" class="mono muted">6</text>
   <text x="100" y="1016" class="heading">조립</text>
-  <text x="680" y="1016" class="mono accent" text-anchor="end">edit / final</text>
   <text x="100" y="1052" class="muted">바꿔 끼우는 엔진</text>
   <text x="100" y="1086" class="mono">Remotion · HyperFrames</text>
   <path d="M40 1108H680" class="rule"/>

@@ -19,43 +19,36 @@
   <text x="40" y="68" class="title">레퍼런스 분석 파이프라인</text>
   <text x="40" y="112" class="muted">같은 지표로 목표와 완성본을 비교해요.</text>
   <path d="M40 152H680" class="rule"/>
-  <text x="40" y="192" class="mono muted">01</text>
   <text x="100" y="192" class="heading">레퍼런스 영상</text>
   <text x="100" y="230" class="mono">reference.mp4</text>
   <text x="100" y="264" class="muted">원본 대신 숫자만 남겨요.</text>
   <path d="M56 212v50" class="flow"/>
   <path d="M40 292H680" class="rule"/>
-  <text x="40" y="332" class="mono muted">02</text>
   <text x="100" y="332" class="heading">분석 · ref-analyze.py</text>
   <text x="100" y="370" class="muted">컷·홀드 · 광학 흐름 · 블러</text>
   <text x="100" y="404" class="muted">심도 띠 · 그레인 · 질감</text>
   <path d="M56 352v50" class="flow"/>
   <path d="M40 432H680" class="rule"/>
-  <text x="40" y="472" class="mono muted">03</text>
   <text x="100" y="472" class="heading">목표 · ref/targets.json</text>
   <text x="100" y="510" class="muted">지표별 목표와 허용 오차</text>
   <text x="100" y="544" class="muted">ANALYSIS.md에서 인용해요.</text>
   <path d="M56 492v50" class="flow"/>
   <path d="M40 572H680" class="rule"/>
-  <text x="40" y="612" class="mono muted">04</text>
   <text x="100" y="612" class="heading">계획</text>
   <text x="100" y="650" class="mono">plan.mjs · look-fit.mjs</text>
   <text x="100" y="684" class="mono">BEATSHEET.md</text>
   <path d="M56 632v50" class="flow"/>
   <path d="M40 712H680" class="rule"/>
-  <text x="40" y="752" class="mono muted">05</text>
   <text x="100" y="752" class="heading">바꿔 끼우는 엔진</text>
   <text x="100" y="790" class="mono">Remotion · carry</text>
   <text x="100" y="824" class="mono">HyperFrames · HTML</text>
   <path d="M56 772v50" class="flow"/>
   <path d="M40 852H680" class="rule"/>
-  <text x="40" y="892" class="mono muted">06</text>
   <text x="100" y="892" class="heading">완성본 · out/final.mp4</text>
   <text x="100" y="930" class="mono">mix-mux.sh · verify.sh</text>
   <text x="100" y="964" class="muted">음악·목소리를 입힌 완성본이에요.</text>
   <path d="M56 912v50" class="flow"/>
   <path d="M40 992H680" class="rule"/>
-  <text x="40" y="1032" class="mono muted">07</text>
   <text x="100" y="1032" class="heading">렌더 분석 · ref-analyze.py</text>
   <text x="100" y="1070" class="mono">qa/render-analysis.json</text>
   <text x="100" y="1104" class="muted">레퍼런스와 같은 분석기로 재요.</text>

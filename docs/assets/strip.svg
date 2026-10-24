@@ -1,21 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="392" viewBox="0 0 800 392" role="img" aria-labelledby="strip-title strip-desc">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="210" viewBox="0 0 800 210" role="img" aria-labelledby="strip-title strip-desc">
   <title id="strip-title">프레임 스트립</title>
-  <desc id="strip-desc">시작 화면이 같아도 1초 뒤에 인물이 달라져요. gate clips가 클립마다 qa/strip-&lt;클립&gt;.png로 만들어요.</desc>
+  <desc id="strip-desc">키프레임과 클립의 다섯 화면을 비교해 인물 변화를 찾아요.</desc>
   <style>
-    text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 32px; fill: #242824; }
+    text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 18px; fill: #242824; }
     .title { font-size: 34px; font-weight: 700; }
     .label { fill: #626860; }
   </style>
-  <rect width="800" height="392" fill="#FFFFFF"/>
+  <rect width="800" height="210" fill="#FFFFFF"/>
   <text x="20" y="54" class="title">프레임 스트립</text>
-  <image x="20" y="88" width="759" height="70" xlink:href="strip-frames.png"/>
-  <text x="83.25" y="198" class="label" text-anchor="middle">키프레임</text>
-  <text x="209.75" y="198" class="label" text-anchor="middle">0초</text>
-  <text x="336.25" y="198" class="label" text-anchor="middle">1.0초</text>
-  <text x="462.75" y="198" class="label" text-anchor="middle">1.5초</text>
-  <text x="589.25" y="198" class="label" text-anchor="middle">2.0초</text>
-  <text x="715.75" y="198" class="label" text-anchor="middle">3.0초</text>
-  <text x="20" y="264">시작 화면이 같아도 1초 뒤에 인물이 달라져요.</text>
-  <text x="20" y="308">gate clips가 클립마다</text>
-  <text x="20" y="352">qa/strip-&lt;클립&gt;.png로 만들어요.</text>
+  <svg x="20" y="88" width="120" height="66.4" viewBox="0 0 253 140"><image width="1518" height="140" xlink:href="strip-frames.png"/></svg>
+  <text x="80" y="185" class="label" text-anchor="middle">키프레임</text>
+  <svg x="156" y="88" width="120" height="66.4" viewBox="253 0 253 140"><image width="1518" height="140" xlink:href="strip-frames.png"/></svg>
+  <text x="216" y="185" class="label" text-anchor="middle">0초</text>
+  <svg x="282" y="88" width="120" height="66.4" viewBox="506 0 253 140"><image width="1518" height="140" xlink:href="strip-frames.png"/></svg>
+  <text x="342" y="185" class="label" text-anchor="middle">1.0초</text>
+  <svg x="408" y="88" width="120" height="66.4" viewBox="759 0 253 140"><image width="1518" height="140" xlink:href="strip-frames.png"/></svg>
+  <text x="468" y="185" class="label" text-anchor="middle">1.5초</text>
+  <svg x="534" y="88" width="120" height="66.4" viewBox="1012 0 253 140"><image width="1518" height="140" xlink:href="strip-frames.png"/></svg>
+  <text x="594" y="185" class="label" text-anchor="middle">2.0초</text>
+  <svg x="660" y="88" width="120" height="66.4" viewBox="1265 0 253 140"><image width="1518" height="140" xlink:href="strip-frames.png"/></svg>
+  <text x="720" y="185" class="label" text-anchor="middle">3.0초</text>
 </svg>

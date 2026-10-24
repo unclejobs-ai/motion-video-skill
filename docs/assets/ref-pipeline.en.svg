@@ -19,43 +19,36 @@
   <text x="40" y="68" class="title">Reference analysis pipeline</text>
   <text x="40" y="112" class="muted">Compare targets and results with the same metrics.</text>
   <path d="M40 152H680" class="rule"/>
-  <text x="40" y="192" class="mono muted">01</text>
   <text x="100" y="192" class="heading">Reference video</text>
   <text x="100" y="230" class="mono">reference.mp4</text>
   <text x="100" y="264" class="muted">Keep numbers, not the source file.</text>
   <path d="M56 212v50" class="flow"/>
   <path d="M40 292H680" class="rule"/>
-  <text x="40" y="332" class="mono muted">02</text>
   <text x="100" y="332" class="heading">Analysis · ref-analyze.py</text>
   <text x="100" y="370" class="muted">Cuts · holds · optical flow · blur</text>
   <text x="100" y="404" class="muted">Depth bands · grain · look</text>
   <path d="M56 352v50" class="flow"/>
   <path d="M40 432H680" class="rule"/>
-  <text x="40" y="472" class="mono muted">03</text>
   <text x="100" y="472" class="heading">Targets · ref/targets.json</text>
   <text x="100" y="510" class="muted">Targets and tolerances per metric</text>
   <text x="100" y="544" class="muted">Cited in ANALYSIS.md</text>
   <path d="M56 492v50" class="flow"/>
   <path d="M40 572H680" class="rule"/>
-  <text x="40" y="612" class="mono muted">04</text>
   <text x="100" y="612" class="heading">Plan</text>
   <text x="100" y="650" class="mono">plan.mjs · look-fit.mjs</text>
   <text x="100" y="684" class="mono">BEATSHEET.md</text>
   <path d="M56 632v50" class="flow"/>
   <path d="M40 712H680" class="rule"/>
-  <text x="40" y="752" class="mono muted">05</text>
   <text x="100" y="752" class="heading">Swappable engine</text>
   <text x="100" y="790" class="mono">Remotion · carry</text>
   <text x="100" y="824" class="mono">HyperFrames · HTML</text>
   <path d="M56 772v50" class="flow"/>
   <path d="M40 852H680" class="rule"/>
-  <text x="40" y="892" class="mono muted">06</text>
   <text x="100" y="892" class="heading">Result · out/final.mp4</text>
   <text x="100" y="930" class="mono">mix-mux.sh · verify.sh</text>
   <text x="100" y="964" class="muted">Finished video with music and voice</text>
   <path d="M56 912v50" class="flow"/>
   <path d="M40 992H680" class="rule"/>
-  <text x="40" y="1032" class="mono muted">07</text>
   <text x="100" y="1032" class="heading">Render analysis · ref-analyze.py</text>
   <text x="100" y="1070" class="mono">qa/render-analysis.json</text>
   <text x="100" y="1104" class="muted">Measure with the same analyzer.</text>
