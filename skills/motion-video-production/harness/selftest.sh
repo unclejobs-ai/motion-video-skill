@@ -111,6 +111,25 @@ B=$(mut shortaudio); ff -i "$W/good/out/final.mp4" -t 2 -vn -af "loudnorm=I=-14:
 B=$(mut fps25); ff -i "$W/good/out/final.mp4" -vf fps=25 -c:a copy "$B/out/final.mp4"; sleep 1; touch "$B/qa/review.md"; expect "fps 가 edit.json 과 다름" 1 final "$B" F08
 B=$(mut silent); ff -i "$W/good/out/final.mp4" -an -c:v copy "$B/out/final.mp4"; sleep 1; touch "$B/qa/review.md"; expect "오디오 없는 최종본" 1 final "$B" F03
 
+# ---- ref (레퍼런스 분석: 계획 전 기록, 렌더 후 목표값 비교)
+make_ref() { # $1 = 폴더. 빈칸 없는 ANALYSIS.md 와 지표 2개짜리 targets.json
+  mkdir -p "$1/ref"
+  sed 's/<[^<>]*>/채움/g' "$HERE/../templates/ANALYSIS.md" > "$1/ref/ANALYSIS.md"
+  echo '{"metrics":{"edit.stillShare":{"target":0.46,"tol":0.25},"motion.meanFlow":{"target":2.0,"tol":0.35}}}' > "$1/ref/targets.json"
+}
+render_analysis() { # $1 = 폴더  $2 = stillShare  $3 = meanFlow
+  echo "{\"edit\":{\"stillShare\":$2},\"motion\":{\"meanFlow\":$3}}" > "$1/qa/render-analysis.json"
+}
+expect "ref/ 없으면 건너뜀" 0 ref "$W/good"
+B=$(mut ref_nomd); make_ref "$B"; rm "$B/ref/ANALYSIS.md"; expect "ANALYSIS.md 없음" 1 ref "$B" R01
+B=$(mut ref_blank); make_ref "$B"; cp "$HERE/../templates/ANALYSIS.md" "$B/ref/ANALYSIS.md"; expect "ANALYSIS.md 빈칸 남음" 1 ref "$B" R02
+B=$(mut ref_notargets); make_ref "$B"; rm "$B/ref/targets.json"; expect "targets.json 없음" 1 ref "$B" R03
+B=$(mut ref_noanalysis); make_ref "$B"; expect "최종본은 있는데 렌더 분석 없음" 1 ref "$B" R04
+B=$(mut ref_stale); make_ref "$B"; render_analysis "$B" 0.5 2.1; touch -t 202001010000 "$B/qa/render-analysis.json"; expect "렌더 분석이 최종본보다 오래됨" 1 ref "$B" R04
+B=$(mut ref_ok); make_ref "$B"; render_analysis "$B" 0.5 2.1; expect "렌더가 목표 허용 범위 안" 0 ref "$B"
+B=$(mut ref_off); make_ref "$B"; render_analysis "$B" 0.67 2.1; expect "정지 프레임이 목표보다 46% 많음" 1 ref "$B" R05
+B=$(mut ref_plan); make_ref "$B"; rm "$B/out/final.mp4"; expect "렌더 전에는 기록만 확인" 0 ref "$B"
+
 # ---- 회귀: ICC 프로파일이 붙은 클립도 프레임 수를 읽는다 (PIL 필요, 없으면 건너뜀)
 if python3 -c "import PIL" 2>/dev/null; then
   B=$(mut icc); mkdir -p "$B/_f"
