@@ -27,7 +27,7 @@
 
 1. 엔진을 복사해 설치해요(`references/engines.md`).
 2. `productions/wordcut/data.ts`에 단어, 장면 문구, 끝 문구를 키워드로 채워요.
-3. 마무리 이미지를 엔진 폴더의 `public/closing.jpg`로 두고 `data.ts`의 `closing`을 `'closing.jpg'`로 바꿔요. 마지막 2초에 이미지로 넘어가 멈추고, 단어는 같은 자리에 남아요.
+3. 마무리 이미지를 엔진 폴더의 `public/closing.jpg`로 두고 `data.ts`의 `closing`을 `'closing.jpg'`로 바꿔요. 마지막 2초에 이미지로 넘어가 멈추고, 단어는 같은 자리에 남아요. 이미지가 페이지를 덮는 경계는 carry 검사에서 bare로 세져서, 데모에서는 carry 점수가 0.50(WARN, FAIL 바로 위)으로 내려갔어요. 단어가 이미지 위에 남는 것이 이 경계의 carry이고, 점수가 0.5 아래로 내려가면 다른 경계를 carry로 바꿔요.
 4. 레퍼런스 분석이 있으면 `node productions/wordcut/plan.mjs ref/analysis.json <초>`로 타이밍을 뽑아요.
 5. `node productions/wordcut/render.mjs video 9x16`로 렌더하고, `drift.mjs`와 `verify.sh`로 재요. 레퍼런스가 있으면 `gate.py ref`로 비교해요.
 
