@@ -1,0 +1,4 @@
+{
+  "narrator": { "provider": "elevenlabs", "voice": "<ElevenLabs voice_id>", "model": "eleven_v3" },
+  "mascot": { "provider": "fish", "voice": "<Fish Audio model_id>", "temperature": 0.8 }
+}
