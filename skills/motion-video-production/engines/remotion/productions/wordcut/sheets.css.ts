@@ -17,7 +17,7 @@ export const CSS = `
 .wc .post{background:var(--night);color:var(--night-ink);text-shadow:0 0 6px rgba(233,231,225,.35)}
 .wc .post .meta{font-size:12px;color:#8d8b85;margin-bottom:14px}
 .wc .post h4{margin:0 0 14px;font-size:21px;font-weight:700}
-.wc .post .tags{font-size:13px;color:#7fb0ff}
+.wc .post .tags{font-size:13px;color:#8d8b85}
 .wc .receipt{width:min(calc(92 * var(--vw)),420px);background:#fbfaf6;font-family:var(--mono);font-size:14px;line-height:1.9;padding:26px 22px;box-shadow:0 0 0 1px #e6e1d5}
 .wc .receipt .c{text-align:center}.wc .receipt .row{display:flex;justify-content:space-between;gap:12px}
 .wc .receipt hr{border:0;border-top:1px dashed #b9b3a5;margin:8px 0}

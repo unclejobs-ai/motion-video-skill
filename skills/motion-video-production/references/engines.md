@@ -53,6 +53,8 @@ Node.js 24 이상이 필요합니다(`.ts` 파일을 바로 실행). 모든 의�
 - **마무리 이미지**: `data.ts`의 `closing`에 엔진 `public/` 폴더의 이미지 파일 이름을 넣으면 마지막 2초에 그 이미지로 넘어가 멈추고 단어는 자리에 남습니다(`references/brand-intro.md`).
 - **렌더**: `node productions/wordcut/render.mjs video [9x16|16x9]` → `renders/wordcut/wordcut-<화면비>.mp4`
 - **한 자리 확인**: `node productions/wordcut/drift.mjs [9x16|16x9]` (픽셀 측정, 0.5px 넘게 움직이면 종료 코드 1)
+- **첫 프레임은 페이지가 아니라 미드숏입니다**: 단어가 화면 가운데에 있고, 단어 줄만 선명한 초점 띠가 있고, 렌즈 질감(RGB 분리, 그레인, 비네트)이 0프레임부터 켜져 있고, 페이지 크롬(메타 줄, 카드 테두리)이 보이지 않고, 하이라이트가 유일한 색입니다. 첫 장면은 페이지보다 더 밀어 들어가 단어 줄이 양쪽 끝을 넘고, 초점 띠와 RGB 분리는 `timing.ts`의 `opener`대로 9프레임에 걸쳐 풀립니다. 해시태그 같은 다른 색 글자는 회색으로 둡니다.
+- **첫 프레임 확인**: `node productions/wordcut/frame0.mjs --check` (렌더한 영상의 0프레임에서 단어 중심이 가로 5%, 세로 12%를 넘게 벗어나거나 초점 비율이 2 미만이면 종료 코드 1)
 - **질감 맞추기**: `node productions/wordcut/look-fit.mjs "$PROJECT_ROOT/ref/analysis.json"` → 결과를 `look.ts`에 붙여 넣습니다. 렌더 한 번에 스틸 30장을 여러 번 렌더하므로 오래 걸립니다.
 - 글꼴: Pretendard, 나눔명조, JetBrains Mono. 모두 SIL OFL 1.1 npm 패키지이고 버전이 고정돼 있습니다.
 

@@ -134,7 +134,7 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 - **carry가 기본 경계입니다.** 비트 경계마다 화면에 있던 요소가 살아남아 다음 비트로 움직이거나 커집니다. 아무것도 남지 않는 장면 교체는 몰아치기 안이나 엔드카드로 갈 때만 씁니다. 어휘는 `references/art-direction.md`에 있습니다.
 - Remotion: 모션은 `motions/`의 순수 함수로, 작품별 기하는 순수 `scene(t)`로 씁니다. 화면과 `track.ts`가 같은 `scene(t)`를 읽습니다. 렌더 전에 `node pipeline/probe.mjs productions/<id>`로 carry를 재고(0.5 미만 FAIL), 스틸(`node pipeline/render.mjs <id> --stills 0.5 1.5 3.0`)을 직접 본 뒤 영상을 렌더합니다(`renders/<id>/`). `productions/carry-demo/`가 모든 파일의 예시입니다.
 - 비트 시트는 `templates/BEATSHEET.md`로 `timing.ts`와 함께 씁니다. 모든 경계에 살아남는 요소를 적습니다.
-- 단어 하나를 여러 장면이 넘겨받는 영상은 `productions/wordcut/`의 `data.ts`만 바꿔서 만듭니다. 레퍼런스가 있으면 `node productions/wordcut/plan.mjs "$PROJECT_ROOT/ref/analysis.json" <초>`로 타이밍을 뽑고, `node productions/wordcut/drift.mjs`가 단어가 한 자리에 있는지 픽셀로 잽니다(0.5px 초과면 종료 코드 1).
+- 단어 하나를 여러 장면이 넘겨받는 영상은 `productions/wordcut/`의 `data.ts`만 바꿔서 만듭니다. 레퍼런스가 있으면 `node productions/wordcut/plan.mjs "$PROJECT_ROOT/ref/analysis.json" <초>`로 타이밍을 뽑고, `node productions/wordcut/drift.mjs`가 단어가 한 자리에 있는지 픽셀로 잽니다(0.5px 초과면 종료 코드 1). 첫 프레임은 페이지가 아니라 미드숏입니다. 단어가 가운데, 단어 줄만 선명한 초점 띠, 0프레임부터 렌즈 질감, 페이지 크롬 없음, 하이라이트만 색. `node productions/wordcut/frame0.mjs --check`가 확인합니다.
 - 목소리는 대사를 먼저 생성하고 길이를 잰 뒤 타이밍을 정합니다(`pipeline/vo.mjs`, `pipeline/vo-assemble.mjs`, composio CLI. `references/providers.md`). 크레딧이 드므로 생성 전에 사용자에게 알립니다.
 - 음악은 `node pipeline/score.mjs productions/<id>`의 기본 스코어로 시작하거나, `templates/MUSIC_BRIEF.md`로 워커에게 맡깁니다.
 - 믹스와 mux는 `bash "$SKILL_ROOT/scripts/mix-mux.sh" <picture.mp4> <fps> <초> <music.wav> <vo.wav|-> <out.mp4>`로 합니다. 프레임 수가 맞을 때만 mux하고, 대사가 나올 때 음악을 낮춥니다.

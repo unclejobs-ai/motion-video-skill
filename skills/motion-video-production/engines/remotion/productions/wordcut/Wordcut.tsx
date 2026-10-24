@@ -77,9 +77,18 @@ export const Wordcut: React.FC<WordcutProps> = ({ aspect, diag = false, look }) 
           <feComponentTransfer>{(['R', 'G', 'B'] as const).map((ch) => React.createElement(`feFunc${ch}`, { key: ch, type: 'gamma', exponent: L.gamma }))}</feComponentTransfer>
           <feComponentTransfer><feFuncB type="table" tableValues={`${L.shadowTint} 1`} /></feComponentTransfer>
         </filter>
+        <filter id="wc-rgb" colorInterpolationFilters="sRGB">
+          {(['1 0 0 0 0', '0 1 0 0 0', '0 0 1 0 0'] as const).map((row, n) => (
+            <React.Fragment key={n}>
+              <feColorMatrix in="SourceGraphic" type="matrix" values={[0, 1, 2].map((m) => (m === n ? row : '0 0 0 0 0')).join(' ') + ' 0 0 0 1 0'} result={`c${n}`} />
+              <feOffset in={`c${n}`} dx={((1 - n) * -c.split).toFixed(2)} result={`o${n}`} />
+            </React.Fragment>
+          ))}
+          <feBlend in="o0" in2="o1" mode="screen" result="rg" /><feBlend in="rg" in2="o2" mode="screen" />
+        </filter>
         <filter id="wc-grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves={1} seed={Math.floor(random(`grain-${f}`) * 1000)} /><feColorMatrix type="saturate" values="0" /></filter>
       </svg>
-      <div ref={root} className={`wc${diag === 'sheet' ? ' diag' : diag === 'slot' ? ' diag-slot' : ''}`} style={{ position: 'absolute', left: 0, top: 0, width: V.w, height: V.h, transform: `scale(${kOut})`, transformOrigin: '0 0', overflow: 'hidden', filter: diag ? undefined : `${L.gamma !== 1 || L.shadowTint ? 'url(#wc-grade) ' : ''}contrast(${L.contrast}) saturate(${L.saturate}) brightness(${L.brightness})`, ['--vw' as string]: `${V.w / 100}px`, ['--vh' as string]: `${V.h / 100}px` }}>
+      <div ref={root} className={`wc${diag === 'sheet' ? ' diag' : diag === 'slot' ? ' diag-slot' : ''}`} style={{ position: 'absolute', left: 0, top: 0, width: V.w, height: V.h, transform: `scale(${kOut})`, transformOrigin: '0 0', overflow: 'hidden', filter: diag ? undefined : `${c.split > 0 ? 'url(#wc-rgb) ' : ''}${L.gamma !== 1 || L.shadowTint ? 'url(#wc-grade) ' : ''}contrast(${L.contrast}) saturate(${L.saturate}) brightness(${L.brightness})`, ['--vw' as string]: `${V.w / 100}px`, ['--vh' as string]: `${V.h / 100}px` }}>
         <div style={{ position: 'absolute', inset: 0, background: bg }} />
         {keys.map((k) => {
           const on = !measuring && k === cur, an = anchors?.[key(k)];
@@ -99,6 +108,15 @@ export const Wordcut: React.FC<WordcutProps> = ({ aspect, diag = false, look }) 
               {[0, 1].map((n) => (
                 <i key={n} style={{ position: 'absolute', left: 0, right: 0, height: '34%', [n ? 'bottom' : 'top']: 0, backdropFilter: `blur(${(L.dof + Math.max(c.bx, c.by) * 0.6).toFixed(2)}px)`, WebkitMaskImage: n ? 'linear-gradient(transparent,#000 65%)' : 'linear-gradient(#000 35%,transparent)' }} />
               ))}
+              {c.band > 0.05 && a && (() => {
+                // the opener's focus band: the word's line and its neighbours stay readable, the blur is full from two
+                // line pitches out and doubles from four (pitch ≈ 1.45 × the word's box height)
+                const pitch = 1.45 * a.h * c.scale;
+                const ring = (sharp: number, full: number, blur: number) => (
+                  <i key={sharp} style={{ position: 'absolute', inset: 0, backdropFilter: `blur(${blur.toFixed(2)}px)`, WebkitMaskImage: `linear-gradient(#000 ${S.y - full}px,transparent ${S.y - sharp}px,transparent ${S.y + sharp}px,#000 ${S.y + full}px)` }} />
+                );
+                return [ring(0.5 * pitch, 2 * pitch, c.band), ring(2.5 * pitch, 4 * pitch, 2 * c.band)];
+              })()}
             </div>
             {a && <Highlight a={a} at={S} scale={c.scale} style={{ background: `linear-gradient(90deg,var(--hl) ${c.hl * 100}%,transparent ${c.hl * 100}%) 0 50%/100% 76% no-repeat` }} />}
             {word}

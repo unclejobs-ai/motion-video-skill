@@ -37,6 +37,8 @@ export type Cam = {
   scale: number;
   /** highlighter width 0..1 on the textbook landing (1 everywhere else) */
   hl: number;
+  /** opener lens, design px: blur outside the word's line (focus band) and the RGB split offset; 0 after cut 0 */
+  band: number; split: number;
 };
 
 /** The textbook's word size at the end of its push, so the dictionary head word continues it without a jump. */
@@ -63,10 +65,14 @@ export function cam(f: number, a: Aspect): Cam {
 
   const kind = kindOf(cur.k);
   let scale = kind === 'dict' ? 1 : V.close;
+  if (i === 0) scale *= T.opener.push[a];
   if (kind === 'textbook') scale *= 1 + T.textbook.push * ease.io(prog(f, T.textbook.pushFrom, T.textbook.pushTo - T.textbook.pushFrom));
   if (kind === 'dict') scale = 1 + T.dict.push * ease.io(prog(f, cur.f, T.seconds * T.fps - cur.f));
   const hl = kind === 'textbook' ? ease.out(prog(f, T.textbook.hlFrom, T.textbook.hlFrames)) : 1;
-  return { i, dx, dy, bx, by, scale, hl };
+  const O = T.opener, rack = 1 - ease.out(prog(f, 1, O.rack - 1));
+  const band = i === 0 ? V.h * (O.bandRest + (O.band - O.bandRest) * rack) : 0;
+  const split = i === 0 ? V.h * (O.splitRest + (O.split - O.splitRest) * rack) : 0;
+  return { i, dx, dy, bx, by, scale, hl, band, split };
 }
 
 // ---- beat-local values ----

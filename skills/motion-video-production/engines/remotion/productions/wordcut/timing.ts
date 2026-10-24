@@ -46,6 +46,10 @@ export const WORDCUT = {
   dict: { push: 0.15, defFrom: dictAt + 15, defStep: 16, defFrames: 14 },
   /** closing image (DATA.closing): fades in over the last 2 s and holds */
   closing: { from: PLAN.seconds * PLAN.fps - 2 * PLAN.fps, frames: 15 },
+  /** frame 0 is a mid-shot, not a page: the opener (cut 0) is pushed in past the page so the word's line runs off both
+   *  edges, a focus band keeps only that line and its neighbours sharp, and an RGB split is on. Both rack open over
+   *  `rack` frames to `bandRest` / `splitRest`. Blur and split are fractions of the frame height. frame0.mjs checks it. */
+  opener: { push: { '9x16': 1.4, '16x9': 2 }, rack: 9, band: 0.003, bandRest: 0, split: 0.0035, splitRest: 0.0006 },
   /** the burst is hard cuts with a one-frame whip; declared as cuts to the probe */
   burst,
 } as const;
