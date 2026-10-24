@@ -6,35 +6,35 @@
 
 [한국어](README.md) · **English**
 
-A **production skill in the Agent Skills format** with a workflow and review criteria for producing motion graphics and videos (30–90 seconds) from start to finish. Codex, Claude Code, and other skill-capable runtimes use the same skill folder.
-It includes a validation script (`harness/gate.py`, referred to below as the gate) that measures the outputs of each of the six production stages and reports pass or fail through exit codes, plus prevention tips for 29 common pitfalls (`references/gotchas.md`).
+A **production skill in the Agent Skills format** for making motion graphics, promo and character videos (15–90 seconds) from start to finish. Codex, Claude Code, and other skill-capable runtimes use the same skill folder.
+Gates (`harness/gate.py`) measure the outputs of each stage and report pass or fail through exit codes. A reference-video analyzer and two ready-to-render engines (Remotion, HyperFrames) ship with it.
 
-**Jump to** · [Installation](#installation) · [Workflow](#workflow) · [Demo](#gate-demo) · [Harness](#harness) · [Tools](#required-tools)
+**Jump to** · [Installation](#installation) · [60-second start](#60-second-start) · [What the full version adds](#what-the-full-version-adds) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Tools](#required-tools) · [Verification scope](#verification-scope)
 
 ---
 
 ## Installation
 
-### Shared installation (Codex, Claude Code, and other runtimes)
+### Shared installation (Codex, Claude Code, other runtimes)
 
-Run this from the project where you want to use the skill. Requires Node.js and npx; select the runtimes you use during installation.
+Run this in the project folder where you want to use the skill. It requires Node.js and npx; select the runtimes you use.
 
 ```bash
 npx skills add unclejobs-ai/motion-video-skill --skill motion-video-production
 ```
 
-To target Codex specifically, use the command below. Add `--global` for a personal installation.
+To target Codex only, run the command below. Add `--global` for personal scope.
 
 ```bash
 npx skills add unclejobs-ai/motion-video-skill --skill motion-video-production --agent codex
 ```
 
-[Vercel skills CLI](https://github.com/vercel-labs/skills) handles installation locations for its supported agents, including Codex, Claude Code, Gemini CLI, Cursor, GitHub Copilot, OpenCode, Amp, Antigravity, and Windsurf. **Installation compatibility and a verified full video production run are different.** Generation tool connections, image viewing, and command execution permissions depend on the runtime environment. See [runtime installation, invocation, and verification scope](docs/runtimes.md).
+The [Vercel skills CLI](https://github.com/vercel-labs/skills) handles install locations for Codex, Claude Code, Gemini CLI, Cursor, GitHub Copilot, OpenCode, Amp, Antigravity, Windsurf, and others. The engines live inside the skill folder, so they install with it. **Installer compatibility is not the same as full video-production validation.** See [runtime installation, invocation, and verification scope](docs/runtimes.md).
 
 <details>
 <summary><strong>Manual installation (without Node.js)</strong></summary>
 
-Codex reads project skills from `.agents/skills/` and personal skills from `~/.agents/skills/`. For a personal installation:
+Codex reads skills from project `.agents/skills/` and personal `~/.agents/skills/`. This example is a personal installation.
 
 ```bash
 git clone https://github.com/unclejobs-ai/motion-video-skill.git
@@ -42,7 +42,7 @@ mkdir -p ~/.agents/skills
 cp -r motion-video-skill/skills/motion-video-production ~/.agents/skills/
 ```
 
-Claude Code reads project skills from `.claude/skills/` and personal skills from `~/.claude/skills/`. The original installation command still works:
+Claude Code reads skills from project `.claude/skills/` and personal `~/.claude/skills/`. The existing installation commands still work.
 
 ```bash
 git clone https://github.com/unclejobs-ai/motion-video-skill.git
@@ -50,109 +50,154 @@ mkdir -p ~/.claude/skills
 cp -r motion-video-skill/skills/motion-video-production ~/.claude/skills/
 ```
 
-To use it only in a specific project, copy the same folder into that runtime's project skill directory. Avoid installing the same skill name in multiple locations for one runtime.
+To use it in one project only, copy the same folder into that project's runtime skill directory. Do not install the same name through several paths in one runtime.
 
 </details>
 
 ### First request
 
-After installation, confirm `motion-video-production` appears in the runtime's skill list. Restart the runtime if it does not appear. Invoke it explicitly with `$motion-video-production` in Codex or `/motion-video-production` in Claude Code and Cursor, or make a request like this:
+After installation, confirm that `motion-video-production` appears in the runtime's skill list. If it does not, restart the runtime. Invoke it with `$motion-video-production` in Codex or `/motion-video-production` in Claude Code and Cursor, or ask:
 
-> I want to make a 30-second opening video featuring a character.
+> I want a 20-second promo video that feels like this reference video.
 
-The agent first asks about four things (how the video will be published, duration and aspect ratio, available tools, and prohibited elements), then works through the stages in order, starting with `STORY.md`. If generation tools are unavailable, it provides prompts and continues with files generated by the user. If it cannot view images, it asks for the user's actual visual review.
+The agent first asks six things (publication type, length and aspect ratio, available tools, prohibited elements, reference video, engine) and proceeds stage by stage. Without generation tools, it hands you prompts and continues from the files you generate.
+
+## 60-second start
+
+Copy an engine out of the installed skill into a working folder and render a demo. Node.js 24 or newer and ffmpeg are required. Never install inside the skill folder.
+
+```bash
+SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # your actual install path
+cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
+node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
+node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
+node pipeline/render.mjs carry-demo                         # renders/carry-demo/picture.mp4
+node pipeline/score.mjs productions/carry-demo              # procedural score
+bash "$SKILL_ROOT/scripts/mix-mux.sh" renders/carry-demo/picture.mp4 60 5 productions/carry-demo/audio/score.wav - out/final.mp4
+bash "$SKILL_ROOT/scripts/verify.sh" out/final.mp4
+```
+
+Rendering uses `CHROME_PATH` or a cached Playwright headless shell. If neither exists, `npx remotion browser ensure` downloads one (ask first).
+
+## What the full version adds
+
+| What | What it does | Where |
+|---|---|---|
+| Remotion engine | Pinned render pipeline, motion modules, demos | `engines/remotion/` |
+| Carry oracle | Measures, before rendering, whether something on screen survives each boundary | `pipeline/carry.ts`, `probe.mjs` |
+| Wordcut template | One word held in one slot while scenes hand it over. Edit only `data.ts` | `productions/wordcut/` |
+| Look fit | Fits lens values to a reference's contrast, colour, grain and depth of field | `look-fit.mjs` |
+| Voice and music | ElevenLabs and Fish Audio voices via the composio CLI, a procedural score on the timing | `vo.mjs`, `score.mjs` |
+| HyperFrames engine | Animates plain HTML/CSS pages with GSAP and renders them to mp4 | `engines/hyperframes/` |
+| Reference analysis | Takes a reference video apart with OpenCV into target numbers | `scripts/ref-analyze.py` |
+
+The engine is swappable. Use Remotion when you need carry and wordcut, HyperFrames when the source material is web pages. The comparison is in [`references/engines.md`](skills/motion-video-production/references/engines.md).
+
+## Reference analysis
+
+![Reference analysis pipeline](docs/assets/ref-pipeline.png)
+
+"Make it like this video" is usually about motion and editing more than texture. Stage 0 takes the reference apart with OpenCV and records cuts and holds, optical flow, blur, depth of field, grain and look as numbers. The plan cites those numbers. After rendering, the same analysis measures the result, and `gate.py ref` lists target and difference per metric and blocks when one is out of range.
+
+```bash
+python3 -I "$SKILL_ROOT/scripts/ref-analyze.py" reference.mp4 -o ref/analysis.json --targets ref/targets.json
+python3 "$SKILL_ROOT/harness/gate.py" ref .
+```
+
+Motion is measured per 1/30 s, so different frame rates compare. The reference file is never committed; only the numbers are kept. Metric explanations and a worked example are in [`references/reference-analysis.md`](skills/motion-video-production/references/reference-analysis.md).
 
 ## Workflow
 
-![The six production stages and their gates](docs/assets/workflow.png)
+![Production stages and their gates](docs/assets/workflow-ref.png)
 
-1. The skill creates the stage outputs (`STORY.md`, `character.txt`, `key/`, `clip/`, `voices.json`, `edit.json`).
-2. Set `SKILL_ROOT` to the parent directory of the installed `SKILL.md` and `PROJECT_ROOT` to the output project directory. At the end of each stage, run `python3 "$SKILL_ROOT/harness/gate.py" <stage> "$PROJECT_ROOT"`.
-3. Exit code 0 means you can move to the next stage. If the exit code is 1 (BLOCK), read the BLOCK lines in `qa/gate-<stage>.txt`, fix the outputs, and run the same gate again.
-4. The script cannot judge checks that require visual inspection. Passing requires review records (`qa/clips-review.md`, `qa/review.md`) written after inspecting the frame strips.
+1. The skill creates the stage outputs (`ref/`, `STORY.md`, `character.txt`, `key/`, `clip/`, `voices.json`, `edit.json`).
+2. Set `SKILL_ROOT` to the parent folder of the installed `SKILL.md` and `PROJECT_ROOT` to the output folder. After each stage, run `python3 "$SKILL_ROOT/harness/gate.py" <stage> "$PROJECT_ROOT"`.
+3. Exit code 0 moves to the next stage. Exit code 1 (BLOCK) means: read the BLOCK lines in `qa/gate-<stage>.txt`, fix the output, and rerun the same gate.
+4. Checks that need human eyes cannot be judged by a script. They pass only with a record written after looking at the frames (`qa/clips-review.md`, `qa/review.md`).
 
 ### Gate demo
 
-This is an example of running `gate.py clips`. Without a visual review record, it returns BLOCK (exit code 1); with the record, it returns PASS (exit code 0). Write the record after opening the frame strip image (`qa/strip-<clip>.png`).
+A `gate.py clips` run. Without a visual review record it returns BLOCK (exit code 1); after the record is written it returns PASS (exit code 0).
 
-![Running gate clips: BLOCK, visual review record, PASS](docs/assets/gate-demo.gif)
+![gate clips run: BLOCK, visual review record, PASS](docs/assets/gate-demo.gif)
 
 ## Harness
 
-![How the gates work: automatic measurements, visual inspection, review records](docs/assets/harness.png)
+![How gates work: automated measurement, visual review, record files](docs/assets/harness.png)
 
 | Production stage | Gate | Checks |
 |---|---|---|
-| 1. Story and scene planning | `story` | Empty fields, BPM, music sync point table (whether times are numeric), scene table |
-| 2. Character sheet | `character` | Whether `character.txt` is a single paragraph of plain text, color descriptions, sheet image |
-| 3. Keyframes | `keyframes` | Duplicate files, aspect ratio compared with clips |
-| 4. Video conversion | `clips` | Duration, frame count, starting frame match, frame strip generation, per-clip review records |
-| 5. Music and voice | `audio` | A single voice ID, dialogue file |
-| 6. Assembly | `edit`, `final` | Beat grid, cut transitions, repeated cuts, dialogue duration, frame count, audio, loudness, true peak, review records |
+| 0. Reference analysis | `ref` | Before planning: blanks in ANALYSIS.md, targets.json format. After rendering: each metric against its target |
+| 1. Story and scene planning | `story` | Blanks, BPM, music sync table, scene table |
+| 2. Character sheet | `character` | Whether `character.txt` is one paragraph, color descriptions, sheet image |
+| 3. Keyframes | `keyframes` | Duplicate files, aspect ratio against clips |
+| 4. Video conversion | `clips` | Duration, frame count, start-frame match, frame strip, per-clip verdicts |
+| 5. Music and voice | `audio` | One voice ID, dialogue files |
+| 6. Assembly | `edit`, `final` | Beat grid, cut continuity, repeated cuts, dialogue length, frame count, audio, loudness, true peak, review record |
+
+Gates measure only the finished mp4, so the standard is the same whichever engine made it.
 
 ### Frame strips
 
-Some clips start with a frame that matches the keyframe but show a changed character 1–2 seconds later. For each clip, `gate clips` creates an image with the keyframe and frames at 0, 1.0, 1.5, 2.0, and 3.0 seconds in a single row.
+Some clips match the keyframe at the start, then change the person after one or two seconds. `gate clips` builds an image per clip with the keyframe and frames at 0, 1.0, 1.5, 2.0, and 3.0 seconds in one row.
 
-![Example frame strip](docs/assets/strip.png)
+![Frame strip example](docs/assets/strip.png)
 
-Image similarity scores such as SSIM cannot distinguish character movement from character deformation (`gotchas.md` G02). The gate uses numerical checks only for the starting frame match; a person must inspect and record the later frames.
+Similarity values such as SSIM cannot tell a person's motion from deformation (`gotchas.md` G02). The gate checks only the start-frame match numerically and asks a person to review and record the later frames.
 
 ### Harness check
 
-From the repository folder, run `bash skills/motion-video-production/harness/selftest.sh`. To check an installed copy, run `bash "$SKILL_ROOT/harness/selftest.sh"`. Exit code 0 means the selftest cases behave as expected on this computer. (Requires Bash, ffmpeg, ffprobe, and Python 3.)
+From the repository folder, run `bash skills/motion-video-production/harness/selftest.sh`. To check an installed copy, run `bash "$SKILL_ROOT/harness/selftest.sh"`. Exit code 0 means the cases behave as expected on this computer.
 
-## Seven criteria for character consistency
+## Seven consistency criteria
 
-The diagram below and `skills/motion-video-production/references/consistency-7.md` show where the seven criteria for keeping faces and voices consistent across scenes fit between the six production stages: character sheet, fixed appearance description, keyframe starting frame, fixed voice, dialogue and lip movements, music beats, and quality review.
+Where the seven criteria that keep faces and voices consistent across scenes sit in the production stages is shown below and in `references/consistency-7.md`.
 
-![Where the seven consistency criteria fit](docs/assets/seams.png)
+![Where the seven consistency criteria sit](docs/assets/seams.png)
 
 ## Gotchas
 
-All 29 are documented in [`references/gotchas.md`](skills/motion-video-production/references/gotchas.md), with symptoms, causes, prevention, and harness check IDs. Common ones:
+All 29 are in [`references/gotchas.md`](skills/motion-video-production/references/gotchas.md) with symptoms, causes, prevention, and check IDs. Engine pitfalls are in [`references/pitfalls.md`](skills/motion-video-production/references/pitfalls.md). Common ones:
 
-- Even when the starting frame matches, clothes, glasses, or hair can change 1–2 seconds into a clip. (G01)
-- Set cut durations as multiples of beats rather than seconds, and round each starting frame only once from the cumulative time. (G11, G12)
-- Measure dialogue duration before setting cut duration. (G13)
-- Piping a check through `tail`, as in `검사 | tail`, loses its exit code. (G21)
-- For videos with an ICC profile, `ffprobe -of csv=p=0` outputs frame counts like `30,`. Use `-of default=nw=1:nk=1`. (G27)
-- In ffmpeg, using `apad` and `atrim` after `adelay` removes the delay. `asetpts=N/SR/TB` is needed. (G26)
+- A clip can match its start frame and still change clothes, glasses, or hair one or two seconds later. (G01)
+- Set cut lengths in beats, and round start frames once from cumulative time. (G11, G12)
+- Measure dialogue length before setting cut length. (G13)
+- Piping a check through `| tail` loses its exit code. (G21)
+- A smooth scene change where nothing survives still scores carry 0.00. Move one element across the boundary.
 
 ## Required tools
 
-Free usage limits and commercial use terms are summarized in `NOTICE.md` and detailed in `skills/motion-video-production/references/licensing.md` (checked on 2026-10-02, with source URLs). Prices and terms change frequently, so check them again immediately before starting work.
+Free tiers and commercial-use conditions are in `NOTICE.md` and `references/licensing.md` (with source URLs). Remotion needs a Company License for for-profit organizations with four or more employees; HyperFrames is Apache-2.0. Terms change often, so check them right before work.
 
 | Tool | Purpose |
 |---|---|
-| Codex, Claude Code, and other skill-capable agents | Production workflow and assembly |
-| ffmpeg, ffprobe, Python 3 | Running the harness and scripts |
-| Bash (macOS/Linux, WSL on Windows) | Running `.sh` scripts |
-| Node.js + Remotion | Motion graphics and assembly |
+| Codex, Claude Code, or another skill-capable agent | Running production and assembly |
+| ffmpeg, ffprobe, Python 3, Bash | Running the harness and scripts (WSL on Windows) |
+| Node.js 24 or newer | Engines (Remotion 4.0.529, HyperFrames 0.8.143, pinned) |
+| OpenCV, numpy (`requirements-ref.txt`) | Reference analysis |
 | ChatGPT / Grok Imagine | Image and video generation |
-| Suno | Music |
-| ElevenLabs, Fish Audio | Voice |
-| whisper | Transcription review (the transcription integration in `verify.sh` is unverified) |
+| ElevenLabs, Fish Audio (composio CLI) | Voice |
+| whisper | Transcription review |
 
 ## Repository structure
 
 ```
-README.md                   Korean README
-README.en.md                English README
-LICENSE                     MIT
-NOTICE.md                   Summary of external tool guidance
-docs/assets/                README images
-docs/runtimes.md             Runtime installation, invocation, and verification scope
+README.md, README.en.md     Korean and English READMEs
+NOTICE.md, LICENSE          External tool notice, MIT
+docs/                       README images (diagram SVG sources included), runtime install and verification scope
 skills/motion-video-production/        Skill folder to install (everything below is copied together)
   SKILL.md                  Skill instructions
-  agents/openai.yaml        Codex display name and invocation example
-  references/               Seven consistency criteria, beat grid, cost rules, tool notes, gotchas, licensing (external tool terms of use)
-  harness/                  gate.py (per-stage pass/fail checks), selftest.sh (harness self-check)
-  scripts/                  dupcheck.py, clipsheet.sh, key-plate.sh, mix-mux.sh, verify.sh, beat-grid.py
-  templates/                STORY.md, CHARACTER_SHEET.md, PROMPTS.md, SCENE_AUDIT.md
+  references/               reference analysis, engines, art direction, consistency, beat grid, tool notes, gotchas, licensing
+  harness/                  gate.py (per-stage verdicts), selftest.sh (harness self-validation)
+  scripts/                  ref-analyze.py, mix-mux.sh, verify.sh, key-plate.sh, clipsheet.sh and more
+  templates/                ANALYSIS.md, STORY.md, BEATSHEET.md, MUSIC_BRIEF.md and more
+  engines/remotion/         carry demo, wordcut template, render, voice and score pipeline
+  engines/hyperframes/      HTML/GSAP carry demo
 ```
 
-Remotion composition code is not included in this repository. Install Remotion separately to use it.
+## Verification scope
+
+On 2026-10-25 the committed tree was exported and installed as is. All 74 skill files installed. Engine `npm ci`, typecheck, 13 tests, the carry probe and the selftest passed. Renders in both engines were measured with `verify.sh` and `gate.py ref`, and the HyperFrames render passed `gate.py final`. Not checked: external generation, voice credits, listening to audio, and invocation inside the seven other runtimes. Details are in [docs/runtimes.md](docs/runtimes.md).
 
 ## Built by
 
@@ -160,4 +205,4 @@ This skill distills the review criteria the team behind [SceneSteller](https://w
 
 ## Rights and responsibilities
 
-Rights and responsibilities for generated outputs are described in `NOTICE.md` and `skills/motion-video-production/references/licensing.md`.
+Rights and responsibilities for generated outputs are described in `NOTICE.md` and `references/licensing.md`.
