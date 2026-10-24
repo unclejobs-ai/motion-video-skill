@@ -197,7 +197,7 @@ skills/motion-video-production/        Skill folder to install (everything below
 
 ## Verification scope
 
-On 2026-10-25 the committed tree was exported and installed as is. All 74 skill files installed. Engine `npm ci`, typecheck, 13 tests, the carry probe and the selftest passed. Renders in both engines were measured with `verify.sh` and `gate.py ref`, and the HyperFrames render passed `gate.py final`. Not checked: external generation, voice credits, listening to audio, and invocation inside the seven other runtimes. Details are in [docs/runtimes.md](docs/runtimes.md).
+On 2026-10-25 the committed tree was exported and installed as is. All 76 skill files installed. Engine `npm ci`, typecheck, 13 tests, the carry probe and the selftest passed. Renders in both engines were measured with `verify.sh` and `gate.py ref`, and the HyperFrames render passed `gate.py final`. Not checked: external generation, voice credits, listening to audio, and invocation inside the seven other runtimes. Details are in [docs/runtimes.md](docs/runtimes.md).
 
 ## Built by
 

@@ -197,7 +197,7 @@ skills/motion-video-production/        설치하는 스킬 폴더 (아래 전체
 
 ## 검증 범위
 
-2026-10-25에 커밋한 트리를 그대로 꺼내 설치하고 확인했어요. 스킬 파일 74개가 모두 설치됐어요. 엔진 `npm ci`, 타입 검사, 테스트 13개, carry 검사, selftest가 통과했어요. 두 엔진의 렌더를 `verify.sh`와 `gate.py ref`로 쟀고, HyperFrames 렌더는 `gate.py final`을 통과했어요. 외부 생성, 목소리 크레딧, 오디오 청취, 다른 일곱 런타임 안에서의 호출은 확인하지 않았어요. 자세한 내용은 [docs/runtimes.md](docs/runtimes.md)에 있어요.
+2026-10-25에 커밋한 트리를 그대로 꺼내 설치하고 확인했어요. 스킬 파일 76개가 모두 설치됐어요. 엔진 `npm ci`, 타입 검사, 테스트 13개, carry 검사, selftest가 통과했어요. 두 엔진의 렌더를 `verify.sh`와 `gate.py ref`로 쟀고, HyperFrames 렌더는 `gate.py final`을 통과했어요. 외부 생성, 목소리 크레딧, 오디오 청취, 다른 일곱 런타임 안에서의 호출은 확인하지 않았어요. 자세한 내용은 [docs/runtimes.md](docs/runtimes.md)에 있어요.
 
 ## 만든 곳
 
