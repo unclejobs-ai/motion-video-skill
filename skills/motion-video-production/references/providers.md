@@ -33,3 +33,21 @@
 - `pip install openai-whisper` 후 `whisper <wav> --model small --language ko`.
 - 모델 파일은 수백 MB이므로 다운로드 전에 사용자에게 알립니다.
 - 단어 단위 시간이 필요하면 `--word_timestamps True --output_format json`을 씁니다.
+
+## 목소리 자동화: composio CLI (`engines/remotion/pipeline/vo.mjs`)
+- 계정 확인: `composio link elevenlabs --list`, `composio link fish_audio --list`. ACTIVE가 없으면 `composio link <toolkit>`으로 사용자가 직접 연결합니다.
+- `vo.mjs`는 실행할 때 계정을 고릅니다. ACTIVE 연결이 하나면 그것을, 여러 개면 `voices.json`의 `"account"`나 환경 변수 `COMPOSIO_ACCOUNT_ELEVENLABS`, `COMPOSIO_ACCOUNT_FISH`를 씁니다. 저장소에는 계정을 적지 않습니다.
+- `productions/<id>/vo/script.json`(`id, who, text, caption`)과 `voices.json`을 채우고 `node pipeline/vo.mjs productions/<id>/vo`를 돌립니다. 없는 줄만 생성합니다. 호출마다 크레딧이 들므로 실행 전에 사용자에게 알립니다.
+- **ElevenLabs**(`ELEVENLABS_TEXT_TO_SPEECH`, 모델 `eleven_v3`): 무료 플랜은 API로 라이브러리 음성을 쓸 수 없습니다("paid_plan_required"). 기본 제공 음성을 씁니다. 실존 인물의 복제처럼 보이는 음성은 고르지 않습니다.
+- **Fish Audio**(`FISH_AUDIO_LIST_VOICE_MODELS`, `FISH_AUDIO_SYNTHESIZE_SPEECH`): 캐릭터 목소리에 좋습니다. 유명인·정치인·아이돌·저작물 캐릭터의 복제는 고르지 않습니다.
+- 큰 응답은 `{outputFilePath}` 파일로 옵니다(`vo.mjs`가 읽습니다).
+- 받은 줄은 `node pipeline/vo-assemble.mjs <vo폴더> <초> <cues.json>`으로 다듬고, 라우드니스를 맞추고, 시각에 배치해 `vo_track.wav` 하나로 만듭니다.
+- 고유명사가 가장 잘 틀립니다. 소리 나는 대로 적고, 받아쓰기로 확인하고, 다른 시드로 다시 받거나 좋은 테이크에서 그 구절만 잘라 붙입니다.
+
+## 초록 배경 캐릭터 애니메이션: Grok CLI
+- `reference_to_video`에 `first_frame`(16:9 초록 배경 포즈 한 장)과 `images`(포즈 시트)를 함께 넣으면 생김새가 유지됩니다. 해상도는 720p로 지정합니다(기본값은 480p). 약 24fps가 나옵니다.
+- 프롬프트에 "perfectly flat, evenly lit chroma-key green background with a locked-off static camera", "the character stays fully in frame; nothing is left on the ground"를 넣습니다.
+- 마지막 장면은 이전 클립의 마지막 프레임(`ffmpeg -sseof -0.1 -i clip.mp4 -frames:v 1 end.png`)을 `first_frame`으로 다시 생성합니다.
+
+## 음악 워커
+- 기본 스코어는 `node pipeline/score.mjs productions/<id>`입니다. 더 공들인 음악은 `templates/MUSIC_BRIEF.md`를 채워 코딩 에이전트에게 맡기고, 결과의 샘플 수·라우드니스·피크·타격 시각을 직접 다시 잽니다. 워커의 종료 코드 0만으로 성공이라고 보지 않고 로그 끝을 읽습니다.

@@ -1,34 +1,37 @@
 ---
 name: motion-video-production
-description: Plan and assemble 30–90 second motion graphics and character videos with six production stages, media gates, and visual review. Use for video production, keyframes, character consistency, and Remotion assembly. 모션 그래픽·캐릭터 영상·오프닝 영상 제작에 사용한다.
+description: Plan, build and verify 15–90 second motion graphics, promo and character videos. Take a reference video apart with OpenCV into measured targets, then produce through gated stages (story, character, keyframes, clips, voice and music, assembly) on a bundled engine, Remotion (carry oracle, one-word cut template) or HyperFrames, and judge the rendered mp4 against the targets. Voice via ElevenLabs or Fish Audio through the composio CLI, a procedural score, mix and verify. Use for video production, reference matching, keyframes, character consistency and motion graphics assembly. 모션 그래픽·홍보 영상·캐릭터 영상 제작과 레퍼런스 영상 분석에 사용한다.
 ---
 
 # 모션 그래픽·영상 제작 스킬 (motion-video-production)
 
 이 스킬은 모션 그래픽과 영상(예: 한 명의 캐릭터가 나오는 30~90초 영상)을 만드는 순서와 점검 기준을 제공합니다.
-이 스킬을 따라가면 STORY.md, 캐릭터 시트, 키프레임, 장면 영상, 음악·목소리, 최종 mp4를 얻어가십니다.
+이 스킬을 따라가면 레퍼런스 분석(`ref/ANALYSIS.md`, `ref/targets.json`), STORY.md, 캐릭터 시트, 키프레임, 장면 영상, 음악·목소리, 최종 mp4를 얻어가십니다. 화면은 스킬에 들어 있는 엔진(Remotion 또는 HyperFrames)으로 만들고, 완성된 mp4를 숫자로 판정합니다.
 
 모든 답변은 사용자의 언어(기본 한국어)로 합니다. 도구를 대신 로그인하거나 결제하지 않습니다. 로그인·결제·대용량 다운로드가 필요한 시점에서는 사용자에게 먼저 묻습니다.
 
 ## 실행 환경과 경로
 
-이 스킬은 Agent Skills 형식의 공통 지침입니다. Codex, Claude Code 및 다른 스킬 지원 런타임에서 같은 폴더를 사용합니다. 특정 모델의 API나 생성 도구 연결을 포함하지 않습니다.
+이 스킬은 Agent Skills 형식의 공통 지침입니다. Codex, Claude Code 및 다른 스킬 지원 런타임에서 같은 폴더를 사용합니다. 특정 모델의 API나 생성 도구 연결을 포함하지 않습니다. 목소리 자동화는 사용자가 연결한 composio CLI 계정이 있을 때만 씁니다.
 
-- 런타임이 알려 준 이 `SKILL.md`의 실제 경로에서 부모 폴더를 `SKILL_ROOT`로 정합니다. `~/.claude/skills` 같은 특정 설치 경로를 가정하지 않습니다. 아래 `references/`, `templates/`, `harness/`, `scripts/`는 모두 이 폴더 기준입니다.
+- 런타임이 알려 준 이 `SKILL.md`의 실제 경로에서 부모 폴더를 `SKILL_ROOT`로 정합니다. `~/.claude/skills` 같은 특정 설치 경로를 가정하지 않습니다. 아래 `references/`, `templates/`, `harness/`, `scripts/`, `engines/`는 모두 이 폴더 기준입니다.
 - 산출물 폴더의 절대 경로를 `PROJECT_ROOT`로 정합니다. 두 경로를 구분하고, 스크립트는 `python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"`처럼 절대 경로로 실행합니다. 보조 스크립트는 산출물 폴더에서 `bash "$SKILL_ROOT/scripts/<파일>.sh" ...`로 실행합니다.
-- Python 3, ffmpeg, ffprobe가 필요합니다. `.sh` 스크립트에는 Bash가 필요합니다(macOS/Linux 또는 Windows의 WSL). Remotion은 Node.js와 별도 설치가 필요합니다.
+- Python 3, ffmpeg, ffprobe가 필요합니다. `.sh` 스크립트에는 Bash가 필요합니다(macOS/Linux 또는 Windows의 WSL). 엔진에는 Node.js 24 이상이 필요합니다. 레퍼런스 분석에는 `scripts/requirements-ref.txt`의 OpenCV를 가상환경에 설치합니다.
+- 엔진(`engines/remotion`, `engines/hyperframes`)은 스킬 폴더 안에서 설치하지 않습니다. 스킬 폴더는 여러 런타임이 함께 쓰는 사본입니다. `cp -R "$SKILL_ROOT/engines/<엔진>" "$PROJECT_ROOT/engine"`으로 복사한 뒤 그 안에서 `npm ci`를 실행합니다.
 - 시작할 때 실제로 제공된 파일 읽기·터미널·이미지 보기·생성 도구를 확인합니다. 생성 도구가 없으면 프롬프트와 저장 위치를 제공하고 사용자가 만든 파일을 받아 이어갑니다. 구독만으로 API 접근이나 자동 생성을 할 수 있다고 가정하지 않습니다.
 - 이미지를 볼 수 없는 런타임은 사용자의 실제 눈 검수 결과를 요청합니다. 보지 않은 프레임의 검수 기록을 대신 만들지 않습니다. 검사 스크립트 실행이 불가능하면 명령을 전달하고 실제 종료 코드·보고서를 받은 뒤에만 결과를 판단합니다.
 - `STORY.md`는 제공된 템플릿의 한국어 항목명과 표 구조를 유지하고, 내용은 사용자 언어로 채웁니다. 게이트가 이 항목명을 읽습니다. 한국어 외의 `character.txt`에는 색 이름과 함께 `#RRGGBB` 색상 코드를 적습니다(현재 색 검사에서 인식 가능).
 
 ## 0. 시작하기 전에 정할 것
 
-작업을 시작할 때 아래 4가지를 사용자에게 한 번에 묻고 `STORY.md` 맨 위에 기록합니다.
+작업을 시작할 때 아래 6가지를 사용자에게 한 번에 묻고 `STORY.md` 맨 위에 기록합니다.
 
 1. 공개 방식: 비공개 시안인가, 상업적으로 공개하는 최종본인가. (공개 방식이 비용 규칙을 정합니다. `references/cost-rules.md`)
 2. 길이와 화면비: 기본값 30~90초, 16:9.
 3. 사용 가능한 도구와 구독 상태: 이미지 생성, 영상 생성, 음악, 목소리 도구 중 어떤 것을 쓸 수 있는지.
 4. 금지 사항: 영상에 넣지 않을 요소(예: 로고, 실존 인물, 읽히는 글자).
+5. 레퍼런스 영상: "이런 느낌으로" 따라갈 영상이 있는가. 있으면 0단계를 먼저 합니다.
+6. 엔진: Remotion 또는 HyperFrames. 정하기 어려우면 아래 "엔진 선택"의 기준으로 추천합니다.
 
 ## 제작 6단계
 
@@ -36,12 +39,13 @@ description: Plan and assemble 30–90 second motion graphics and character vide
 
 | 단계 | 하는 일 | 쓰는 도구(예시) | 산출물 |
 |---|---|---|---|
+| 0. 레퍼런스 분석 | 레퍼런스 영상을 OpenCV로 분해해 편집 리듬·움직임·블러·심도·그레인·질감을 숫자로 남기고, 계획이 그 숫자를 인용하게 함 | `scripts/ref-analyze.py` | `ref/ANALYSIS.md`, `ref/targets.json` |
 | 1. 스토리·장면 기획 | 한 줄 줄거리, 장면 목록(시간·장소·행동·대사), 음악 싱크 지점 확정 | 현재 에이전트 | `STORY.md`, 장면 목록 |
 | 2. 캐릭터 시트 | 정면·측면·표정·의상을 한 장에 고정한 기준 이미지 | 이미지 생성 도구 | 캐릭터 시트 PNG, 외형 고정문 |
 | 3. 키프레임 | 장면마다 시작 화면 1장씩 생성 | 이미지 생성 도구 | 키프레임 PNG |
 | 4. 영상 변환 | 키프레임을 시작 화면으로 고정하고 3~6초 클립 생성 | 영상 생성 도구 | 장면별 mp4 |
 | 5. 음악·목소리 | 음악 1곡, 캐릭터 목소리 1개(ID 고정), 대사 음성 | 음악·음성 도구 | 음악 wav/mp3, 대사 wav |
-| 6. Remotion 조립 | 박 격자에 맞춰 컷 배치, 자막·타이틀·엔드카드 모션 그래픽, 믹스, mux | Remotion, ffmpeg | 최종 mp4 |
+| 6. 조립 | 박 격자에 맞춰 컷 배치, 자막·타이틀·엔드카드 모션 그래픽, 믹스, mux | 엔진(Remotion 또는 HyperFrames), ffmpeg | 최종 mp4 |
 
 ## Gotchas (먼저 읽을 것)
 
@@ -66,6 +70,7 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 
 | 제작 단계 | 게이트 | 하는 검사 |
 |---|---|---|
+| 0. 레퍼런스 분석 | `ref` | 계획 전: ANALYSIS.md 빈칸, targets.json 형식. 렌더 후: 렌더 분석을 지표마다 목표값과 비교(목표, 값, 차이 %, 허용 범위) |
 | 1. 스토리·장면 기획 | `story` | STORY.md 빈칸, BPM, 음악 싱크 지점 표(시간이 숫자인지), 장면 표 |
 | 2. 캐릭터 시트 | `character` | character.txt(1개 문단 평문, 색 표현), 시트 이미지 |
 | 3. 키프레임 | `keyframes` | 중복 파일, 클립과의 화면비 |
@@ -79,10 +84,18 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 - 눈으로 봐야 하는 검사는 기록 파일을 요구합니다. 에이전트가 프레임 스트립과 컨택트 시트를 실제로 보거나 사용자의 실제 검수 결과를 받은 뒤에만 아래 줄을 씁니다.
   - `qa/clips-review.md`: `REVIEWED: <이름> <YYYY-MM-DD>` 줄과, 클립마다 `<클립 이름>: ok|trim|redo|replace` 줄. `redo`, `replace`가 남아 있으면 통과하지 못합니다. 키프레임이 없는 클립은 `nokey: <클립 이름>` 줄로 허용합니다.
   - `qa/review.md`: `REVIEWED: <이름> <YYYY-MM-DD>` 줄과, 본 결과를 적은 줄. 최종본(`out/final.mp4`)보다 나중에 작성해야 합니다.
-- 임계값은 환경 변수로 바꿉니다. (`GATE_SSIM_START`, `GATE_LUFS`, `GATE_LUFS_TOL`, `GATE_TP_MAX`)
+- 임계값은 환경 변수로 바꿉니다. (`GATE_REF_TOL_SCALE`, `GATE_SSIM_START`, `GATE_LUFS`, `GATE_LUFS_TOL`, `GATE_TP_MAX`)
+- 게이트는 엔진을 가리지 않습니다. `ref`와 `final`은 완성된 mp4만 잽니다. `ref/` 폴더가 없으면 `ref` 게이트는 WARN 한 줄을 남기고 건너뜁니다.
 - 게이트를 고치거나 새 검사를 더하면 `bash "$SKILL_ROOT/harness/selftest.sh"`가 종료 코드 0으로 끝나야 합니다. 막아야 할 사례를 합성 프로젝트로 실제로 막는지 확인하는 셀프테스트이고, 새 검사에는 막아야 할 사례를 함께 추가합니다.
 
 ## 단계별 상세
+
+### 0단계. 레퍼런스 분석
+- 사용자가 레퍼런스 영상을 주면 계획 전에 분해합니다. 레퍼런스 파일과 그 프레임은 저장소에 커밋하지 않고 숫자만 남깁니다.
+- `python3 -I "$SKILL_ROOT/scripts/ref-analyze.py" <레퍼런스.mp4> -o "$PROJECT_ROOT/ref/analysis.json" --targets "$PROJECT_ROOT/ref/targets.json"` (OpenCV가 설치된 가상환경의 python3로 실행)
+- `templates/ANALYSIS.md`를 `ref/ANALYSIS.md`로 복사해 숫자와 그 숫자가 이번 작품에 주는 뜻을 채웁니다. `gate.py ref`가 통과해야 1단계로 넘어갑니다.
+- 1단계 이후의 계획(컷 길이, 홀드, 전환, 블러, 질감)은 ANALYSIS.md의 숫자를 인용합니다. 렌더한 뒤에는 같은 스크립트로 최종본을 분석해 `qa/render-analysis.json`에 쓰고 `gate.py ref`로 비교합니다.
+- 지표의 뜻, 재는 방법, 다를 때 고칠 것, 실제 예시는 `references/reference-analysis.md`에 있습니다.
 
 ### 1단계. 스토리·장면 기획
 - `templates/STORY.md`를 복사해 채웁니다. 장면마다 시간대, 장소, 캐릭터 행동 1개, 감정 1개를 적습니다.
@@ -110,15 +123,22 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 - 목소리는 도구에서 음성 1개를 골라 그 ID만 모든 대사에 씁니다. 대사를 합성한 뒤 받아쓰기(whisper)로 대본과 일치하는지 확인합니다.
 - 유명인·정치인·저작물 캐릭터의 목소리 복제 모델은 사용하지 않습니다.
 
-### 6단계. Remotion 조립
-모션 그래픽(자막, 타이틀, 엔드카드, 화면 효과)과 최종 조립은 Remotion으로 합니다. 아래는 Remotion 공식 구성요소(`Composition`, `Sequence`, `OffthreadVideo`, `Audio`, `useCurrentFrame`, `staticFile`)를 쓰는 구조입니다.
+### 엔진 선택
+화면을 만드는 엔진은 둘 중 하나를 고릅니다. 두 엔진 모두 스킬에 들어 있고, 버전이 고정돼 있습니다. 자세한 비교와 명령은 `references/engines.md`에 있습니다.
+- **Remotion** (`engines/remotion/`): React로 프레임마다 값을 계산합니다. 경계마다 무언가가 살아남는지(carry)를 렌더 전에 숫자로 재는 검사, 단어 하나를 한 자리에 두고 장면이 넘겨받는 wordcut 템플릿이 여기에만 있습니다. 직원 4명 이상 영리 조직은 Remotion Company License가 필요합니다.
+- **HyperFrames** (`engines/hyperframes/`): 평범한 HTML/CSS 페이지를 GSAP으로 움직여 mp4로 렌더합니다. 재료가 웹페이지·문서일 때, HTML을 아는 사람이 바로 고쳐야 할 때 좋습니다. Apache-2.0입니다. 선언한 track이 없어서 carry 점수는 내지 못하고, 움직임은 `gate.py ref`가 mp4에서 잽니다.
+- 정하기 어려우면 Remotion으로 시작하고, 라이선스 조건이 맞지 않으면 HyperFrames를 씁니다.
 
-- 프로젝트는 `npx create-video@latest`로 직접 만듭니다. 이 스킬은 Remotion 코드를 포함하지 않습니다. (라이선스는 `references/licensing.md`)
-- 컷 목록을 JSON(`edit.json`)으로 두고, 각 컷을 `<Sequence from={시작프레임} durationInFrames={길이}>` 안에 `<OffthreadVideo src={staticFile(...)} />`로 배치합니다.
-- 컷의 시작 프레임은 박 격자(박 길이 x 정수)에 맞춥니다.
-- 자막·타이틀은 `useCurrentFrame()` 값에서 계산하는 순수 함수로 작성합니다. 같은 프레임을 다시 렌더해도 같은 결과가 나옵니다.
-- 렌더는 `npx remotion render <컴포지션ID> out/picture.mp4`로 하고, 렌더 후 `scripts/mix-mux.sh`로 음악·대사를 섞어 입힙니다.
-- 최종 확인은 `scripts/verify.sh`로 하고, 생성된 컨택트 시트를 직접 봅니다.
+### 6단계. 조립
+- 엔진 폴더를 작업 폴더로 복사하고 `npm ci`로 설치합니다(스킬 폴더 안에서 설치하지 않음).
+- **carry가 기본 경계입니다.** 비트 경계마다 화면에 있던 요소가 살아남아 다음 비트로 움직이거나 커집니다. 아무것도 남지 않는 장면 교체는 몰아치기 안이나 엔드카드로 갈 때만 씁니다. 어휘는 `references/art-direction.md`에 있습니다.
+- Remotion: 모션은 `motions/`의 순수 함수로, 작품별 기하는 순수 `scene(t)`로 씁니다. 화면과 `track.ts`가 같은 `scene(t)`를 읽습니다. 렌더 전에 `node pipeline/probe.mjs productions/<id>`로 carry를 재고(0.5 미만 FAIL), 스틸(`node pipeline/render.mjs <id> --stills …`)을 직접 본 뒤 영상을 렌더합니다. `productions/carry-demo/`가 모든 파일의 예시입니다.
+- 비트 시트는 `templates/BEATSHEET.md`로 `timing.ts`와 함께 씁니다. 모든 경계에 살아남는 요소를 적습니다.
+- 단어 하나를 여러 장면이 넘겨받는 영상은 `productions/wordcut/`의 `data.ts`만 바꿔서 만듭니다. 레퍼런스가 있으면 `plan.mjs`가 `ref/analysis.json`에서 타이밍을 뽑고, `drift.mjs`가 단어가 한 자리에 있는지 픽셀로 잽니다.
+- 목소리는 대사를 먼저 생성하고 길이를 잰 뒤 타이밍을 정합니다(`pipeline/vo.mjs`, `pipeline/vo-assemble.mjs`, composio CLI. `references/providers.md`). 크레딧이 드므로 생성 전에 사용자에게 알립니다.
+- 음악은 `node pipeline/score.mjs productions/<id>`의 기본 스코어로 시작하거나, `templates/MUSIC_BRIEF.md`로 워커에게 맡깁니다.
+- 믹스와 mux는 `scripts/mix-mux.sh`로 합니다. 프레임 수가 맞을 때만 mux하고, 대사가 나올 때 음악을 낮춥니다.
+- 최종 확인은 `scripts/verify.sh`(`PRODUCTION=productions/<id>`를 주면 carry 검사도 함께)로 하고, 생성된 컨택트 시트를 직접 봅니다. 레퍼런스가 있으면 `gate.py ref`로 비교합니다.
 
 ## 캐릭터 일관성 7가지
 
@@ -141,10 +161,13 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 
 | 파일 | 용도 |
 |---|---|
+| `ref-analyze.py` | 레퍼런스(또는 렌더) 영상을 OpenCV로 분해해 JSON 하나로 (`requirements-ref.txt`) |
 | `dupcheck.py` | 같은 키프레임을 쓰는 반복 컷 검출 |
 | `clipsheet.sh` | 프레임 시트(클립의 모든 프레임을 6x5 칸으로 배치) |
 | `key-plate.sh` | 초록 배경 -> 투명 PNG |
 | `mix-mux.sh` | 음악·대사 믹스와 프레임 수 게이트 mux |
-| `verify.sh` | 영상 측정과 컨택트 시트 (받아쓰기 연동은 미검증) |
+| `verify.sh` | 영상 측정, 반복 프레임, 가장자리 색, 컨택트 시트, 받아쓰기, 선택적 carry 검사 |
 | `beat-grid.py` | BPM 기준 박 길이·스냅 계산 |
 | `../harness/gate.py` | 단계별 통과 여부를 종료 코드로 판정 |
+
+엔진 폴더의 스크립트(`pipeline/render.mjs`, `probe.mjs`, `score.mjs`, `vo.mjs`, `vo-assemble.mjs`, `productions/wordcut/*.mjs`)는 `references/engines.md`에 정리돼 있습니다.
