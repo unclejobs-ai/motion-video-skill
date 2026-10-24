@@ -1,7 +1,7 @@
 # 레퍼런스 분석
 
 `ref/analysis.json`의 숫자를 옮겨 적고, 그 숫자가 이번 작품의 계획을 어떻게 정하는지 적습니다.
-`<...>` 칸이 하나라도 남아 있으면 `gate.py ref`가 막습니다. 지표의 뜻은 `references/reference-analysis.md`에 있습니다.
+꺾쇠로 감싼 빈칸이 하나라도 남아 있으면 `gate.py ref`가 막습니다. 지표의 뜻은 `references/reference-analysis.md`에 있습니다.
 
 - 레퍼런스: <길이(초), 화면비, fps>
 - 분석 명령: `python3 -I "$SKILL_ROOT/scripts/ref-analyze.py" ref/reference.mp4 -o ref/analysis.json --targets ref/targets.json`

@@ -114,7 +114,7 @@ B=$(mut silent); ff -i "$W/good/out/final.mp4" -an -c:v copy "$B/out/final.mp4";
 # ---- ref (레퍼런스 분석: 계획 전 기록, 렌더 후 목표값 비교)
 make_ref() { # $1 = 폴더. 빈칸 없는 ANALYSIS.md 와 지표 2개짜리 targets.json
   mkdir -p "$1/ref"
-  sed 's/<[^<>]*>/채움/g' "$HERE/../templates/ANALYSIS.md" > "$1/ref/ANALYSIS.md"
+  sed 's/<[^<>.]*>/채움/g' "$HERE/../templates/ANALYSIS.md" > "$1/ref/ANALYSIS.md"
   echo '{"metrics":{"edit.stillShare":{"target":0.46,"tol":0.25},"motion.meanFlow":{"target":2.0,"tol":0.35}}}' > "$1/ref/targets.json"
 }
 render_analysis() { # $1 = 폴더  $2 = stillShare  $3 = meanFlow
