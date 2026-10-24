@@ -38,6 +38,10 @@
 - HyperFrames는 Apache-2.0입니다. 회사 규모에 따른 조건이 없습니다. 재배포할 때는 라이선스 사본과 고지를 함께 둡니다(이 저장소는 재배포하지 않고 npm으로 설치합니다).
 - GSAP 3.14.2의 README에는 "the entire GSAP toolset is FREE, even for commercial use"라고 적혀 있습니다. 표준 무료 라이선스의 제한 조항(예: 경쟁 제품 관련)은 미확인입니다. 상업 공개 전에 위 URL에서 원문을 확인합니다.
 
+## 1-2-1. Three.js (홈페이지 템플릿)
+
+- `templates/homepage-intro.html`이 `three@0.170.0`을 jsDelivr에서 불러옵니다. npm `license` 필드: MIT (2026-10-25 확인). 저장소에는 Three.js 파일을 넣지 않았습니다.
+
 ## 1-3. 글꼴
 
 | 글꼴 | 패키지(고정 버전) | 라이선스 | 확인 |

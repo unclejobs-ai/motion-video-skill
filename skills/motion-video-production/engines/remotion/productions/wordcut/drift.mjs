@@ -7,7 +7,7 @@
 //          of the slot word on the same frame (diag-slot), with the sheet at rest 3 frames after it lands: how far the
 //          document's word sits from the word drawn over it. Same font, size and scale, so glyph shape cancels.
 // Slot centres are also compared with the slot centre the layout asks for (VIEW × slotY). Writes renders/wordcut/drift-<aspect>.json.
-// Usage (engine folder): node productions/wordcut/drift.mjs [9x16|16x9]     Exit 1 when the slot moves more than 0.5 px.
+// Usage (engine folder): node productions/wordcut/drift.mjs [9x16|16x9]     Exit 1 when the slot moves more than 0.5 px or a measurement is missing.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -23,7 +23,9 @@ const dir = `renders/wordcut/drift-${aspect}`;
 
 // frame pairs straddling each boundary; the textbook lands unhighlighted, so its "after" is the end of the highlighter wipe.
 const pairs = T.cuts.slice(1).map((c) => [c.f - 1, kindOf(c.k) === 'textbook' ? T.textbook.hlFrom + T.textbook.hlFrames : c.f]);
-const rest = T.cuts.map((c) => c.f + 3);
+// each sheet at rest: 3 frames after it lands, but never on or after the next whip's out-frame (next.f - 1), where the
+// sheet is shifted on purpose; in a 4-frame burst that is the frame after landing + 2 (refocus blur only, no offset)
+const rest = T.cuts.map((c, i) => (T.cuts[i + 1] ? Math.min(c.f + 3, T.cuts[i + 1].f - 2) : c.f + 3));
 
 const render = (frames, mode) => {
   const out = join(dir, mode);
@@ -97,4 +99,6 @@ for (const p of report.pairs) console.log(`  slot  f${p.before}→f${p.after}  �
 for (const p of report.rest) console.log(`  sheet ${p.sheet.padEnd(9)} f${p.frame}  word − slot ${p.dx?.toFixed(2)}, ${p.dy?.toFixed(2)} px`);
 const m = report.max, xy = (v) => `${v.dx.toFixed(2)}, ${v.dy.toFixed(2)} px`;
 console.log(`max |Δ| slot across boundaries ${xy(m.slotAcrossBoundary)} · slot vs wanted ${xy(m.slotVsWanted)} · sheet word vs slot ${xy(m.sheetWordVsSlot)} · lens (noisy) ${xy(m.lensAcrossBoundary)}`);
-process.exit(Math.max(m.slotAcrossBoundary.dx, m.slotAcrossBoundary.dy, m.sheetWordVsSlot.dx, m.sheetWordVsSlot.dy) > 0.5 ? 1 : 0);
+const missing = [...report.pairs, ...report.rest].filter((r) => r.dx === null).length;
+if (missing) console.log(`FAIL ${missing} measurements found no word (frame on a whip, or the word left the window)`);
+process.exit(missing || Math.max(m.slotAcrossBoundary.dx, m.slotAcrossBoundary.dy, m.sheetWordVsSlot.dx, m.sheetWordVsSlot.dy) > 0.5 ? 1 : 0);

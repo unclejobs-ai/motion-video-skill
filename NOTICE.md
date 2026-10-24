@@ -9,6 +9,7 @@
 | Remotion 4.0.529 | 개인, 영리 조직 직원 3명 이하, 비영리, 상업 사용 전 평가는 무료. 직원 4명 이상 영리 조직은 Company License 필요. 원문: https://github.com/remotion-dev/remotion/blob/main/LICENSE.md | skills/motion-video-production/references/licensing.md 1장 |
 | HyperFrames 0.8.143 | Apache-2.0. 회사 규모 조건 없음. 원문: https://github.com/heygen-com/hyperframes/blob/main/LICENSE | 1-2장 |
 | GSAP 3.14.2 | GreenSock 표준 무료 라이선스. README에 상업 이용 무료로 표기. 제한 조항 전문은 미확인: https://gsap.com/standard-license | 1-2장 |
+| Three.js 0.170.0 (홈페이지 템플릿) | MIT. CDN에서 불러오고 저장소에는 넣지 않음 | 1-2-1장 |
 | 글꼴 (Pretendard, 나눔명조, JetBrains Mono) | SIL Open Font License 1.1, npm 패키지로 설치 | 1-3장 |
 | OpenCV, numpy (레퍼런스 분석) | opencv-python-headless 4.13.0.92 (Apache-2.0), numpy 2.5.4 (BSD-3-Clause 외, 패키지 메타데이터 기준), 사용자가 pip로 설치 | - |
 | ElevenLabs | 무료 플랜에는 상업 라이선스가 없고, 상업 이용은 Starter 플랜부터 표기됨 | 2장 |
