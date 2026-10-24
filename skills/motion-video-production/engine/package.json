@@ -1,0 +1,31 @@
+{
+  "name": "motion-video-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Remotion engine for the motion-video-production skill: carry oracle, motion modules, render and voice pipeline",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "test": "node --test 'motions/**/*.test.ts' 'pipeline/**/*.test.ts'",
+    "typecheck": "tsc --noEmit",
+    "render": "node pipeline/render.mjs",
+    "probe": "node pipeline/probe.mjs"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.529",
+    "@remotion/cli": "4.0.529",
+    "@remotion/renderer": "4.0.529",
+    "pretendard": "1.3.9",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.529"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "@types/react": "18.3.31",
+    "typescript": "5.9.3"
+  }
+}

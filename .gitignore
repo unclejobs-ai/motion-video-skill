@@ -29,3 +29,4 @@ charsheet*.png
 
 # OS
 .DS_Store
+.claude/
