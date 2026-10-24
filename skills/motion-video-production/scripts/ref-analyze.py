@@ -19,9 +19,10 @@ import numpy as np
 
 SHORT = 540          # 분석 해상도: 짧은 변
 FLOW_SHORT = 270     # 광학 흐름 해상도: 짧은 변 (속도 때문에 절반)
-STILL_DIFF = 1.0     # 앞 프레임과의 평균 밝기 차(0-255)가 이보다 작으면 정지 프레임
+PER = 30.0           # 움직임 지표의 시간 단위: 1/30초. fps가 다른 영상끼리 비교할 수 있게 프레임당 값에 fps/PER를 곱한다
+STILL_DIFF = 1.0     # 1/30초당 평균 밝기 차(0-255)가 이보다 작으면 정지 프레임
 CUT_CORR = 0.6       # HSV 히스토그램 상관이 이보다 낮으면 컷(장 바뀜)
-CUT_DIFF = 25.0      # 또는 평균 밝기 차가 이보다 크면 컷
+CUT_DIFF = 25.0      # 또는 프레임 사이 평균 밝기 차가 이보다 크면 컷 (컷은 한 프레임에 일어나므로 정규화하지 않는다)
 HOLD_MIN = 0.25      # 이 길이(초) 이상 이어진 정지 구간만 홀드로 센다
 TRANSITION = 0.25    # 컷 앞뒤 이 길이(초)를 전환 구간으로 보고 흐름을 잰다
 LOOK_EVERY = 0.5     # 질감 지표는 이 간격(초)마다 한 프레임
@@ -131,7 +132,7 @@ def analyze(path):
         if i % look_step == 0:
             looks.append(look(bgr))
             dofs.append(dof_bands(y.astype(np.float64)))
-        if flow and flow[-1] > 4:
+        if flow and flow[-1] * fps / PER > 4:  # 4 px per 1/30 s
             hp = y.astype(np.float64) - cv2.blur(y.astype(np.float64), (9, 9))
             horiz = dirs[-1] % 180 in (0, 45, 135)
             blur_along.append(autocorr_len(hp, 1 if horiz else 0))
@@ -141,9 +142,13 @@ def analyze(path):
     cap.release()
     n = i
     seconds = n / fps
+    norm = fps / PER
+    raw_diffs = diffs
+    diffs = [d * norm for d in raw_diffs]
+    flow = [x * norm for x in flow]
 
     # 컷: 프레임 k (k = 1..n-1) 가 앞 프레임과 다른 장면
-    cut_frames = [k + 1 for k, (d, c) in enumerate(zip(diffs, corrs)) if c < CUT_CORR or d > CUT_DIFF]
+    cut_frames = [k + 1 for k, (d, c) in enumerate(zip(raw_diffs, corrs)) if c < CUT_CORR or d > CUT_DIFF]
     merged = []
     for k in cut_frames:  # 연속 프레임 컷(와이프·휙 넘김)은 첫 프레임 하나로 합친다
         if not merged or k - merged[-1] > max(2, round(fps * 0.1)):
@@ -172,7 +177,7 @@ def analyze(path):
         if not seg:
             continue
         peak = int(np.argmax(seg))
-        moving = [x for x in seg if x > 2]
+        moving = [x for x in seg if x > 2]  # 2 px per 1/30 s
         transitions.append({
             "t": round(k / fps, 3),
             "peakFlow": round(float(seg[peak]), 2),
@@ -214,6 +219,7 @@ def analyze(path):
         "dof": {"bands": [round(float(np.mean([d[b] for d in dofs])), 4) for b in range(5)] if dofs else [], "sharpRatio": lk.get("sharpRatio", 0.0)},
         "grain": lk.get("grain", 0.0),
         "look": lk,
+        "units": "motion and meanDiff are per 1/30 s at the 540 px short side; times in seconds",
         "thresholds": {"stillDiff": STILL_DIFF, "cutCorr": CUT_CORR, "cutDiff": CUT_DIFF, "holdMinS": HOLD_MIN, "transitionS": TRANSITION, "lookEveryS": LOOK_EVERY},
     }
 
