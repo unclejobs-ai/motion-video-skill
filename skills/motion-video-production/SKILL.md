@@ -27,7 +27,7 @@ description: Plan, build and verify 15–90 second motion graphics, promo and ch
 작업을 시작할 때 아래 6가지를 사용자에게 한 번에 묻고 `STORY.md` 맨 위에 기록합니다.
 
 1. 공개 방식: 비공개 시안인가, 상업적으로 공개하는 최종본인가. (공개 방식이 비용 규칙을 정합니다. `references/cost-rules.md`)
-2. 길이와 화면비: 기본값 30~90초, 16:9.
+2. 길이와 화면비: 15~90초(기본 30~90초), 16:9.
 3. 사용 가능한 도구와 구독 상태: 이미지 생성, 영상 생성, 음악, 목소리 도구 중 어떤 것을 쓸 수 있는지.
 4. 금지 사항: 영상에 넣지 않을 요소(예: 로고, 실존 인물, 읽히는 글자).
 5. 레퍼런스 영상: "이런 느낌으로" 따라갈 영상이 있는가. 있으면 0단계를 먼저 합니다.
@@ -115,7 +115,7 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 ### 4단계. 영상 변환
 - 키프레임을 영상의 **시작 화면**으로 고정하고, 캐릭터 시트를 참조 이미지로 함께 넣습니다.
 - 클립 길이는 3~6초로 짧게 잡습니다. 길수록 뒤쪽에서 얼굴이 녹거나 소품이 사라집니다.
-- 생성한 클립은 `scripts/clipsheet.sh`로 프레임 시트(클립의 모든 프레임)를 만들어 눈으로 확인하고, 결함이 있는 구간은 잘라 내고 쓸 수 있는 구간만 사용합니다. (`templates/SCENE_AUDIT.md`에 기록)
+- 생성한 클립은 `bash "$SKILL_ROOT/scripts/clipsheet.sh" <클립.mp4>`로 프레임 시트(클립의 모든 프레임, 기본 `qa/sheets/`)를 만들어 눈으로 확인하고, 결함이 있는 구간은 잘라 내고 쓸 수 있는 구간만 사용합니다. (`templates/SCENE_AUDIT.md`에 기록)
 - 초록 배경으로 생성한 클립에서 캐릭터만 떼어 합성하는 경우 `scripts/key-plate.sh`를 사용합니다.
 
 ### 5단계. 음악·목소리
@@ -132,13 +132,13 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 ### 6단계. 조립
 - 엔진 폴더를 작업 폴더로 복사하고 `npm ci`로 설치합니다(스킬 폴더 안에서 설치하지 않음).
 - **carry가 기본 경계입니다.** 비트 경계마다 화면에 있던 요소가 살아남아 다음 비트로 움직이거나 커집니다. 아무것도 남지 않는 장면 교체는 몰아치기 안이나 엔드카드로 갈 때만 씁니다. 어휘는 `references/art-direction.md`에 있습니다.
-- Remotion: 모션은 `motions/`의 순수 함수로, 작품별 기하는 순수 `scene(t)`로 씁니다. 화면과 `track.ts`가 같은 `scene(t)`를 읽습니다. 렌더 전에 `node pipeline/probe.mjs productions/<id>`로 carry를 재고(0.5 미만 FAIL), 스틸(`node pipeline/render.mjs <id> --stills …`)을 직접 본 뒤 영상을 렌더합니다. `productions/carry-demo/`가 모든 파일의 예시입니다.
+- Remotion: 모션은 `motions/`의 순수 함수로, 작품별 기하는 순수 `scene(t)`로 씁니다. 화면과 `track.ts`가 같은 `scene(t)`를 읽습니다. 렌더 전에 `node pipeline/probe.mjs productions/<id>`로 carry를 재고(0.5 미만 FAIL), 스틸(`node pipeline/render.mjs <id> --stills 0.5 1.5 3.0`)을 직접 본 뒤 영상을 렌더합니다(`renders/<id>/`). `productions/carry-demo/`가 모든 파일의 예시입니다.
 - 비트 시트는 `templates/BEATSHEET.md`로 `timing.ts`와 함께 씁니다. 모든 경계에 살아남는 요소를 적습니다.
-- 단어 하나를 여러 장면이 넘겨받는 영상은 `productions/wordcut/`의 `data.ts`만 바꿔서 만듭니다. 레퍼런스가 있으면 `plan.mjs`가 `ref/analysis.json`에서 타이밍을 뽑고, `drift.mjs`가 단어가 한 자리에 있는지 픽셀로 잽니다.
+- 단어 하나를 여러 장면이 넘겨받는 영상은 `productions/wordcut/`의 `data.ts`만 바꿔서 만듭니다. 레퍼런스가 있으면 `node productions/wordcut/plan.mjs "$PROJECT_ROOT/ref/analysis.json" <초>`로 타이밍을 뽑고, `node productions/wordcut/drift.mjs`가 단어가 한 자리에 있는지 픽셀로 잽니다(0.5px 초과면 종료 코드 1).
 - 목소리는 대사를 먼저 생성하고 길이를 잰 뒤 타이밍을 정합니다(`pipeline/vo.mjs`, `pipeline/vo-assemble.mjs`, composio CLI. `references/providers.md`). 크레딧이 드므로 생성 전에 사용자에게 알립니다.
 - 음악은 `node pipeline/score.mjs productions/<id>`의 기본 스코어로 시작하거나, `templates/MUSIC_BRIEF.md`로 워커에게 맡깁니다.
-- 믹스와 mux는 `scripts/mix-mux.sh`로 합니다. 프레임 수가 맞을 때만 mux하고, 대사가 나올 때 음악을 낮춥니다.
-- 최종 확인은 `scripts/verify.sh`(`PRODUCTION=productions/<id>`를 주면 carry 검사도 함께)로 하고, 생성된 컨택트 시트를 직접 봅니다. 레퍼런스가 있으면 `gate.py ref`로 비교합니다.
+- 믹스와 mux는 `bash "$SKILL_ROOT/scripts/mix-mux.sh" <picture.mp4> <fps> <초> <music.wav> <vo.wav|-> <out.mp4>`로 합니다. 프레임 수가 맞을 때만 mux하고, 대사가 나올 때 음악을 낮춥니다.
+- 최종 확인은 `bash "$SKILL_ROOT/scripts/verify.sh" <mp4>`(`PRODUCTION=productions/<id>`를 주면 carry 검사도 함께)로 하고, 생성된 컨택트 시트를 직접 봅니다. 레퍼런스가 있으면 `gate.py ref`로 비교합니다.
 
 ### 브랜드 소개 영상과 홈페이지 (레시피)
 "우리 가게 소개 영상을 홈페이지에 넣고 싶다"는 요청은 이 순서로 만듭니다. 새 엔진 없이 wordcut 템플릿과 `templates/homepage-intro.html`을 씁니다. 자세한 순서와 예시는 `references/brand-intro.md`에 있습니다.
