@@ -6,16 +6,32 @@
 
 **한국어** · [English](README.en.md)
 
-모션 그래픽, 홍보 영상, 캐릭터 영상(15~90초)을 처음부터 끝까지 만드는 **Agent Skills 형식의 제작 스킬**이에요. Codex, Claude Code 및 다른 스킬 지원 런타임에서 같은 스킬 폴더를 써요.
-단계마다 산출물을 재서 통과 여부를 종료 코드로 판정하는 게이트(`harness/gate.py`)가 있어요. 레퍼런스 영상을 숫자로 분해하는 분석기와, 바로 렌더할 수 있는 엔진 두 개(Remotion, HyperFrames)도 함께 들어 있어요.
+모션 그래픽, 홍보 영상, 캐릭터 영상(15~90초)을 처음부터 끝까지 만드는 **Agent Skills 형식의 제작 스킬**이에요. Codex, Claude Code 및 다른 스킬 지원 런타임에서 같은 스킬 폴더를 써요. 단계 산출물을 숫자로 재고 종료 코드로 통과 여부를 알려 주는 게이트(`harness/gate.py`), 레퍼런스 영상 분석기, 바로 렌더할 수 있는 엔진 두 개(Remotion, HyperFrames)가 들어 있어요.
 
-**바로 가기** · [설치](#설치) · [60초 시작](#60초-시작) · [풀 버전이 더하는 것](#풀-버전이-더하는-것) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [필요한 도구](#필요한-도구) · [검증 범위](#검증-범위)
+아래는 `gate clips`가 클립마다 만드는 프레임 스트립이에요. 키프레임과 0초부터 3초까지 한 줄에 놓아서 인물이 그대로인지 사람이 확인하게 해요.
 
----
+![프레임 스트립 예시](docs/assets/strip.png)
+
+**바로 가기** · [60초 시작](#60초-시작) · [설치](#설치) · [풀 버전이 더하는 것](#풀-버전이-더하는-것) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [필요한 도구](#필요한-도구) · [검증 범위](#검증-범위)
+
+## 60초 시작
+
+스킬을 설치한 뒤(방법은 [설치](#설치)) 엔진을 작업 폴더로 복사해 데모 하나를 렌더해요. Node.js 24 이상과 ffmpeg가 필요해요. 스킬 폴더 안에서는 설치하지 않아요.
+
+```bash
+SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # 실제 설치 경로
+cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
+node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
+node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
+node pipeline/render.mjs carry-demo                         # renders/carry-demo/picture.mp4
+node pipeline/score.mjs productions/carry-demo              # 절차적 스코어
+bash "$SKILL_ROOT/scripts/mix-mux.sh" renders/carry-demo/picture.mp4 60 5 productions/carry-demo/audio/score.wav - out/final.mp4
+bash "$SKILL_ROOT/scripts/verify.sh" out/final.mp4
+```
+
+렌더 브라우저는 `CHROME_PATH`나 캐시된 Playwright 헤드리스 셸을 써요. 둘 다 없으면 `npx remotion browser ensure`가 내려받아요(먼저 물어봐요).
 
 ## 설치
-
-### 공통 설치 (Codex·Claude Code·다른 런타임)
 
 스킬을 쓸 프로젝트 폴더에서 실행해요. Node.js와 npx가 필요하고, 쓸 런타임을 골라 설치해요.
 
@@ -62,23 +78,6 @@ cp -r motion-video-skill/skills/motion-video-production ~/.claude/skills/
 
 에이전트가 먼저 6가지(공개 방식, 길이와 화면비, 쓸 수 있는 도구, 금지 요소, 레퍼런스 영상, 엔진)를 묻고 단계 순서대로 진행해요. 생성 도구가 없으면 프롬프트를 건네고, 사용자가 만든 파일을 받아 이어가요.
 
-## 60초 시작
-
-설치된 스킬에서 엔진을 작업 폴더로 복사해 데모 하나를 렌더하는 순서예요. Node.js 24 이상과 ffmpeg가 필요해요. 스킬 폴더 안에서는 설치하지 않아요.
-
-```bash
-SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # 실제 설치 경로
-cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
-node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
-node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
-node pipeline/render.mjs carry-demo                         # renders/carry-demo/picture.mp4
-node pipeline/score.mjs productions/carry-demo              # 절차적 스코어
-bash "$SKILL_ROOT/scripts/mix-mux.sh" renders/carry-demo/picture.mp4 60 5 productions/carry-demo/audio/score.wav - out/final.mp4
-bash "$SKILL_ROOT/scripts/verify.sh" out/final.mp4
-```
-
-렌더 브라우저는 `CHROME_PATH`나 캐시된 Playwright 헤드리스 셸을 써요. 둘 다 없으면 `npx remotion browser ensure`가 내려받아요(먼저 물어봐요).
-
 ## 풀 버전이 더하는 것
 
 | 무엇 | 하는 일 | 위치 |
@@ -115,8 +114,6 @@ python3 "$SKILL_ROOT/harness/gate.py" ref .
 3. 종료 코드 0이면 다음 단계로 가요. 1(BLOCK)이면 `qa/gate-<단계>.txt`의 BLOCK 줄을 읽고 고친 뒤 같은 게이트를 다시 실행해요.
 4. 눈으로 봐야 하는 검사는 스크립트가 판정하지 못해요. 프레임을 보고 남긴 기록(`qa/clips-review.md`, `qa/review.md`)이 있어야 통과해요.
 
-### 게이트 실행 예시
-
 `gate.py clips` 실행 예시예요. 눈 검수 기록이 없어서 BLOCK(종료 코드 1)이 나오고, 기록을 남기면 PASS(종료 코드 0)가 돼요.
 
 ![gate clips 실행: BLOCK, 눈 검수 기록, PASS](docs/assets/gate-demo.gif)
@@ -137,15 +134,7 @@ python3 "$SKILL_ROOT/harness/gate.py" ref .
 
 게이트는 완성된 mp4만 재요. 그래서 어느 엔진으로 만들었든 같은 기준이에요.
 
-### 프레임 스트립
-
-시작 화면이 키프레임과 같아도 1~2초 뒤에 인물이 달라지는 클립이 있어요. `gate clips`가 클립마다 키프레임, 0, 1.0, 1.5, 2.0, 3.0초를 한 줄에 놓은 이미지를 만들어요.
-
-![프레임 스트립 예시](docs/assets/strip.png)
-
-SSIM 같은 유사도 값은 인물의 움직임과 변형을 구분하지 못해요(`gotchas.md` G02). 게이트는 시작 화면 일치만 숫자로 판정하고, 뒤쪽 프레임은 사람이 보고 기록하게 해요.
-
-### 하네스 점검
+SSIM 같은 유사도 값은 인물의 움직임과 변형을 구분하지 못해요(`gotchas.md` G02). 게이트는 시작 화면 일치만 숫자로 판정하고, 뒤쪽 프레임은 사람이 프레임 스트립을 보고 기록하게 해요.
 
 저장소 폴더에서 `bash skills/motion-video-production/harness/selftest.sh`를 실행해요. 설치된 사본은 `bash "$SKILL_ROOT/harness/selftest.sh"`로 점검해요. 종료 코드 0이면 이 컴퓨터에서 검사 사례가 기대대로 동작해요.
 

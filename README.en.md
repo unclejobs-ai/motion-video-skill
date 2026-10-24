@@ -6,16 +6,32 @@
 
 [한국어](README.md) · **English**
 
-A **production skill in the Agent Skills format** for making motion graphics, promo and character videos (15–90 seconds) from start to finish. Codex, Claude Code, and other skill-capable runtimes use the same skill folder.
-Gates (`harness/gate.py`) measure the outputs of each stage and report pass or fail through exit codes. A reference-video analyzer and two ready-to-render engines (Remotion, HyperFrames) ship with it.
+A **production skill in the Agent Skills format** for making motion graphics, promo and character videos (15–90 seconds) from start to finish. Codex, Claude Code, and other skill-capable runtimes use the same skill folder. It ships gates (`harness/gate.py`) that measure each stage's outputs and report pass or fail through exit codes, a reference-video analyzer, and two ready-to-render engines (Remotion, HyperFrames).
 
-**Jump to** · [Installation](#installation) · [60-second start](#60-second-start) · [What the full version adds](#what-the-full-version-adds) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Tools](#required-tools) · [Verification scope](#verification-scope)
+Below is the frame strip `gate clips` builds for each clip. The keyframe and frames from 0 to 3 seconds sit in one row, so a person can check that the character stays the same.
 
----
+![Frame strip example](docs/assets/strip.png)
+
+**Jump to** · [60-second start](#60-second-start) · [Installation](#installation) · [What the full version adds](#what-the-full-version-adds) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Required tools](#required-tools) · [Verification scope](#verification-scope)
+
+## 60-second start
+
+After installing the skill (see [Installation](#installation)), copy an engine into a working folder and render a demo. Node.js 24 or newer and ffmpeg are required. Never install inside the skill folder.
+
+```bash
+SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # your actual install path
+cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
+node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
+node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
+node pipeline/render.mjs carry-demo                         # renders/carry-demo/picture.mp4
+node pipeline/score.mjs productions/carry-demo              # procedural score
+bash "$SKILL_ROOT/scripts/mix-mux.sh" renders/carry-demo/picture.mp4 60 5 productions/carry-demo/audio/score.wav - out/final.mp4
+bash "$SKILL_ROOT/scripts/verify.sh" out/final.mp4
+```
+
+Rendering uses `CHROME_PATH` or a cached Playwright headless shell. If neither exists, `npx remotion browser ensure` downloads one (ask first).
 
 ## Installation
-
-### Shared installation (Codex, Claude Code, other runtimes)
 
 Run this in the project folder where you want to use the skill. It requires Node.js and npx; select the runtimes you use.
 
@@ -62,23 +78,6 @@ After installation, confirm that `motion-video-production` appears in the runtim
 
 The agent first asks six things (publication type, length and aspect ratio, available tools, prohibited elements, reference video, engine) and proceeds stage by stage. Without generation tools, it hands you prompts and continues from the files you generate.
 
-## 60-second start
-
-Copy an engine out of the installed skill into a working folder and render a demo. Node.js 24 or newer and ffmpeg are required. Never install inside the skill folder.
-
-```bash
-SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # your actual install path
-cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
-node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
-node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
-node pipeline/render.mjs carry-demo                         # renders/carry-demo/picture.mp4
-node pipeline/score.mjs productions/carry-demo              # procedural score
-bash "$SKILL_ROOT/scripts/mix-mux.sh" renders/carry-demo/picture.mp4 60 5 productions/carry-demo/audio/score.wav - out/final.mp4
-bash "$SKILL_ROOT/scripts/verify.sh" out/final.mp4
-```
-
-Rendering uses `CHROME_PATH` or a cached Playwright headless shell. If neither exists, `npx remotion browser ensure` downloads one (ask first).
-
 ## What the full version adds
 
 | What | What it does | Where |
@@ -115,8 +114,6 @@ Motion is measured per 1/30 s, so different frame rates compare. The reference f
 3. Exit code 0 moves to the next stage. Exit code 1 (BLOCK) means: read the BLOCK lines in `qa/gate-<stage>.txt`, fix the output, and rerun the same gate.
 4. Checks that need human eyes cannot be judged by a script. They pass only with a record written after looking at the frames (`qa/clips-review.md`, `qa/review.md`).
 
-### Gate demo
-
 A `gate.py clips` run. Without a visual review record it returns BLOCK (exit code 1); after the record is written it returns PASS (exit code 0).
 
 ![gate clips run: BLOCK, visual review record, PASS](docs/assets/gate-demo.gif)
@@ -137,15 +134,7 @@ A `gate.py clips` run. Without a visual review record it returns BLOCK (exit cod
 
 Gates measure only the finished mp4, so the standard is the same whichever engine made it.
 
-### Frame strips
-
-Some clips match the keyframe at the start, then change the person after one or two seconds. `gate clips` builds an image per clip with the keyframe and frames at 0, 1.0, 1.5, 2.0, and 3.0 seconds in one row.
-
-![Frame strip example](docs/assets/strip.png)
-
-Similarity values such as SSIM cannot tell a person's motion from deformation (`gotchas.md` G02). The gate checks only the start-frame match numerically and asks a person to review and record the later frames.
-
-### Harness check
+Similarity values such as SSIM cannot tell a person's motion from deformation (`gotchas.md` G02). The gate checks only the start-frame match numerically and asks a person to review the frame strips and record the later frames.
 
 From the repository folder, run `bash skills/motion-video-production/harness/selftest.sh`. To check an installed copy, run `bash "$SKILL_ROOT/harness/selftest.sh"`. Exit code 0 means the cases behave as expected on this computer.
 
