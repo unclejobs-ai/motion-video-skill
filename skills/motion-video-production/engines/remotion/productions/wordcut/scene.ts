@@ -81,6 +81,8 @@ export function letterOffset(n: number, p: number) {
   const dir = n % 2 ? 1 : -1, r = ((n * 37) % 11) / 11;
   return { x: dir * p * (40 + r * 60), y: (r - 0.5) * p * 50, o: 1 - p };
 }
+/** opacity of the closing image (0 when DATA.closing is null or before it starts) */
+export const closingOpacity = (f: number, on: boolean) => (on ? ease.out(prog(f, T.closing.from, T.closing.frames)) : 0);
 /** dictionary definition n stacks in */
 export function dictDef(f: number, n: number) {
   const a = ease.out(prog(f, T.dict.defFrom + n * T.dict.defStep, T.dict.defFrames));

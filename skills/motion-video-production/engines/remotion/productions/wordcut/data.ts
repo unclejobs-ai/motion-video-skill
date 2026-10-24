@@ -37,6 +37,9 @@ export const DATA = {
   ] satisfies Sheet[] as Sheet[],
   /** the ending: a textbook line whose letters scatter, then the word becomes a dictionary head word */
   textbook: { chapter: '3장 · 몸과 습관', before: ['몸은 쓰는 만큼 깨어나고, 쉬는 만큼 회복한다. 둘 사이의 균형이 하루의 결을 정한다.'], line: ['가볍게 바람을 쐬며 천천히 걷는 일을 ', '이라고 부른다.'], after: ['방법은 사람마다 다르다. 같은 이름으로 부르지만 걷는 이유는 저마다 있다.'] },
+  /** optional closing image (a file under the engine's public/ folder, e.g. 'closing.jpg'): the last beat fades to it
+   *  and holds while the word stays in its slot on top. null ends on the dictionary page. */
+  closing: null as string | null,
   dict: [{ tag: '명사', text: '휴식이나 건강을 위해서 천천히 걷는 일' }, { text: '저녁마다 공원을 산책하다' }, { tag: '비슷한말', text: '산보(散步)' }, { tag: '영어', text: 'walk' }],
   /** paper colour per sheet kind behind the sheet */
   bg: { post: '#121314', receipt: '#fbfaf6', qa: '#ffffff', news: '#f3efe4', chat: '#e9ecef', subtitle: '#1b1d20', memo: '#fffdf7', search: '#ffffff', diary: '#fbf8f1', notice: '#22262c', textbook: '#faf7ef', dict: '#F6F3EC' },

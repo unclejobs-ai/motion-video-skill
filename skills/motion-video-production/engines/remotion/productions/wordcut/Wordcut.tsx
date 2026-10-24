@@ -6,13 +6,13 @@
 // drift check (drift.mjs) `diag` drops the lens layers and paints one thing magenta: 'sheet' the moving sheet's word
 // (slot hidden), 'slot' the slot word, 'slotbox' the highlighter box.
 import React, { useEffect, useRef, useState } from 'react';
-import { AbsoluteFill, continueRender, delayRender, random, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, Img, continueRender, delayRender, random, staticFile, useCurrentFrame } from 'remotion';
 import { DATA, type Aspect } from './data.ts';
 import { SHEET_REFS, SheetBody } from './Sheets.tsx';
 import { CSS } from './sheets.css.ts';
 import { fontsReady } from './fonts.ts';
 import { LOOK, type Look } from './look.ts';
-import { VIEW, cam, dictHeadPx, slotOf, textbookScatter } from './scene.ts';
+import { VIEW, cam, closingOpacity, dictHeadPx, slotOf, textbookScatter } from './scene.ts';
 import { WORDCUT as T, kindOf, type SheetRef } from './timing.ts';
 
 export type WordcutProps = { aspect: Aspect; diag?: false | 'sheet' | 'slot' | 'slotbox'; look?: Partial<Look> };
@@ -88,6 +88,9 @@ export const Wordcut: React.FC<WordcutProps> = ({ aspect, diag = false, look }) 
             : { visibility: 'hidden' as const };
           return <div key={key(k)} data-k={key(k)} style={{ position: 'absolute', left: 0, top: 0, ...place }}><SheetBody k={k} f={f} dictPx={dictPx} slot={S} /></div>;
         })}
+        {DATA.closing && closingOpacity(f, true) > 0 && (
+          <Img src={staticFile(DATA.closing)} style={{ position: 'absolute', inset: 0, width: V.w, height: V.h, objectFit: 'cover', opacity: closingOpacity(f, true) }} />
+        )}
         {diag === 'slotbox' && a && <Highlight a={a} at={S} scale={c.scale} style={{ background: '#ff00ff' }} />}
         {diag === 'slot' && word}
         {!diag && !measuring && (

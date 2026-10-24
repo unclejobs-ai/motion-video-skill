@@ -6,7 +6,7 @@
 // element ('paper'): the same blank page the textbook empties out and the dictionary writes on.
 import type { Box, Film } from '../../pipeline/carry.ts';
 import { DATA, type Aspect, type Sheet } from './data.ts';
-import { VIEW, cam, dictDef, dictHeadPx, slotOf, textbookScatter } from './scene.ts';
+import { VIEW, cam, closingOpacity, dictDef, dictHeadPx, slotOf, textbookScatter } from './scene.ts';
 import { WORDCUT as T, kindOf } from './timing.ts';
 
 const aspect: Aspect = process.env.WORDCUT_ASPECT === '16x9' || process.env.WORDCUT_ASPECT === '9x16' ? process.env.WORDCUT_ASPECT : DATA.aspect;
@@ -44,6 +44,8 @@ export function track(t: number): Box[] {
   } else {
     boxes.push(R(`sheet-${String(cur)}`, c.dx, c.dy, V.w, V.h));
   }
+  const co = closingOpacity(f, !!DATA.closing);
+  if (co > 0) boxes.push(R('closing', 0, 0, V.w, V.h, co));
   const base = typeof cur === 'number' ? wordPx(DATA.sheets[cur]) : kind === 'dict' ? dictHeadPx(aspect) : 17;
   const px = base * c.scale, w = px * ems, h = px * 1.3;
   boxes.push(R('slot', S.x - w / 2, S.y - h / 2, w, h));

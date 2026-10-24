@@ -44,6 +44,8 @@ export const WORDCUT = {
   },
   /** the camera keeps pushing in on the dictionary entry while the definitions stack in */
   dict: { push: 0.15, defFrom: dictAt + 15, defStep: 16, defFrames: 14 },
+  /** closing image (DATA.closing): fades in over the last 2 s and holds */
+  closing: { from: PLAN.seconds * PLAN.fps - 2 * PLAN.fps, frames: 15 },
   /** the burst is hard cuts with a one-frame whip; declared as cuts to the probe */
   burst,
 } as const;

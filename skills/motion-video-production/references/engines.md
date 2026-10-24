@@ -50,6 +50,7 @@ Node.js 24 이상이 필요합니다(`.ts` 파일을 바로 실행). 모든 의�
 - **바꾸는 곳**: `data.ts`(단어, 장면 목록과 문구, 끝 문구, 화면비). 모든 문구는 단어 자리를 `{w}`로 표시하고, 장면마다 정확히 한 번 씁니다(`timing.test.ts`가 확인).
 - **타이밍**: `plan.ts`. 레퍼런스가 있으면 `node productions/wordcut/plan.mjs "$PROJECT_ROOT/ref/analysis.json" <초>`가 컷 간격·몰아치기·블러를 레퍼런스에서 뽑아 씁니다.
 - **고정된 구조**: 단어는 한 자리(측정 드리프트 0.11px 이하), 장면이 단어를 넘겨받음, 휙 넘김(나가는 장면의 마지막 프레임과 들어오는 장면의 첫 프레임이 블러와 함께 이동), 몰아치기 구간, 교과서, 사전.
+- **마무리 이미지**: `data.ts`의 `closing`에 엔진 `public/` 폴더의 이미지 파일 이름을 넣으면 마지막 2초에 그 이미지로 넘어가 멈추고 단어는 자리에 남습니다(`references/brand-intro.md`).
 - **렌더**: `node productions/wordcut/render.mjs video [9x16|16x9]` → `renders/wordcut/wordcut-<화면비>.mp4`
 - **한 자리 확인**: `node productions/wordcut/drift.mjs [9x16|16x9]` (픽셀 측정, 0.5px 넘게 움직이면 종료 코드 1)
 - **질감 맞추기**: `node productions/wordcut/look-fit.mjs "$PROJECT_ROOT/ref/analysis.json"` → 결과를 `look.ts`에 붙여 넣습니다. 렌더 한 번에 스틸 30장을 여러 번 렌더하므로 오래 걸립니다.

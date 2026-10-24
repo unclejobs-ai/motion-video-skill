@@ -140,6 +140,14 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 - 믹스와 mux는 `scripts/mix-mux.sh`로 합니다. 프레임 수가 맞을 때만 mux하고, 대사가 나올 때 음악을 낮춥니다.
 - 최종 확인은 `scripts/verify.sh`(`PRODUCTION=productions/<id>`를 주면 carry 검사도 함께)로 하고, 생성된 컨택트 시트를 직접 봅니다. 레퍼런스가 있으면 `gate.py ref`로 비교합니다.
 
+### 브랜드 소개 영상과 홈페이지 (레시피)
+"우리 가게 소개 영상을 홈페이지에 넣고 싶다"는 요청은 이 순서로 만듭니다. 새 엔진 없이 wordcut 템플릿과 `templates/homepage-intro.html`을 씁니다. 자세한 순서와 예시는 `references/brand-intro.md`에 있습니다.
+1. 레퍼런스를 읽고(있으면 0단계) 장면 목록을 4줄 이하로 씁니다. 한 줄 = 프레임 범위, 화면, 빌려 오는 레퍼런스.
+2. 이미지 프롬프트와 마무리를 정하는 키워드 3~6개를 고릅니다. 하나는 wordcut의 단어가 됩니다.
+3. 마무리 이미지를 생성합니다. 화면비는 영상과 같게, 단어 자리는 비워 둡니다.
+4. wordcut으로 컷을 만듭니다. `data.ts`의 `closing`에 마무리 이미지를 넣으면 마지막 비트가 그 이미지에서 멈춥니다.
+5. 홈페이지 한 장: 영상을 Three.js 장면 안의 카드에서 재생하는 HTML 한 장(`templates/homepage-intro.html`)이 산출물입니다. reduced motion이나 WebGL이 없으면 포스터(마지막 프레임)와 일반 페이지만 보여 줍니다.
+
 ## 캐릭터 일관성 7가지
 
 캐릭터 시트, 외형 고정문, 키프레임 시작 화면, 목소리 고정(같은 음성 ID), 대사와 입 모양 타이밍, 음악 박자, 품질 검수가 모두 맞물려야 장면이 바뀌어도 얼굴과 목소리가 같습니다. 항목별 문제와 맞추는 방법은 `references/consistency-7.md`에 있습니다.
