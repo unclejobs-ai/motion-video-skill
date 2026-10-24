@@ -1,8 +1,76 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="workflow-ref" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1148" width="720" height="1148" role="img" aria-labelledby="workflow-ref-title workflow-ref-desc">
-<title id="workflow-ref-title">제작 단계와 게이트</title><desc id="workflow-ref-desc">레퍼런스 분석을 0단계로 둔 7단계 제작 흐름과 단계별 게이트, 조립 단계의 바꿔 끼우는 엔진.</desc>
-<defs><style>@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500;600&amp;family=Noto+Sans+KR:wght@400;500;700;800&amp;display=swap');.k{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif} .m{font-family:'Geist Mono',ui-monospace,monospace}</style>
-<marker id="workflow-ref-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#0a0a09" stroke-width="1.6"/></marker>
-<marker id="workflow-ref-ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#c2410c" stroke-width="1.6"/></marker></defs>
-<rect width="720" height="1148" fill="#fafaf7"/>
-<text x="586" y="44" class="m" font-size="22" font-weight="600" fill="#57554f" text-anchor="middle">gate.py</text><path d="M586 168 V194" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><text x="24" y="110" class="m" font-size="22" font-weight="600" fill="#57554f" text-anchor="start">0</text><text x="52" y="112" class="k" font-size="26" font-weight="800" fill="#c2410c" text-anchor="start">레퍼런스 분석</text><text x="52" y="148" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">OpenCV</text><rect x="262" y="72" width="228" height="100" fill="#fff" stroke="#c2410c" stroke-width="3"/><text x="278" y="114" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">ref/ANALYSIS.md</text><text x="278" y="146" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">ref/targets.json</text><path d="M490 122 H510" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#workflow-ref-ao)"/><rect x="512" y="78" width="148" height="88" fill="#c2410c"/><text x="586" y="129" class="m" font-size="22" font-weight="600" fill="#fff" text-anchor="middle">ref</text><path d="M586 292 V318" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><text x="24" y="234" class="m" font-size="22" font-weight="600" fill="#57554f" text-anchor="start">1</text><text x="52" y="236" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">스토리·장면</text><text x="52" y="272" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">에이전트</text><rect x="262" y="196" width="228" height="100" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="278" y="254" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">STORY.md</text><path d="M490 246 H510" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><rect x="512" y="202" width="148" height="88" fill="#0a0a09"/><text x="586" y="253" class="m" font-size="22" font-weight="600" fill="#fff" text-anchor="middle">story</text><path d="M586 416 V442" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><text x="24" y="358" class="m" font-size="22" font-weight="600" fill="#57554f" text-anchor="start">2</text><text x="52" y="360" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">캐릭터 시트</text><text x="52" y="396" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">이미지 생성</text><rect x="262" y="320" width="228" height="100" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="278" y="362" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">character.txt</text><text x="278" y="394" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">sheet/*.png</text><path d="M490 370 H510" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><rect x="512" y="326" width="148" height="88" fill="#0a0a09"/><text x="586" y="377" class="m" font-size="22" font-weight="600" fill="#fff" text-anchor="middle">character</text><path d="M586 540 V566" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><text x="24" y="482" class="m" font-size="22" font-weight="600" fill="#57554f" text-anchor="start">3</text><text x="52" y="484" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">키프레임</text><text x="52" y="520" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">이미지 생성</text><rect x="262" y="444" width="228" height="100" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="278" y="502" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">key/*.png</text><path d="M490 494 H510" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><rect x="512" y="450" width="148" height="88" fill="#0a0a09"/><text x="586" y="501" class="m" font-size="22" font-weight="600" fill="#fff" text-anchor="middle">keyframes</text><path d="M586 664 V690" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><text x="24" y="606" class="m" font-size="22" font-weight="600" fill="#57554f" text-anchor="start">4</text><text x="52" y="608" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">영상 변환</text><text x="52" y="644" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">영상 생성</text><rect x="262" y="568" width="228" height="100" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="278" y="626" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">clip/*.mp4</text><path d="M490 618 H510" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><rect x="512" y="574" width="148" height="88" fill="#0a0a09"/><text x="586" y="625" class="m" font-size="22" font-weight="600" fill="#fff" text-anchor="middle">clips</text><path d="M586 788 V814" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><text x="24" y="730" class="m" font-size="22" font-weight="600" fill="#57554f" text-anchor="start">5</text><text x="52" y="732" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">음악·목소리</text><text x="52" y="768" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">composio · score</text><rect x="262" y="692" width="228" height="100" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="278" y="734" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">voices.json</text><text x="278" y="766" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">audio/*.wav</text><path d="M490 742 H510" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><rect x="512" y="698" width="148" height="88" fill="#0a0a09"/><text x="586" y="749" class="m" font-size="22" font-weight="600" fill="#fff" text-anchor="middle">audio</text><text x="24" y="854" class="m" font-size="22" font-weight="600" fill="#57554f" text-anchor="start">6</text><text x="52" y="856" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">조립</text><text x="52" y="892" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">바꿔 끼우는 엔진</text><rect x="262" y="816" width="228" height="100" rx="4" fill="#fff" stroke="#0a0a09" stroke-width="2" stroke-dasharray="8 6"/><rect x="276" y="828" width="200" height="34" rx="3" fill="#fff" stroke="#0a0a09" stroke-width="1.6"/><text x="376" y="852" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="middle">Remotion</text><rect x="276" y="868" width="200" height="34" rx="3" fill="#fff" stroke="#0a0a09" stroke-width="1.6"/><text x="376" y="892" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="middle">HyperFrames</text><path d="M490 866 H510" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><rect x="512" y="822" width="148" height="88" fill="#0a0a09"/><text x="586" y="873" class="m" font-size="22" font-weight="600" fill="#fff" text-anchor="middle">final</text><line x1="24" y1="944" x2="696" y2="944" stroke="#d6d3cb" stroke-width="1.5"/><path d="M24 988 H96" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#workflow-ref-a)"/><text x="112" y="996" class="k" font-size="22" font-weight="500" fill="#0a0a09" text-anchor="start">PASS (종료 코드 0): 다음 단계로</text><path d="M96 1036 H24" fill="none" stroke="#c2410c" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#workflow-ref-ao)"/><text x="112" y="1044" class="k" font-size="22" font-weight="700" fill="#c2410c" text-anchor="start">BLOCK (종료 코드 1): 고쳐서 다시 실행</text><text x="24" y="1090" class="k" font-size="22" font-weight="400" fill="#57554f" text-anchor="start">게이트는 완성된 mp4만 잽니다.</text><text x="24" y="1122" class="k" font-size="22" font-weight="400" fill="#57554f" text-anchor="start">엔진을 바꿔도 기준은 그대로예요.</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1608" viewBox="0 0 720 1608" role="img" aria-labelledby="workflow-ref-title workflow-ref-desc">
+  <title id="workflow-ref-title">제작 단계와 단계별 게이트</title>
+  <desc id="workflow-ref-desc">레퍼런스 분석부터 조립까지 7단계. 산출물을 검사하고 PASS면 다음 단계, BLOCK이면 수정 후 같은 게이트를 재실행합니다.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
+      .title { font-size: 34px; font-weight: 700; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
+      .muted { fill: #626860; }
+      .accent { fill: #B8441A; }
+      .rule { stroke: #626860; stroke-opacity: .24; }
+      .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="1608" fill="#FFFFFF"/>
+  <text x="40" y="68" class="title">제작 단계와 단계별 게이트</text>
+  <text x="40" y="112" class="muted">만들고, 검사하고, 다음 단계로.</text>
+  <text x="680" y="112" class="mono muted" text-anchor="end">gate.py</text>
+  <path d="M40 152H680" class="rule"/>
+  <text x="40" y="194" class="mono muted">0</text>
+  <text x="84" y="194" class="heading accent">레퍼런스 분석</text>
+  <text x="84" y="232" class="muted">OpenCV</text>
+  <text x="84" y="270" class="mono">ref/ANALYSIS.md</text>
+  <text x="84" y="300" class="mono">ref/targets.json</text>
+  <text x="680" y="194" class="mono accent" text-anchor="end">ref</text>
+  <path d="M52 214V290" class="flow"/>
+  <path d="M40 324H680" class="rule"/>
+  <text x="40" y="366" class="mono muted">1</text>
+  <text x="84" y="366" class="heading">스토리·장면</text>
+  <text x="84" y="404" class="muted">에이전트</text>
+  <text x="84" y="442" class="mono">STORY.md</text>
+  <text x="680" y="366" class="mono accent" text-anchor="end">story</text>
+  <path d="M52 386V462" class="flow"/>
+  <path d="M40 496H680" class="rule"/>
+  <text x="40" y="538" class="mono muted">2</text>
+  <text x="84" y="538" class="heading">캐릭터 시트</text>
+  <text x="84" y="576" class="muted">이미지 생성</text>
+  <text x="84" y="614" class="mono">character.txt · sheet/*.png</text>
+  <text x="680" y="538" class="mono accent" text-anchor="end">character</text>
+  <path d="M52 558V634" class="flow"/>
+  <path d="M40 668H680" class="rule"/>
+  <text x="40" y="710" class="mono muted">3</text>
+  <text x="84" y="710" class="heading">키프레임</text>
+  <text x="84" y="748" class="muted">이미지 생성</text>
+  <text x="84" y="786" class="mono">key/*.png</text>
+  <text x="680" y="710" class="mono accent" text-anchor="end">keyframes</text>
+  <path d="M52 730V806" class="flow"/>
+  <path d="M40 840H680" class="rule"/>
+  <text x="40" y="882" class="mono muted">4</text>
+  <text x="84" y="882" class="heading">영상 변환</text>
+  <text x="84" y="920" class="muted">영상 생성</text>
+  <text x="84" y="958" class="mono">clip/*.mp4</text>
+  <text x="680" y="882" class="mono accent" text-anchor="end">clips</text>
+  <path d="M52 902V978" class="flow"/>
+  <path d="M40 1012H680" class="rule"/>
+  <text x="40" y="1054" class="mono muted">5</text>
+  <text x="84" y="1054" class="heading">음악·목소리</text>
+  <text x="84" y="1092" class="muted">composio · score</text>
+  <text x="84" y="1130" class="mono">voices.json · audio/*.wav</text>
+  <text x="680" y="1054" class="mono accent" text-anchor="end">audio</text>
+  <path d="M52 1074V1150" class="flow"/>
+  <path d="M40 1184H680" class="rule"/>
+  <text x="40" y="1226" class="mono muted">6</text>
+  <text x="84" y="1226" class="heading">조립</text>
+  <text x="84" y="1264" class="muted">바꿔 끼우는 엔진</text>
+  <text x="84" y="1302" class="mono">Remotion · HyperFrames</text>
+  <text x="680" y="1226" class="mono accent" text-anchor="end">edit / final</text>
+  <path d="M40 1356H680" class="rule"/>
+  <text x="40" y="1400" class="mono">PASS · exit 0: 다음 단계로</text>
+  <text x="40" y="1442" class="mono accent">BLOCK · exit 1: 고쳐서 다시 실행</text>
+  <text x="40" y="1506" class="muted">계획 전: 문서와 목표값을 검사해요.</text>
+  <text x="40" y="1548" class="muted">렌더 후: 완성본을 재고 목표와 비교해요.</text>
+  <text x="40" y="1586" class="muted">엔진을 바꿔도 비교 기준은 그대로예요.</text>
+</svg>

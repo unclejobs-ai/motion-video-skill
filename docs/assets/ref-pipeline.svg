@@ -1,8 +1,71 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="ref-pipeline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1088" width="720" height="1088" role="img" aria-labelledby="ref-pipeline-title ref-pipeline-desc">
-<title id="ref-pipeline-title">레퍼런스 분석 파이프라인</title><desc id="ref-pipeline-desc">레퍼런스 영상을 지표로 분해해 목표값을 만들고, 바꿔 끼우는 엔진으로 렌더한 결과를 같은 분석으로 재서 gate ref가 비교하는 흐름.</desc>
-<defs><style>@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500;600&amp;family=Noto+Sans+KR:wght@400;500;700;800&amp;display=swap');.k{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif} .m{font-family:'Geist Mono',ui-monospace,monospace}</style>
-<marker id="ref-pipeline-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#0a0a09" stroke-width="1.6"/></marker>
-<marker id="ref-pipeline-ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#c2410c" stroke-width="1.6"/></marker></defs>
-<rect width="720" height="1088" fill="#fafaf7"/>
-<path d="M178 268 V322" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#ref-pipeline-a)"/><path d="M178 496 V550" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#ref-pipeline-a)"/><path d="M178 724 V778" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#ref-pipeline-a)"/><path d="M332 866 H386" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#ref-pipeline-a)"/><path d="M542 780 V726" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#ref-pipeline-a)"/><path d="M542 552 V498" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#ref-pipeline-a)"/><path d="M542 324 V270" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#ref-pipeline-a)"/><path d="M332 612 H352 Q360 612 360 604 V190 Q360 182 368 182 H386" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#ref-pipeline-ao)"/><rect x="336" y="386" width="48" height="56" fill="#fafaf7"/><text x="360" y="410" class="k" font-size="22" font-weight="700" fill="#c2410c" text-anchor="middle">목</text><text x="360" y="436" class="k" font-size="22" font-weight="700" fill="#c2410c" text-anchor="middle">표</text><path d="M542 96 V36" fill="none" stroke="#0a0a09" stroke-width="2.5" marker-end="url(#ref-pipeline-a)"/><text x="526" y="58" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="end">PASS · exit 0: 다음 단계</text><rect x="24" y="96" width="308" height="172" rx="4" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="44" y="140" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">레퍼런스 영상</text><text x="44" y="180" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="start">reference.mp4</text><text x="44" y="212" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">커밋하지 않고</text><text x="44" y="244" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">숫자만 남김</text><rect x="24" y="324" width="308" height="172" rx="4" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="44" y="368" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">ref-analyze.py</text><text x="44" y="408" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">컷·홀드 · 광학 흐름</text><text x="44" y="440" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">블러 · 심도 띠</text><text x="44" y="472" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">그레인 · 질감</text><rect x="24" y="552" width="308" height="172" rx="4" fill="#fff" stroke="#c2410c" stroke-width="3"/><text x="44" y="596" class="k" font-size="26" font-weight="800" fill="#c2410c" text-anchor="start">ref/targets.json</text><text x="44" y="636" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">지표별 목표와</text><text x="44" y="668" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">허용 오차</text><text x="44" y="700" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">ANALYSIS.md가 인용</text><rect x="24" y="780" width="308" height="172" rx="4" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="44" y="824" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">계획</text><text x="44" y="864" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="start">plan.mjs</text><text x="44" y="896" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="start">look-fit.mjs</text><text x="44" y="928" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="start">BEATSHEET.md</text><rect x="388" y="780" width="308" height="172" rx="4" fill="#fff" stroke="#0a0a09" stroke-width="2" stroke-dasharray="8 6"/><text x="408" y="824" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">엔진 (바꿔 끼움)</text><rect x="404" y="842" width="276" height="42" rx="3" fill="#fff" stroke="#0a0a09" stroke-width="1.6"/><text x="420" y="870" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">Remotion</text><text x="664" y="870" class="k" font-size="20" font-weight="400" fill="#57554f" text-anchor="end">carry</text><rect x="404" y="894" width="276" height="42" rx="3" fill="#fff" stroke="#0a0a09" stroke-width="1.6"/><text x="420" y="922" class="m" font-size="20" font-weight="600" fill="#0a0a09" text-anchor="start">HyperFrames</text><text x="664" y="922" class="k" font-size="20" font-weight="400" fill="#57554f" text-anchor="end">HTML</text><rect x="388" y="552" width="308" height="172" rx="4" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="408" y="596" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">out/final.mp4</text><text x="408" y="636" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="start">mix-mux.sh</text><text x="408" y="668" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="start">verify.sh</text><text x="408" y="700" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">음악·목소리를 입힌 완성본</text><rect x="388" y="324" width="308" height="172" rx="4" fill="#fff" stroke="#0a0a09" stroke-width="2"/><text x="408" y="368" class="k" font-size="26" font-weight="800" fill="#0a0a09" text-anchor="start">렌더 분석</text><text x="408" y="408" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="start">ref-analyze.py</text><text x="408" y="440" class="m" font-size="19" font-weight="600" fill="#0a0a09" text-anchor="start">qa/render-analysis.json</text><rect x="388" y="96" width="308" height="172" rx="4" fill="#fff" stroke="#c2410c" stroke-width="3"/><text x="408" y="140" class="k" font-size="26" font-weight="800" fill="#c2410c" text-anchor="start">gate.py ref</text><text x="408" y="180" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">지표마다 목표·값·차이</text><text x="408" y="212" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">범위 밖이면 exit 1</text><text x="408" y="244" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">→ 계획을 고침</text><line x1="24" y1="988" x2="696" y2="988" stroke="#d6d3cb" stroke-width="1.5"/><text x="24" y="1030" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">움직임은 1/30초당 값이라 fps가 달라도 비교돼요.</text><text x="24" y="1062" class="k" font-size="21" font-weight="400" fill="#57554f" text-anchor="start">게이트는 mp4만 보므로 엔진이 달라도 같은 기준이에요.</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1560" viewBox="0 0 720 1560" role="img" aria-labelledby="ref-pipeline-title ref-pipeline-desc">
+  <title id="ref-pipeline-title">레퍼런스 분석 파이프라인</title>
+  <desc id="ref-pipeline-desc">레퍼런스에서 목표를 정하고, 계획과 엔진을 거쳐 만든 완성본을 같은 지표로 분석해 비교합니다. 목표값은 마지막 ref 게이트에도 전달됩니다.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
+      .title { font-size: 34px; font-weight: 700; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
+      .muted { fill: #626860; }
+      .accent { fill: #B8441A; }
+      .rule { stroke: #626860; stroke-opacity: .24; }
+      .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="1560" fill="#FFFFFF"/>
+  <text x="40" y="68" class="title">레퍼런스 분석 파이프라인</text>
+  <text x="40" y="112" class="muted">같은 지표로 목표와 완성본을 비교해요.</text>
+  <path d="M40 164H680" class="rule"/>
+  <text x="40" y="208" class="mono muted">01</text>
+  <text x="100" y="208" class="heading">레퍼런스 영상</text>
+  <text x="100" y="248" class="mono">reference.mp4</text>
+  <text x="100" y="284" class="muted">커밋하지 않고 숫자만 남김</text>
+  <path d="M56 228V298" class="flow"/>
+  <path d="M40 316H680" class="rule"/>
+  <text x="40" y="360" class="mono muted">02</text>
+  <text x="100" y="360" class="heading">분석 · ref-analyze.py</text>
+  <text x="100" y="400" class="muted">컷·홀드 · 광학 흐름 · 블러</text>
+  <text x="100" y="436" class="muted">심도 띠 · 그레인 · 질감</text>
+  <path d="M56 380V450" class="flow"/>
+  <path d="M40 468H680" class="rule"/>
+  <text x="40" y="512" class="mono muted">03</text>
+  <text x="100" y="512" class="heading accent">목표 · ref/targets.json</text>
+  <text x="100" y="552" class="muted">지표별 목표와 허용 오차</text>
+  <text x="100" y="588" class="muted">ANALYSIS.md가 인용</text>
+  <path d="M56 532V602" class="flow"/>
+  <path d="M40 620H680" class="rule"/>
+  <text x="40" y="664" class="mono muted">04</text>
+  <text x="100" y="664" class="heading">계획</text>
+  <text x="100" y="704" class="mono">plan.mjs · look-fit.mjs</text>
+  <text x="100" y="740" class="mono">BEATSHEET.md</text>
+  <path d="M56 684V754" class="flow"/>
+  <path d="M40 772H680" class="rule"/>
+  <text x="40" y="816" class="mono muted">05</text>
+  <text x="100" y="816" class="heading">엔진 (바꿔 끼움)</text>
+  <text x="100" y="856" class="mono">Remotion — carry</text>
+  <text x="100" y="892" class="mono">HyperFrames — HTML</text>
+  <path d="M56 836V906" class="flow"/>
+  <path d="M40 924H680" class="rule"/>
+  <text x="40" y="968" class="mono muted">06</text>
+  <text x="100" y="968" class="heading">완성본 · out/final.mp4</text>
+  <text x="100" y="1008" class="mono">mix-mux.sh · verify.sh</text>
+  <text x="100" y="1044" class="muted">음악·목소리를 입힌 완성본</text>
+  <path d="M56 988V1058" class="flow"/>
+  <path d="M40 1076H680" class="rule"/>
+  <text x="40" y="1120" class="mono muted">07</text>
+  <text x="100" y="1120" class="heading">렌더 분석 · ref-analyze.py</text>
+  <text x="100" y="1160" class="mono">qa/render-analysis.json</text>
+  <text x="100" y="1196" class="muted">레퍼런스와 같은 분석으로 측정</text>
+  <text x="560" y="512" class="muted">목표값</text>
+  <path d="M646 512H668V1250H646" class="flow" stroke-dasharray="5 7"/>
+  <path d="M56 1140V1212" class="flow"/>
+  <rect x="40" y="1232" width="600" height="192" rx="12" fill="#FFFFFF" stroke="#B8441A" stroke-width="2"/>
+  <text x="64" y="1274" class="mono accent">gate.py ref</text>
+  <text x="64" y="1318" class="accent">목표·측정값·차이를 지표마다 비교</text>
+  <text x="64" y="1360" class="mono">PASS · exit 0: 다음 단계</text>
+  <text x="64" y="1398" class="mono accent">BLOCK · exit 1: 계획을 고침</text>
+  <text x="40" y="1482" class="muted">움직임은 1/30초당 값: fps가 달라도 비교.</text>
+  <text x="40" y="1524" class="muted">완성본 비교는 엔진과 무관하게 같은 기준.</text>
+</svg>

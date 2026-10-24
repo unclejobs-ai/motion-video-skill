@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="2176" viewBox="0 0 720 2176" role="img" aria-labelledby="workflow-title workflow-desc">
+  <title id="workflow-title">제작 흐름과 검사 항목</title>
+  <desc id="workflow-desc">6단계 제작 흐름. 각 단계의 산출물과 검사 항목, 통과·수정 흐름과 눈 검수 기록을 함께 보여줍니다.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
+      .title { font-size: 34px; font-weight: 700; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
+      .muted { fill: #626860; }
+      .accent { fill: #B8441A; }
+      .rule { stroke: #626860; stroke-opacity: .24; }
+      .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="2176" fill="#FFFFFF"/>
+  <text x="40" y="68" class="title">제작 흐름과 검사 항목</text>
+  <text x="40" y="112" class="muted">단계마다 만들고, 검사하고, 필요하면 고쳐요.</text>
+  <path d="M40 156H680" class="rule"/>
+  <text x="40" y="200" class="mono muted">1</text>
+  <text x="84" y="200" class="heading">스토리·장면 기획</text>
+  <text x="84" y="240" class="muted">Claude</text>
+  <text x="84" y="282" class="mono">STORY.md</text>
+  <text x="84" y="328" class="mono accent">gate story</text>
+  <text x="84" y="366" class="muted">빈칸 · BPM · 음악 싱크 지점</text>
+  <path d="M52 222V380" class="flow"/>
+  <path d="M40 416H680" class="rule"/>
+  <text x="40" y="460" class="mono muted">2</text>
+  <text x="84" y="460" class="heading">캐릭터 시트</text>
+  <text x="84" y="500" class="muted">이미지 생성 도구</text>
+  <text x="84" y="542" class="mono">character.txt · sheet/*.png</text>
+  <text x="84" y="588" class="mono accent">gate character</text>
+  <text x="84" y="626" class="muted">고정문 1개 문단 · 시트 이미지</text>
+  <path d="M52 482V640" class="flow"/>
+  <path d="M40 676H680" class="rule"/>
+  <text x="40" y="720" class="mono muted">3</text>
+  <text x="84" y="720" class="heading">키프레임</text>
+  <text x="84" y="760" class="muted">이미지 생성 도구</text>
+  <text x="84" y="802" class="mono">key/*.png</text>
+  <text x="84" y="848" class="mono accent">gate keyframes</text>
+  <text x="84" y="886" class="muted">중복 파일 · 크기 통일</text>
+  <path d="M52 742V900" class="flow"/>
+  <path d="M40 936H680" class="rule"/>
+  <text x="40" y="980" class="mono muted">4</text>
+  <text x="84" y="980" class="heading">영상 변환</text>
+  <text x="84" y="1020" class="muted">영상 생성 도구</text>
+  <text x="84" y="1062" class="mono">clip/*.mp4</text>
+  <text x="84" y="1108" class="mono accent">gate clips</text>
+  <text x="84" y="1146" class="muted">길이 · 프레임 수 · 시작 화면 일치</text>
+  <text x="84" y="1178" class="muted">프레임 스트립 → 눈 검수</text>
+  <path d="M52 1002V1160" class="flow"/>
+  <path d="M40 1196H680" class="rule"/>
+  <text x="40" y="1240" class="mono muted">5</text>
+  <text x="84" y="1240" class="heading">음악·목소리</text>
+  <text x="84" y="1280" class="muted">음악·음성 도구</text>
+  <text x="84" y="1322" class="mono">voices.json · audio/*.wav</text>
+  <text x="84" y="1368" class="mono accent">gate audio</text>
+  <text x="84" y="1406" class="muted">음성 ID 1개 · 대사 파일</text>
+  <path d="M52 1262V1420" class="flow"/>
+  <path d="M40 1456H680" class="rule"/>
+  <text x="40" y="1500" class="mono muted">6</text>
+  <text x="84" y="1500" class="heading">조립</text>
+  <text x="84" y="1540" class="muted">Remotion · ffmpeg</text>
+  <text x="84" y="1582" class="mono">edit.json · out/final.mp4</text>
+  <text x="84" y="1628" class="mono accent">gate edit → final</text>
+  <text x="84" y="1666" class="muted">박 격자 · 반복 컷 · 프레임 수 · 라우드니스</text>
+  <text x="84" y="1698" class="muted">컨택트 시트 → 눈 검수</text>
+  <path d="M40 1744H680" class="rule"/>
+  <text x="40" y="1788" class="heading">PASS · 종료 코드 0</text>
+  <text x="40" y="1830" class="muted">다음 단계로 진행. WARN은 보고서에 남겨요.</text>
+  <text x="40" y="1894" class="heading accent">BLOCK · 종료 코드 1</text>
+  <text x="40" y="1936" class="mono">qa/gate-&lt;단계&gt;.txt</text>
+  <text x="40" y="1976" class="muted">BLOCK 줄을 읽고 산출물을 고친 뒤 재실행.</text>
+  <path d="M40 2008H680" class="rule"/>
+  <text x="40" y="2052" class="heading">눈 검수: REVIEWED 기록이 있어야 통과</text>
+  <text x="40" y="2094" class="mono">clips → qa/clips-review.md</text>
+  <text x="40" y="2134" class="mono">final → qa/review.md</text>
+</svg>

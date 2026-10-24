@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1184" viewBox="0 0 720 1184" role="img" aria-labelledby="seams-title seams-desc">
+  <title id="seams-title">일관성 7가지가 놓이는 자리</title>
+  <desc id="seams-desc">스토리부터 조립까지 제작 흐름에 캐릭터 시트, 외형 고정문, 키프레임 시작 화면, 목소리 고정, 대사·입 모양, 음악 박자, 품질 검수를 연결합니다.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
+      .title { font-size: 34px; font-weight: 700; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
+      .muted { fill: #626860; }
+      .accent { fill: #B8441A; }
+      .rule { stroke: #626860; stroke-opacity: .24; }
+      .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="1184" fill="#FFFFFF"/>
+  <text x="40" y="68" class="title">일관성 7가지가 놓이는 자리</text>
+  <text x="40" y="112" class="muted">각 단계에서 다음 장면으로 이어지는 기준</text>
+  <path d="M40 156H680" class="rule"/>
+  <text x="40" y="200" class="mono muted">1</text>
+  <text x="84" y="200" class="heading">스토리</text>
+  <text x="84" y="240" class="mono muted">STORY.md</text>
+  <path d="M52 220V300" class="flow"/>
+  <path d="M40 320H680" class="rule"/>
+  <text x="40" y="364" class="mono muted">2</text>
+  <text x="84" y="364" class="heading">캐릭터 시트</text>
+  <text x="84" y="404" class="muted">PNG</text>
+  <text x="376" y="364" class="mono accent">01</text>
+  <text x="428" y="364">캐릭터 시트</text>
+  <path d="M52 384V464" class="flow"/>
+  <path d="M40 484H680" class="rule"/>
+  <text x="40" y="528" class="mono muted">3</text>
+  <text x="84" y="528" class="heading">키프레임</text>
+  <text x="84" y="568" class="muted">장면당 1장</text>
+  <text x="376" y="528" class="mono accent">01</text>
+  <text x="428" y="528">캐릭터 시트</text>
+  <text x="376" y="570" class="mono accent">02</text>
+  <text x="428" y="570">외형 고정문</text>
+  <path d="M52 548V628" class="flow"/>
+  <path d="M40 648H680" class="rule"/>
+  <text x="40" y="692" class="mono muted">4</text>
+  <text x="84" y="692" class="heading">영상 변환</text>
+  <text x="84" y="732" class="muted">클립</text>
+  <text x="376" y="692" class="mono accent">03</text>
+  <text x="428" y="692">키프레임 시작 화면</text>
+  <path d="M52 712V792" class="flow"/>
+  <path d="M40 812H680" class="rule"/>
+  <text x="40" y="856" class="mono muted">5</text>
+  <text x="84" y="856" class="heading">음악·목소리</text>
+  <text x="84" y="896" class="muted">BPM · 음성 ID</text>
+  <text x="376" y="856" class="mono accent">04</text>
+  <text x="428" y="856">목소리 고정</text>
+  <text x="376" y="898" class="mono accent">06</text>
+  <text x="428" y="898">음악 박자</text>
+  <path d="M52 876V956" class="flow"/>
+  <path d="M40 976H680" class="rule"/>
+  <text x="40" y="1020" class="mono muted">6</text>
+  <text x="84" y="1020" class="heading">조립</text>
+  <text x="84" y="1060" class="muted">Remotion</text>
+  <text x="376" y="1020" class="mono accent">05</text>
+  <text x="428" y="1020">대사·입 모양</text>
+  <text x="376" y="1062" class="mono accent">06</text>
+  <text x="428" y="1062">음악 박자</text>
+  <text x="376" y="1104" class="mono accent">07</text>
+  <text x="428" y="1104">품질 검수</text>
+</svg>
