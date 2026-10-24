@@ -199,6 +199,13 @@ skills/motion-video-production/        Skill folder to install (everything below
 
 On 2026-10-25 the committed tree was exported and installed as is. All 76 skill files installed. Engine `npm ci`, typecheck, 13 tests, the carry probe and the selftest passed. Renders in both engines were measured with `verify.sh` and `gate.py ref`, and the HyperFrames render passed `gate.py final`. Not checked: external generation, voice credits, listening to audio, and invocation inside the seven other runtimes. Details are in [docs/runtimes.md](docs/runtimes.md).
 
+## Known limitations
+
+- **The carry probe is Remotion-only.** It reads the boxes declared before rendering (`track.ts`). HyperFrames renders are measured on the mp4 with `verify.sh`, `gate.py final` and `gate.py ref`. There is no mp4-side carry measurement yet.
+- **The wordcut demo is an untuned first render.** Against the reference targets, `gate.py ref` blocks 10 of 12 metrics; grain, sharpness ratio and contrast are furthest off. Re-running `look-fit.mjs` and `plan.mjs` to close that gap is how the skill is meant to be used.
+- **A closing image lowers the carry score to 0.50 (WARN).** The boundary where the image covers the page counts as bare. If the score drops below 0.5, turn another boundary into a carry.
+- **The full text of the GSAP license clauses was not verified.** GSAP 3.14.2, used by the HyperFrames demo, says in its README that it is free including commercial use. Check https://gsap.com/standard-license yourself before publishing.
+
 ## Built by
 
 This skill distills the review criteria the team behind [SceneSteller](https://www.scenesteller.com/?utm_source=github&utm_medium=readme&utm_campaign=motion-video-skill) built up while producing videos. If you'd rather go from story to finished video right in your browser, try it in SceneSteller.

@@ -199,6 +199,13 @@ skills/motion-video-production/        설치하는 스킬 폴더 (아래 전체
 
 2026-10-25에 커밋한 트리를 그대로 꺼내 설치하고 확인했어요. 스킬 파일 76개가 모두 설치됐어요. 엔진 `npm ci`, 타입 검사, 테스트 13개, carry 검사, selftest가 통과했어요. 두 엔진의 렌더를 `verify.sh`와 `gate.py ref`로 쟀고, HyperFrames 렌더는 `gate.py final`을 통과했어요. 외부 생성, 목소리 크레딧, 오디오 청취, 다른 일곱 런타임 안에서의 호출은 확인하지 않았어요. 자세한 내용은 [docs/runtimes.md](docs/runtimes.md)에 있어요.
 
+## 알려진 한계
+
+- **carry 검사는 Remotion 전용이에요.** 렌더 전에 선언한 상자(`track.ts`)를 읽기 때문이에요. HyperFrames 렌더는 `verify.sh`, `gate.py final`, `gate.py ref`로 mp4에서 재요. mp4에서 carry를 재는 방식은 아직 없어요.
+- **wordcut 데모는 조정 전 첫 렌더예요.** 레퍼런스 목표와 비교하면 `gate.py ref`가 12개 지표 중 10개에서 막아요. 그레인, 선명도 비, 대비가 특히 멀어요. `look-fit.mjs`와 `plan.mjs`를 다시 돌려 맞추는 과정이 이 스킬의 사용법이에요.
+- **마무리 이미지를 켜면 carry 점수가 0.50(WARN)으로 내려가요.** 이미지가 페이지를 덮는 경계가 bare로 세지기 때문이에요. 0.5 아래로 내려가면 다른 경계를 carry로 바꿔요.
+- **GSAP 라이선스 조항 전문은 확인하지 못했어요.** HyperFrames 데모가 쓰는 GSAP 3.14.2는 README에 상업 이용도 무료라고 적혀 있어요. 공개 전에 https://gsap.com/standard-license 를 직접 확인해요.
+
 ## 만든 곳
 
 이 스킬은 [SceneSteller](https://www.scenesteller.com/?utm_source=github&utm_medium=readme&utm_campaign=motion-video-skill)를 만드는 팀이 영상 제작 과정에서 쌓은 점검 기준을 정리한 것이에요. 스토리에서 영상까지 브라우저에서 바로 만들어 보고 싶다면 SceneSteller를 써 보세요.
