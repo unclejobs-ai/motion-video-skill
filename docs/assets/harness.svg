@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1580" viewBox="0 0 720 1580" role="img" aria-labelledby="harness-title harness-desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="788" viewBox="0 0 720 788" role="img" aria-labelledby="harness-title harness-desc">
   <title id="harness-title">게이트가 동작하는 방식</title>
-  <desc id="harness-desc">자동 측정과 사람의 눈 검수를 함께 기록합니다. 검사 보고서와 REVIEWED 기록을 확인하고 종료 코드 0 또는 1을 반환합니다.</desc>
+  <desc id="harness-desc">자동 측정과 눈 검수 기록을 확인하고 종료 코드 0 또는 1을 돌려줘요. 기록 파일은 순서대로 만드는 단계가 아니라 각각 남기는 산출물이에요.</desc>
   <defs>
     <style>
       text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
@@ -8,43 +8,30 @@
       .heading { font-size: 28px; font-weight: 700; }
       .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
       .muted { fill: #626860; }
+      .label { font-size: 24px; fill: #626860; }
       .accent { fill: #B8441A; }
       .rule { stroke: #626860; stroke-opacity: .24; }
       .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
     </style>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
   </defs>
-  <rect width="720" height="1580" fill="#FFFFFF"/>
+  <rect width="720" height="788" fill="#FFFFFF"/>
   <text x="40" y="68" class="title">게이트가 동작하는 방식</text>
   <text x="40" y="112" class="muted">자동 측정 + 눈 검수 + 기록 파일</text>
   <path d="M40 152H680" class="rule"/>
-  <text x="40" y="196" class="heading">자동 측정</text>
-  <text x="64" y="248" class="heading">산출물 폴더</text>
-  <text x="64" y="290" class="mono">key/ · clip/ · audio/ · out/</text>
-  <path d="M80 314V350" class="flow"/>
-  <text x="64" y="396" class="mono accent">gate.py &lt;단계&gt; &lt;폴더&gt;</text>
-  <text x="64" y="436" class="muted">ffprobe · ffmpeg로 측정</text>
-  <path d="M80 458V494" class="flow"/>
-  <text x="64" y="536" class="heading">검사 항목마다 PASS / WARN / BLOCK</text>
-  <text x="64" y="578" class="mono muted">예: V05 시작 화면 SSIM ≥ 0.55</text>
-  <path d="M40 622H680" class="rule"/>
-  <text x="40" y="666" class="heading">눈으로 확인</text>
-  <text x="64" y="718" class="heading">프레임 스트립 생성</text>
-  <text x="64" y="760" class="muted">키프레임 · 0 · 1.0 · 1.5 · 2.0 · 3.0초</text>
-  <path d="M80 782V818" class="flow"/>
-  <text x="64" y="860" class="heading">옷 · 안경 · 머리를 눈으로 비교</text>
-  <text x="64" y="902" class="muted">컨택트 시트로 전체 컷도 확인</text>
-  <path d="M40 946H680" class="rule"/>
-  <text x="40" y="990" class="heading">기록 파일</text>
-  <text x="64" y="1042" class="mono">보고서: qa/gate-&lt;단계&gt;.txt</text>
-  <text x="64" y="1084" class="muted">BLOCK · WARN 줄을 그대로 인용해 보고</text>
-  <text x="64" y="1148" class="mono accent">REVIEWED: &lt;이름&gt; &lt;날짜&gt;</text>
-  <text x="64" y="1190" class="mono">qa/clips-review.md</text>
-  <text x="64" y="1230" class="mono">qa/review.md</text>
-  <path d="M80 1254V1298" class="flow"/>
-  <rect x="40" y="1320" width="640" height="208" rx="12" fill="#FFFFFF" stroke="#B8441A" stroke-width="2"/>
-  <text x="64" y="1366" class="heading">종료 코드</text>
-  <text x="64" y="1410" class="mono">0 = 통과 · 1 = BLOCK</text>
-  <text x="64" y="1454" class="muted">clips · final은 눈 검수 기록이 있어야</text>
-  <text x="64" y="1492" class="muted">게이트를 통과해요.</text>
+  <text x="40" y="190" class="label">자동 측정</text>
+  <text x="64" y="232">ffprobe · ffmpeg · 시작 화면 SSIM</text>
+  <text x="64" y="270" class="mono accent">gate.py &lt;단계&gt; &lt;폴더&gt;</text>
+  <path d="M40 300H680" class="rule"/>
+  <text x="40" y="338" class="label">눈으로 확인</text>
+  <text x="64" y="380">프레임 스트립에서 옷·안경·머리를 비교해요.</text>
+  <path d="M40 412H680" class="rule"/>
+  <text x="40" y="450" class="label">기록 파일 (각각 남겨요)</text>
+  <text x="64" y="492" class="mono">qa/gate-&lt;단계&gt;.txt</text>
+  <text x="64" y="530" class="mono">qa/clips-review.md · qa/review.md</text>
+  <rect x="40" y="568" width="640" height="180" rx="12" fill="#FFFFFF" stroke="#626860" stroke-width="2"/>
+  <text x="64" y="610" class="heading">종료 코드</text>
+  <text x="64" y="650">0 = 통과 · 1 = BLOCK</text>
+  <text x="64" y="690" class="muted">clips · final은 눈 검수 기록도 있어야 해요.</text>
+  <text x="64" y="726" class="accent">BLOCK이면 고친 뒤 다시 실행해요.</text>
 </svg>

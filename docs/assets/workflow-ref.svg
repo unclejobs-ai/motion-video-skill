@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1608" viewBox="0 0 720 1608" role="img" aria-labelledby="workflow-ref-title workflow-ref-desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1324" viewBox="0 0 720 1324" role="img" aria-labelledby="workflow-ref-title workflow-ref-desc">
   <title id="workflow-ref-title">제작 단계와 단계별 게이트</title>
-  <desc id="workflow-ref-desc">레퍼런스 분석부터 조립까지 7단계. 산출물을 검사하고 PASS면 다음 단계, BLOCK이면 수정 후 같은 게이트를 재실행합니다.</desc>
+  <desc id="workflow-ref-desc">레퍼런스 분석부터 조립까지 7단계예요. 산출물을 검사하고 BLOCK이면 고쳐서 같은 게이트를 다시 실행해요.</desc>
   <defs>
     <style>
       text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
@@ -8,69 +8,69 @@
       .heading { font-size: 28px; font-weight: 700; }
       .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
       .muted { fill: #626860; }
+      .label { font-size: 24px; fill: #626860; }
       .accent { fill: #B8441A; }
       .rule { stroke: #626860; stroke-opacity: .24; }
       .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
     </style>
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
   </defs>
-  <rect width="720" height="1608" fill="#FFFFFF"/>
+  <rect width="720" height="1324" fill="#FFFFFF"/>
   <text x="40" y="68" class="title">제작 단계와 단계별 게이트</text>
-  <text x="40" y="112" class="muted">만들고, 검사하고, 다음 단계로.</text>
+  <text x="40" y="112" class="muted">만들고 검사한 뒤 다음 단계로 가요.</text>
   <text x="680" y="112" class="mono muted" text-anchor="end">gate.py</text>
   <path d="M40 152H680" class="rule"/>
-  <text x="40" y="194" class="mono muted">0</text>
-  <text x="84" y="194" class="heading accent">레퍼런스 분석</text>
-  <text x="84" y="232" class="muted">OpenCV</text>
-  <text x="84" y="270" class="mono">ref/ANALYSIS.md</text>
-  <text x="84" y="300" class="mono">ref/targets.json</text>
-  <text x="680" y="194" class="mono accent" text-anchor="end">ref</text>
-  <path d="M52 214V290" class="flow"/>
-  <path d="M40 324H680" class="rule"/>
-  <text x="40" y="366" class="mono muted">1</text>
-  <text x="84" y="366" class="heading">스토리·장면</text>
-  <text x="84" y="404" class="muted">에이전트</text>
-  <text x="84" y="442" class="mono">STORY.md</text>
-  <text x="680" y="366" class="mono accent" text-anchor="end">story</text>
-  <path d="M52 386V462" class="flow"/>
-  <path d="M40 496H680" class="rule"/>
-  <text x="40" y="538" class="mono muted">2</text>
-  <text x="84" y="538" class="heading">캐릭터 시트</text>
-  <text x="84" y="576" class="muted">이미지 생성</text>
-  <text x="84" y="614" class="mono">character.txt · sheet/*.png</text>
-  <text x="680" y="538" class="mono accent" text-anchor="end">character</text>
-  <path d="M52 558V634" class="flow"/>
-  <path d="M40 668H680" class="rule"/>
-  <text x="40" y="710" class="mono muted">3</text>
-  <text x="84" y="710" class="heading">키프레임</text>
-  <text x="84" y="748" class="muted">이미지 생성</text>
-  <text x="84" y="786" class="mono">key/*.png</text>
-  <text x="680" y="710" class="mono accent" text-anchor="end">keyframes</text>
-  <path d="M52 730V806" class="flow"/>
-  <path d="M40 840H680" class="rule"/>
-  <text x="40" y="882" class="mono muted">4</text>
-  <text x="84" y="882" class="heading">영상 변환</text>
-  <text x="84" y="920" class="muted">영상 생성</text>
-  <text x="84" y="958" class="mono">clip/*.mp4</text>
-  <text x="680" y="882" class="mono accent" text-anchor="end">clips</text>
-  <path d="M52 902V978" class="flow"/>
-  <path d="M40 1012H680" class="rule"/>
-  <text x="40" y="1054" class="mono muted">5</text>
-  <text x="84" y="1054" class="heading">음악·목소리</text>
-  <text x="84" y="1092" class="muted">composio · score</text>
-  <text x="84" y="1130" class="mono">voices.json · audio/*.wav</text>
-  <text x="680" y="1054" class="mono accent" text-anchor="end">audio</text>
-  <path d="M52 1074V1150" class="flow"/>
-  <path d="M40 1184H680" class="rule"/>
-  <text x="40" y="1226" class="mono muted">6</text>
-  <text x="84" y="1226" class="heading">조립</text>
-  <text x="84" y="1264" class="muted">바꿔 끼우는 엔진</text>
-  <text x="84" y="1302" class="mono">Remotion · HyperFrames</text>
-  <text x="680" y="1226" class="mono accent" text-anchor="end">edit / final</text>
-  <path d="M40 1356H680" class="rule"/>
-  <text x="40" y="1400" class="mono">PASS · exit 0: 다음 단계로</text>
-  <text x="40" y="1442" class="mono accent">BLOCK · exit 1: 고쳐서 다시 실행</text>
-  <text x="40" y="1506" class="muted">계획 전: 문서와 목표값을 검사해요.</text>
-  <text x="40" y="1548" class="muted">렌더 후: 완성본을 재고 목표와 비교해요.</text>
-  <text x="40" y="1586" class="muted">엔진을 바꿔도 비교 기준은 그대로예요.</text>
+  <text x="40" y="192" class="mono muted">0</text>
+  <text x="100" y="192" class="heading">레퍼런스 분석</text>
+  <text x="680" y="192" class="mono accent" text-anchor="end">ref</text>
+  <text x="100" y="228" class="muted">OpenCV</text>
+  <text x="100" y="262" class="mono">ref/ANALYSIS.md</text>
+  <text x="100" y="294" class="mono">ref/targets.json</text>
+  <path d="M56 212v50" class="flow"/>
+  <path d="M40 316H680" class="rule"/>
+  <text x="40" y="356" class="mono muted">1</text>
+  <text x="100" y="356" class="heading">스토리·장면</text>
+  <text x="680" y="356" class="mono accent" text-anchor="end">story</text>
+  <text x="100" y="392" class="muted">에이전트</text>
+  <text x="100" y="426" class="mono">STORY.md</text>
+  <path d="M56 376v50" class="flow"/>
+  <path d="M40 448H680" class="rule"/>
+  <text x="40" y="488" class="mono muted">2</text>
+  <text x="100" y="488" class="heading">캐릭터 시트</text>
+  <text x="680" y="488" class="mono accent" text-anchor="end">character</text>
+  <text x="100" y="524" class="muted">이미지 생성</text>
+  <text x="100" y="558" class="mono">character.txt · sheet/*.png</text>
+  <path d="M56 508v50" class="flow"/>
+  <path d="M40 580H680" class="rule"/>
+  <text x="40" y="620" class="mono muted">3</text>
+  <text x="100" y="620" class="heading">키프레임</text>
+  <text x="680" y="620" class="mono accent" text-anchor="end">keyframes</text>
+  <text x="100" y="656" class="muted">이미지 생성</text>
+  <text x="100" y="690" class="mono">key/*.png</text>
+  <path d="M56 640v50" class="flow"/>
+  <path d="M40 712H680" class="rule"/>
+  <text x="40" y="752" class="mono muted">4</text>
+  <text x="100" y="752" class="heading">영상 변환</text>
+  <text x="680" y="752" class="mono accent" text-anchor="end">clips</text>
+  <text x="100" y="788" class="muted">영상 생성</text>
+  <text x="100" y="822" class="mono">clip/*.mp4</text>
+  <path d="M56 772v50" class="flow"/>
+  <path d="M40 844H680" class="rule"/>
+  <text x="40" y="884" class="mono muted">5</text>
+  <text x="100" y="884" class="heading">음악·목소리</text>
+  <text x="680" y="884" class="mono accent" text-anchor="end">audio</text>
+  <text x="100" y="920" class="muted">composio · score</text>
+  <text x="100" y="954" class="mono">voices.json · audio/*.wav</text>
+  <path d="M56 904v50" class="flow"/>
+  <path d="M40 976H680" class="rule"/>
+  <text x="40" y="1016" class="mono muted">6</text>
+  <text x="100" y="1016" class="heading">조립</text>
+  <text x="680" y="1016" class="mono accent" text-anchor="end">edit / final</text>
+  <text x="100" y="1052" class="muted">바꿔 끼우는 엔진</text>
+  <text x="100" y="1086" class="mono">Remotion · HyperFrames</text>
+  <path d="M40 1108H680" class="rule"/>
+  <text x="40" y="1150">PASS · exit 0: 다음 단계로 가요</text>
+  <text x="40" y="1190" class="accent">BLOCK · exit 1: 고쳐서 다시 실행해요</text>
+  <text x="40" y="1246" class="muted">계획 전에는 문서와 목표값을 검사해요.</text>
+  <text x="40" y="1286" class="muted">렌더 후에는 완성본을 목표와 비교해요.</text>
 </svg>

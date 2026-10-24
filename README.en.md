@@ -1,30 +1,31 @@
-<p>
-  <img src="docs/assets/logo.svg" width="80" height="80" alt="Motion Video Production logo" />
-</p>
-
 # motion-video-production
 
 [한국어](README.md) · **English**
 
-A **production skill in the Agent Skills format** for making motion graphics, promo and character videos (15–90 seconds) from start to finish. Codex, Claude Code, and other skill-capable runtimes use the same skill folder. It ships gates (`harness/gate.py`) that measure each stage's outputs and report pass or fail through exit codes, a reference-video analyzer, and two ready-to-render engines (Remotion, HyperFrames).
+A **production skill in the Agent Skills format** for making 15–90 second motion graphics, promo and character mp4 videos with music and voice. It includes stage gates, a reference-video analyzer, and two render engines (Remotion, HyperFrames).
 
-Below is the frame strip `gate clips` builds for each clip. The keyframe and frames from 0 to 3 seconds sit in one row, so a person can check that the character stays the same.
+Codex, Claude Code, and other skill-capable runtimes use the same skill folder.
 
-![Frame strip example](docs/assets/strip.png)
+![Carry demo result at 1.5 and 3.0 seconds](docs/assets/carry-demo.png)
 
-**Jump to** · [60-second start](#60-second-start) · [Installation](#installation) · [What the full version adds](#what-the-full-version-adds) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Required tools](#required-tools) · [Verification scope](#verification-scope)
+The quick start renders this 5-second typography demo. These are the 1.5 and 3.0 second frames from `renders/carry-demo/contact.png`. The demo has music but no voice; its on-screen text is Korean.
 
-## 60-second start
+**Jump to** · [Quick start](#quick-start) · [Installation](#installation) · [What's inside](#whats-inside) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Required tools](#required-tools) · [Verification scope](#verification-scope)
+
+## Quick start
 
 After installing the skill (see [Installation](#installation)), copy an engine into a working folder and render a demo. Node.js 24 or newer and ffmpeg are required. Never install inside the skill folder.
 
 ```bash
 SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # your actual install path
+# Personal install: use "$HOME/.agents/skills/motion-video-production" or "$HOME/.claude/skills/motion-video-production"
 cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
+# carry: the fraction of cut boundaries with a surviving on-screen element
 node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
 node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
 node pipeline/render.mjs carry-demo                         # renders/carry-demo/picture.mp4
 node pipeline/score.mjs productions/carry-demo              # procedural score
+# <picture> <fps> <seconds> <music> <voice, - for none> <output>
 bash "$SKILL_ROOT/scripts/mix-mux.sh" renders/carry-demo/picture.mp4 60 5 productions/carry-demo/audio/score.wav - out/final.mp4
 bash "$SKILL_ROOT/scripts/verify.sh" out/final.mp4
 ```
@@ -78,12 +79,12 @@ After installation, confirm that `motion-video-production` appears in the runtim
 
 The agent first asks six things (publication type, length and aspect ratio, available tools, prohibited elements, reference video, engine) and proceeds stage by stage. Without generation tools, it hands you prompts and continues from the files you generate.
 
-## What the full version adds
+## What's inside
 
 | What | What it does | Where |
 |---|---|---|
 | Remotion engine | Pinned render pipeline, motion modules, demos | `engines/remotion/` |
-| Carry oracle | Measures, before rendering, whether something on screen survives each boundary | `pipeline/carry.ts`, `probe.mjs` |
+| Carry probe | Measures, before rendering, whether something on screen survives each boundary | `pipeline/carry.ts`, `probe.mjs` |
 | Wordcut template | One word held in one slot while scenes hand it over. Edit only `data.ts` | `productions/wordcut/` |
 | Look fit | Fits lens values to a reference's contrast, colour, grain and depth of field | `look-fit.mjs` |
 | Voice and music | ElevenLabs and Fish Audio voices via the composio CLI, a procedural score on the timing | `vo.mjs`, `score.mjs` |
@@ -94,33 +95,39 @@ The engine is swappable. Use Remotion when you need carry and wordcut, HyperFram
 
 ## Reference analysis
 
-![Reference analysis pipeline](docs/assets/ref-pipeline.png)
+![Reference analysis pipeline](docs/assets/ref-pipeline.en.png)
 
 "Make it like this video" is usually about motion and editing more than texture. Stage 0 takes the reference apart with OpenCV and records cuts and holds, optical flow, blur, depth of field, grain and look as numbers. The plan cites those numbers. After rendering, the same analysis measures the result, and `gate.py ref` lists target and difference per metric and blocks when one is out of range.
 
 ```bash
+PROJECT_ROOT="$PWD"   # output folder containing reference.mp4 and ref/
+python3 -m venv .venv && . .venv/bin/activate && python3 -m pip install -r "$SKILL_ROOT/scripts/requirements-ref.txt"
 python3 -I "$SKILL_ROOT/scripts/ref-analyze.py" reference.mp4 -o ref/analysis.json --targets ref/targets.json
-python3 "$SKILL_ROOT/harness/gate.py" ref .
+python3 "$SKILL_ROOT/harness/gate.py" ref "$PROJECT_ROOT"
 ```
 
 Motion is measured per 1/30 s, so different frame rates compare. The reference file is never committed; only the numbers are kept. Metric explanations and a worked example are in [`references/reference-analysis.md`](skills/motion-video-production/references/reference-analysis.md).
 
 ## Workflow
 
-![Production stages and their gates](docs/assets/workflow-ref.png)
+![Production stages and their gates](docs/assets/workflow-ref.en.png)
 
 1. The skill creates the stage outputs (`ref/`, `STORY.md`, `character.txt`, `key/`, `clip/`, `voices.json`, `edit.json`).
 2. Set `SKILL_ROOT` to the parent folder of the installed `SKILL.md` and `PROJECT_ROOT` to the output folder. After each stage, run `python3 "$SKILL_ROOT/harness/gate.py" <stage> "$PROJECT_ROOT"`.
 3. Exit code 0 moves to the next stage. Exit code 1 (BLOCK) means: read the BLOCK lines in `qa/gate-<stage>.txt`, fix the output, and rerun the same gate.
 4. Checks that need human eyes cannot be judged by a script. They pass only with a record written after looking at the frames (`qa/clips-review.md`, `qa/review.md`).
 
-A `gate.py clips` run. Without a visual review record it returns BLOCK (exit code 1); after the record is written it returns PASS (exit code 0).
+The start frame can match, yet the character changes a second later. `gate clips` creates `qa/strip-<clip>.png` for each clip.
+
+![Frame strip showing character drift](docs/assets/strip.en.png)
+
+A `gate.py clips` run (gate output is in Korean). Without a visual review record it returns BLOCK (exit code 1); after the record is written it returns PASS (exit code 0).
 
 ![gate clips run: BLOCK, visual review record, PASS](docs/assets/gate-demo.gif)
 
 ## Harness
 
-![How gates work: automated measurement, visual review, record files](docs/assets/harness.png)
+![How gates work: automated measurement, visual review, record files](docs/assets/harness.en.png)
 
 | Production stage | Gate | Checks |
 |---|---|---|
@@ -142,7 +149,7 @@ From the repository folder, run `bash skills/motion-video-production/harness/sel
 
 Where the seven criteria that keep faces and voices consistent across scenes sit in the production stages is shown below and in `references/consistency-7.md`.
 
-![Where the seven consistency criteria sit](docs/assets/seams.png)
+![Where the seven consistency criteria sit](docs/assets/seams.en.png)
 
 ## Gotchas
 
@@ -163,7 +170,7 @@ Free tiers and commercial-use conditions are in `NOTICE.md` and `references/lice
 | Codex, Claude Code, or another skill-capable agent | Running production and assembly |
 | ffmpeg, ffprobe, Python 3, Bash | Running the harness and scripts (WSL on Windows) |
 | Node.js 24 or newer | Engines (Remotion 4.0.529, HyperFrames 0.8.143, pinned) |
-| OpenCV, numpy (`requirements-ref.txt`) | Reference analysis |
+| OpenCV, numpy (`scripts/requirements-ref.txt`) | Reference analysis |
 | ChatGPT / Grok Imagine | Image and video generation |
 | ElevenLabs, Fish Audio (composio CLI) | Voice |
 | whisper | Transcription review |
@@ -193,7 +200,7 @@ On 2026-10-25 the committed tree was exported and installed as is. All 76 skill 
 - **The carry probe is Remotion-only.** It reads the boxes declared before rendering (`track.ts`). HyperFrames renders are measured on the mp4 with `verify.sh`, `gate.py final` and `gate.py ref`. There is no mp4-side carry measurement yet.
 - **The wordcut demo is an untuned first render.** Against the reference targets, `gate.py ref` blocks 10 of 12 metrics; grain, sharpness ratio and contrast are furthest off. Re-running `look-fit.mjs` and `plan.mjs` to close that gap is how the skill is meant to be used.
 - **A closing image lowers the carry score to 0.50 (WARN).** The boundary where the image covers the page counts as bare. If the score drops below 0.5, turn another boundary into a carry.
-- **The full text of the GSAP license clauses was not verified.** GSAP 3.14.2, used by the HyperFrames demo, says in its README that it is free including commercial use. Check https://gsap.com/standard-license yourself before publishing.
+- **The full text of the GSAP license clauses was not verified.** GSAP 3.14.2, used by the HyperFrames demo, says in its README that it is free including commercial use. Before releasing a commercial video, check https://gsap.com/standard-license.
 
 ## Built by
 

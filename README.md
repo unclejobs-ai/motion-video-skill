@@ -1,30 +1,31 @@
-<p>
-  <img src="docs/assets/logo.svg" width="80" height="80" alt="Motion Video Production 로고" />
-</p>
-
 # motion-video-production
 
 **한국어** · [English](README.en.md)
 
-모션 그래픽, 홍보 영상, 캐릭터 영상(15~90초)을 처음부터 끝까지 만드는 **Agent Skills 형식의 제작 스킬**이에요. Codex, Claude Code 및 다른 스킬 지원 런타임에서 같은 스킬 폴더를 써요. 단계 산출물을 숫자로 재고 종료 코드로 통과 여부를 알려 주는 게이트(`harness/gate.py`), 레퍼런스 영상 분석기, 바로 렌더할 수 있는 엔진 두 개(Remotion, HyperFrames)가 들어 있어요.
+음악과 목소리를 담은 15~90초 mp4를 만드는 **Agent Skills 형식의 제작 스킬**이에요. 모션 그래픽, 홍보 영상, 캐릭터 영상을 만들어요. 단계별 게이트, 레퍼런스 분석기, 렌더 엔진 두 개(Remotion, HyperFrames)가 들어 있어요.
 
-아래는 `gate clips`가 클립마다 만드는 프레임 스트립이에요. 키프레임과 0초부터 3초까지 한 줄에 놓아서 인물이 그대로인지 사람이 확인하게 해요.
+Codex, Claude Code와 다른 스킬 지원 런타임에서 같은 스킬 폴더를 써요.
 
-![프레임 스트립 예시](docs/assets/strip.png)
+![carry 데모의 1.5초와 3.0초 결과 화면](docs/assets/carry-demo.png)
 
-**바로 가기** · [60초 시작](#60초-시작) · [설치](#설치) · [풀 버전이 더하는 것](#풀-버전이-더하는-것) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [필요한 도구](#필요한-도구) · [검증 범위](#검증-범위)
+빠른 시작으로 만드는 5초 타이포그래피 데모예요. `renders/carry-demo/contact.png`의 1.5초와 3.0초 화면이에요. 이 데모에는 음악만 넣고 목소리는 넣지 않아요.
 
-## 60초 시작
+**바로 가기** · [빠른 시작](#빠른-시작) · [설치](#설치) · [들어 있는 것](#들어-있는-것) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [필요한 도구](#필요한-도구) · [검증 범위](#검증-범위)
+
+## 빠른 시작
 
 스킬을 설치한 뒤(방법은 [설치](#설치)) 엔진을 작업 폴더로 복사해 데모 하나를 렌더해요. Node.js 24 이상과 ffmpeg가 필요해요. 스킬 폴더 안에서는 설치하지 않아요.
 
 ```bash
 SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # 실제 설치 경로
+# 개인 설치면 "$HOME/.agents/skills/motion-video-production" 또는 "$HOME/.claude/skills/motion-video-production"
 cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
+# carry: 화면 요소가 컷 경계를 넘어 살아남는 경계의 비율
 node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
 node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
 node pipeline/render.mjs carry-demo                         # renders/carry-demo/picture.mp4
 node pipeline/score.mjs productions/carry-demo              # 절차적 스코어
+# <영상> <fps> <초> <음악> <대사, -는 없음> <출력>
 bash "$SKILL_ROOT/scripts/mix-mux.sh" renders/carry-demo/picture.mp4 60 5 productions/carry-demo/audio/score.wav - out/final.mp4
 bash "$SKILL_ROOT/scripts/verify.sh" out/final.mp4
 ```
@@ -78,7 +79,7 @@ cp -r motion-video-skill/skills/motion-video-production ~/.claude/skills/
 
 에이전트가 먼저 6가지(공개 방식, 길이와 화면비, 쓸 수 있는 도구, 금지 요소, 레퍼런스 영상, 엔진)를 묻고 단계 순서대로 진행해요. 생성 도구가 없으면 프롬프트를 건네고, 사용자가 만든 파일을 받아 이어가요.
 
-## 풀 버전이 더하는 것
+## 들어 있는 것
 
 | 무엇 | 하는 일 | 위치 |
 |---|---|---|
@@ -99,8 +100,10 @@ cp -r motion-video-skill/skills/motion-video-production ~/.claude/skills/
 "이 영상처럼"이라는 요청은 보통 질감보다 움직임과 편집에서 나와요. 0단계에서 레퍼런스를 OpenCV로 분해해 컷과 홀드, 광학 흐름, 블러, 심도, 그레인, 질감을 숫자로 남겨요. 계획은 그 숫자를 인용해요. 렌더한 뒤에는 같은 분석으로 결과를 재고, `gate.py ref`가 지표마다 목표와 차이를 적고 범위를 벗어나면 막아요.
 
 ```bash
+PROJECT_ROOT="$PWD"   # reference.mp4와 ref/를 둘 산출물 폴더
+python3 -m venv .venv && . .venv/bin/activate && python3 -m pip install -r "$SKILL_ROOT/scripts/requirements-ref.txt"
 python3 -I "$SKILL_ROOT/scripts/ref-analyze.py" reference.mp4 -o ref/analysis.json --targets ref/targets.json
-python3 "$SKILL_ROOT/harness/gate.py" ref .
+python3 "$SKILL_ROOT/harness/gate.py" ref "$PROJECT_ROOT"
 ```
 
 움직임은 1/30초당 값으로 재서 fps가 달라도 비교돼요. 레퍼런스 파일은 커밋하지 않고 숫자만 남겨요. 지표 설명과 실제 예시는 [`references/reference-analysis.md`](skills/motion-video-production/references/reference-analysis.md)에 있어요.
@@ -113,6 +116,10 @@ python3 "$SKILL_ROOT/harness/gate.py" ref .
 2. 설치된 `SKILL.md`의 부모 폴더를 `SKILL_ROOT`, 산출물 폴더를 `PROJECT_ROOT`로 정하고, 단계가 끝나면 `python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"`를 실행해요.
 3. 종료 코드 0이면 다음 단계로 가요. 1(BLOCK)이면 `qa/gate-<단계>.txt`의 BLOCK 줄을 읽고 고친 뒤 같은 게이트를 다시 실행해요.
 4. 눈으로 봐야 하는 검사는 스크립트가 판정하지 못해요. 프레임을 보고 남긴 기록(`qa/clips-review.md`, `qa/review.md`)이 있어야 통과해요.
+
+시작 화면이 같아도 1초 뒤에 인물이 달라져요. `gate clips`가 클립마다 `qa/strip-<클립>.png`로 만들어요.
+
+![인물 변화가 보이는 프레임 스트립](docs/assets/strip.png)
 
 `gate.py clips` 실행 예시예요. 눈 검수 기록이 없어서 BLOCK(종료 코드 1)이 나오고, 기록을 남기면 PASS(종료 코드 0)가 돼요.
 
@@ -144,7 +151,7 @@ SSIM 같은 유사도 값은 인물의 움직임과 변형을 구분하지 못�
 
 ![일관성 7가지가 놓이는 자리](docs/assets/seams.png)
 
-## Gotchas
+## 자주 겪는 함정
 
 전체 29가지는 [`references/gotchas.md`](skills/motion-video-production/references/gotchas.md)에 증상, 원인, 예방, 검사 ID로 정리돼 있어요. 엔진 쪽 함정은 [`references/pitfalls.md`](skills/motion-video-production/references/pitfalls.md)에 있어요. 자주 부딪히는 것:
 
@@ -163,7 +170,7 @@ SSIM 같은 유사도 값은 인물의 움직임과 변형을 구분하지 못�
 | Codex, Claude Code 등 스킬 지원 에이전트 | 제작 진행·조립 |
 | ffmpeg, ffprobe, Python 3, Bash | 하네스·스크립트 실행 (Windows는 WSL) |
 | Node.js 24 이상 | 엔진 (Remotion 4.0.529, HyperFrames 0.8.143, 버전 고정) |
-| OpenCV, numpy (`requirements-ref.txt`) | 레퍼런스 분석 |
+| OpenCV, numpy (`scripts/requirements-ref.txt`) | 레퍼런스 분석 |
 | ChatGPT / Grok Imagine | 이미지·영상 생성 |
 | ElevenLabs, Fish Audio (composio CLI) | 목소리 |
 | whisper | 받아쓰기 검수 |
@@ -192,8 +199,8 @@ skills/motion-video-production/        설치하는 스킬 폴더 (아래 전체
 
 - **carry 검사는 Remotion 전용이에요.** 렌더 전에 선언한 상자(`track.ts`)를 읽기 때문이에요. HyperFrames 렌더는 `verify.sh`, `gate.py final`, `gate.py ref`로 mp4에서 재요. mp4에서 carry를 재는 방식은 아직 없어요.
 - **wordcut 데모는 조정 전 첫 렌더예요.** 레퍼런스 목표와 비교하면 `gate.py ref`가 12개 지표 중 10개에서 막아요. 그레인, 선명도 비, 대비가 특히 멀어요. `look-fit.mjs`와 `plan.mjs`를 다시 돌려 맞추는 과정이 이 스킬의 사용법이에요.
-- **마무리 이미지를 켜면 carry 점수가 0.50(WARN)으로 내려가요.** 이미지가 페이지를 덮는 경계가 bare로 세지기 때문이에요. 0.5 아래로 내려가면 다른 경계를 carry로 바꿔요.
-- **GSAP 라이선스 조항 전문은 확인하지 못했어요.** HyperFrames 데모가 쓰는 GSAP 3.14.2는 README에 상업 이용도 무료라고 적혀 있어요. 공개 전에 https://gsap.com/standard-license 를 직접 확인해요.
+- **마무리 이미지를 켜면 carry 점수가 0.50(WARN)으로 내려가요.** 이미지가 페이지를 덮는 경계는 아무것도 넘어가지 않는 경계로 세지기 때문이에요. 0.5 아래로 내려가면 다른 경계를 carry로 바꿔요.
+- **GSAP 라이선스 조항 전문은 확인하지 못했어요.** HyperFrames 데모가 쓰는 GSAP 3.14.2는 README에 상업 이용도 무료라고 적혀 있어요. 상업용 영상을 공개하기 전에 https://gsap.com/standard-license 를 확인해요.
 
 ## 만든 곳
 

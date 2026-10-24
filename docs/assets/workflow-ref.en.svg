@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1324" viewBox="0 0 720 1324" role="img" aria-labelledby="workflow-ref-title workflow-ref-desc">
+  <title id="workflow-ref-title">Production stages and gates</title>
+  <desc id="workflow-ref-desc">Seven stages from reference analysis to assembly. Check outputs at each gate; fix a BLOCK before proceeding.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
+      .title { font-size: 34px; font-weight: 700; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
+      .muted { fill: #626860; }
+      .label { font-size: 24px; fill: #626860; }
+      .accent { fill: #B8441A; }
+      .rule { stroke: #626860; stroke-opacity: .24; }
+      .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="1324" fill="#FFFFFF"/>
+  <text x="40" y="68" class="title">Production stages and gates</text>
+  <text x="40" y="112" class="muted">Make it, check it, then move on.</text>
+  <text x="680" y="112" class="mono muted" text-anchor="end">gate.py</text>
+  <path d="M40 152H680" class="rule"/>
+  <text x="40" y="192" class="mono muted">0</text>
+  <text x="100" y="192" class="heading">Reference analysis</text>
+  <text x="680" y="192" class="mono accent" text-anchor="end">ref</text>
+  <text x="100" y="228" class="muted">OpenCV</text>
+  <text x="100" y="262" class="mono">ref/ANALYSIS.md</text>
+  <text x="100" y="294" class="mono">ref/targets.json</text>
+  <path d="M56 212v50" class="flow"/>
+  <path d="M40 316H680" class="rule"/>
+  <text x="40" y="356" class="mono muted">1</text>
+  <text x="100" y="356" class="heading">Story and scenes</text>
+  <text x="680" y="356" class="mono accent" text-anchor="end">story</text>
+  <text x="100" y="392" class="muted">Agent</text>
+  <text x="100" y="426" class="mono">STORY.md</text>
+  <path d="M56 376v50" class="flow"/>
+  <path d="M40 448H680" class="rule"/>
+  <text x="40" y="488" class="mono muted">2</text>
+  <text x="100" y="488" class="heading">Character sheet</text>
+  <text x="680" y="488" class="mono accent" text-anchor="end">character</text>
+  <text x="100" y="524" class="muted">Image generation</text>
+  <text x="100" y="558" class="mono">character.txt · sheet/*.png</text>
+  <path d="M56 508v50" class="flow"/>
+  <path d="M40 580H680" class="rule"/>
+  <text x="40" y="620" class="mono muted">3</text>
+  <text x="100" y="620" class="heading">Keyframes</text>
+  <text x="680" y="620" class="mono accent" text-anchor="end">keyframes</text>
+  <text x="100" y="656" class="muted">Image generation</text>
+  <text x="100" y="690" class="mono">key/*.png</text>
+  <path d="M56 640v50" class="flow"/>
+  <path d="M40 712H680" class="rule"/>
+  <text x="40" y="752" class="mono muted">4</text>
+  <text x="100" y="752" class="heading">Video conversion</text>
+  <text x="680" y="752" class="mono accent" text-anchor="end">clips</text>
+  <text x="100" y="788" class="muted">Video generation</text>
+  <text x="100" y="822" class="mono">clip/*.mp4</text>
+  <path d="M56 772v50" class="flow"/>
+  <path d="M40 844H680" class="rule"/>
+  <text x="40" y="884" class="mono muted">5</text>
+  <text x="100" y="884" class="heading">Music and voice</text>
+  <text x="680" y="884" class="mono accent" text-anchor="end">audio</text>
+  <text x="100" y="920" class="muted">composio · score</text>
+  <text x="100" y="954" class="mono">voices.json · audio/*.wav</text>
+  <path d="M56 904v50" class="flow"/>
+  <path d="M40 976H680" class="rule"/>
+  <text x="40" y="1016" class="mono muted">6</text>
+  <text x="100" y="1016" class="heading">Assembly</text>
+  <text x="680" y="1016" class="mono accent" text-anchor="end">edit / final</text>
+  <text x="100" y="1052" class="muted">Swappable engine</text>
+  <text x="100" y="1086" class="mono">Remotion · HyperFrames</text>
+  <path d="M40 1108H680" class="rule"/>
+  <text x="40" y="1150">PASS · exit 0: next stage</text>
+  <text x="40" y="1190" class="accent">BLOCK · exit 1: fix and rerun</text>
+  <text x="40" y="1246" class="muted">Before planning: check documents and targets.</text>
+  <text x="40" y="1286" class="muted">After rendering: compare the result to targets.</text>
+</svg>
