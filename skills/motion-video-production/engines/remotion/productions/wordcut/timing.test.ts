@@ -24,3 +24,9 @@ test('structure is fixed: one opener, slow landings, a burst of hard cuts, textb
   assert.deepEqual(cuts.slice(-2).map((c) => c.k), ['textbook', 'dict']);
   assert.deepEqual(burst.slice(1).map((f, i) => f - burst[i]), Array(PLAN.burstCount - 1).fill(PLAN.burstStep));
 });
+
+test('one shot per cut, and no two neighbours share tilt + push + depth of field', () => {
+  assert.equal(WORDCUT.shots.length, WORDCUT.cuts.length);
+  const combo = (s: (typeof WORDCUT.shots)[number]) => `${s.rx}/${s.rz}/${s.push}/${s.dof}`;
+  WORDCUT.shots.slice(1).forEach((s, i) => assert.notEqual(combo(s), combo(WORDCUT.shots[i]), `cuts ${i} and ${i + 1}`));
+});

@@ -1,7 +1,7 @@
 // render.mjs — the word cut needs inputProps (aspect, diag, look), which pipeline/render.mjs does not pass.
 // Usage (from the engine folder):
 //   node productions/wordcut/render.mjs video [9x16|16x9]                                  → renders/wordcut/wordcut-<aspect>.mp4
-//   node productions/wordcut/render.mjs stills [9x16|16x9] <frame…> [--diag | --diag-slot | --diag-slotbox] [--look '{json}'] [--out dir]
+//   node productions/wordcut/render.mjs stills [9x16|16x9] <frame…> [--diag | --diag-slot | --diag-slotbox | --diag-slotdot] [--look '{json}'] [--out dir]
 //                                                                                          → <dir>/f_0000.png …  (lossless PNG)
 // The aspect defaults to DATA.aspect. Env: CHROME_PATH (browser binary), CONCURRENCY (default: half the cores).
 import { bundle } from '@remotion/bundler';
@@ -17,7 +17,7 @@ if (!['video', 'stills'].includes(mode)) {
   console.error('usage: render.mjs video [9x16|16x9] | stills [9x16|16x9] <frame…> [--diag] [--out dir]');
   process.exit(2);
 }
-const diag = args.includes('--diag-slotbox') ? 'slotbox' : args.includes('--diag-slot') ? 'slot' : args.includes('--diag') ? 'sheet' : false;
+const diag = args.includes('--diag-slotdot') ? 'slotdot' : args.includes('--diag-slotbox') ? 'slotbox' : args.includes('--diag-slot') ? 'slot' : args.includes('--diag') ? 'sheet' : false;
 const outIdx = args.indexOf('--out');
 const frames = args.filter((a, i) => /^\d+$/.test(a) && args[i - 1] !== '--out').map(Number);
 

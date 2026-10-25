@@ -28,6 +28,28 @@ export function buildCuts(nSheets: number, plan: typeof PLAN): { cuts: Cut[]; bu
   return { cuts, burst, dictAt };
 }
 
+/** One word in focus per shot, and every shot varies angle, scale and depth of field (a reference contact sheet mixes
+ *  pages on a desk, phones held up and flat screens; close, closer, very close). push multiplies the close-up scale; rx
+ *  tilts the page back like paper on a desk (+) or a phone held up (−) and rz rolls it, both about the word, degrees;
+ *  dof is the blur of the first ring round the word as a fraction of the frame height (rings 2 and 3 take 2× and 4×);
+ *  split is the RGB offset on the out-of-focus rings (design px); ground shows round the page (null: the sheet's
+ *  paper); light and grain scale the lens (the light's streak angle also turns per shot). The presets cycle, so no
+ *  two neighbours share tilt + push + dof. */
+export type Shot = { push: number; rx: number; rz: number; dof: number; split: number; ground: string | null; light: number; grain: number };
+export const SHOT_PRESETS: Shot[] = [
+  { push: 1, rx: 0, rz: 0, dof: 0.006, split: 1.1, ground: null, light: 1, grain: 2 }, // flat, close
+  { push: 1.25, rx: 26, rz: -4, dof: 0.009, split: 1.2, ground: '#3a2f25', light: 1.4, grain: 1.5 }, // page on a desk
+  { push: 1.5, rx: 0, rz: 1.5, dof: 0.009, split: 1.2, ground: null, light: 0.7, grain: 3 }, // very close, flat
+  { push: 1.15, rx: -14, rz: 3, dof: 0.006, split: 1, ground: '#1c1d20', light: 0.5, grain: 1.5 }, // phone held up
+  { push: 1.6, rx: 18, rz: 0, dof: 0.0075, split: 1.2, ground: '#22302a', light: 1.2, grain: 2 }, // very close, on a desk
+  { push: 1, rx: 0, rz: -2, dof: 0.0045, split: 0.8, ground: null, light: 0.7, grain: 1 }, // flat, shallow
+];
+/** the ending pages stay flat at push 1 (the dictionary continues the textbook's word size) */
+const ENDING_SHOT: Record<'textbook' | 'dict', Shot> = {
+  textbook: { push: 1, rx: 0, rz: 0, dof: 0.0055, split: 1, ground: null, light: 1, grain: 1.5 },
+  dict: { push: 1, rx: 0, rz: 0, dof: 0.003, split: 0.6, ground: null, light: 1, grain: 1.5 },
+};
+
 const { cuts, burst, dictAt } = buildCuts(DATA.sheets.length, PLAN);
 const tb = cuts[cuts.length - 2].f, tbLen = dictAt - tb;
 
@@ -48,8 +70,10 @@ export const WORDCUT = {
   closing: { from: PLAN.seconds * PLAN.fps - 2 * PLAN.fps, frames: 15 },
   /** frame 0 is a mid-shot, not a page: the opener (cut 0) is pushed in past the page so the word's line runs off both
    *  edges, a focus band keeps only that line and its neighbours sharp, and an RGB split is on. Both rack open over
-   *  `rack` frames to `bandRest` / `splitRest`. Blur and split are fractions of the frame height. frame0.mjs checks it. */
-  opener: { push: { '9x16': 1.4, '16x9': 2 }, rack: 9, band: 0.003, bandRest: 0, split: 0.0035, splitRest: 0.0006 },
+   *  `rack` frames to the shot's `dof` / `splitRest`. Blur and split are fractions of the frame height. frame0.mjs checks it. */
+  opener: { push: { '9x16': 1.4, '16x9': 2 }, rack: 9, band: 0.008, split: 0.0035, splitRest: 0.0006 },
+  /** one shot per cut (same index as `cuts`); focus.mjs checks the focus on every landing */
+  shots: cuts.map((c, i) => (c.k === 'textbook' || c.k === 'dict' ? ENDING_SHOT[c.k] : SHOT_PRESETS[i % SHOT_PRESETS.length])),
   /** the burst is hard cuts with a one-frame whip; declared as cuts to the probe */
   burst,
 } as const;

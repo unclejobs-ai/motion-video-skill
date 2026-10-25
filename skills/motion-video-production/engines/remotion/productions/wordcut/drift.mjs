@@ -6,8 +6,11 @@
 //  sheet : glyph centroid of each sheet's own word (diag-sheet: its glyphs magenta, slot hidden) minus the glyph centroid
 //          of the slot word on the same frame (diag-slot), with the sheet at rest 3 frames after it lands: how far the
 //          document's word sits from the word drawn over it. Same font, size and scale, so glyph shape cancels.
+//  dot   : diag-slotdot, a 1 px dot on the word's centre point, on the same pairs. A shot tilted in perspective leans the
+//          slot box's area centroid toward its near (lower) half; the dot is the point itself, so the gate uses it.
 // Slot centres are also compared with the slot centre the layout asks for (VIEW × slotY). Writes renders/wordcut/drift-<aspect>.json.
-// Usage (engine folder): node productions/wordcut/drift.mjs [9x16|16x9]     Exit 1 when the slot moves more than 0.5 px or a measurement is missing.
+// Usage (engine folder): node productions/wordcut/drift.mjs [9x16|16x9]     Exit 1 when the word's centre point moves more
+// than 0.5 px across a boundary, the sheet's word sits more than 0.5 px off the slot word, or a measurement is missing.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -30,7 +33,7 @@ const rest = T.cuts.map((c, i) => (T.cuts[i + 1] ? Math.min(c.f + 3, T.cuts[i + 
 const render = (frames, mode) => {
   const out = join(dir, mode);
   mkdirSync(out, { recursive: true });
-  const flag = { lens: [], sheet: ['--diag'], slot: ['--diag-slot'], slotbox: ['--diag-slotbox'] }[mode];
+  const flag = { lens: [], sheet: ['--diag'], slot: ['--diag-slot'], slotbox: ['--diag-slotbox'], slotdot: ['--diag-slotdot'] }[mode];
   execFileSync('node', ['productions/wordcut/render.mjs', 'stills', aspect, ...frames.map(String), ...flag, '--out', out], { stdio: 'inherit' });
   return out;
 };
@@ -73,14 +76,15 @@ function sheetCentre(b) {
 }
 
 const pairFrames = [...new Set(pairs.flat())].sort((a, b) => a - b);
-const lensDir = render(pairFrames, 'lens'), boxDir = render(pairFrames, 'slotbox'), diagDir = render(rest, 'sheet'), glyphDir = render(rest, 'slot');
+const lensDir = render(pairFrames, 'lens'), boxDir = render(pairFrames, 'slotbox'), dotDir = render(pairFrames, 'slotdot'), diagDir = render(rest, 'sheet'), glyphDir = render(rest, 'slot');
 const r2 = (v) => Math.round(v * 100) / 100;
 const report = { aspect, want, pairs: [], rest: [] };
 const delta = (p, q) => (p && q ? { dx: r2(q.x - p.x), dy: r2(q.y - p.y) } : { dx: null, dy: null });
 for (const [a, b] of pairs) {
   const p = sheetCentre(rgb(png(boxDir, a))), q = sheetCentre(rgb(png(boxDir, b)));
   const lp = slotCentre(rgb(png(lensDir, a))), lq = slotCentre(rgb(png(lensDir, b)));
-  report.pairs.push({ before: a, after: b, ...delta(p, q), off: p && { x: r2(p.x - want.x), y: r2(p.y - want.y) }, lens: delta(lp, lq) });
+  const dp = sheetCentre(rgb(png(dotDir, a))), dq = sheetCentre(rgb(png(dotDir, b)));
+  report.pairs.push({ before: a, after: b, ...delta(p, q), off: p && { x: r2(p.x - want.x), y: r2(p.y - want.y) }, lens: delta(lp, lq), dot: delta(dp, dq) });
 }
 T.cuts.forEach((c, n) => {
   const m = sheetCentre(rgb(png(diagDir, rest[n]))), g = sheetCentre(rgb(png(glyphDir, rest[n])));
@@ -88,6 +92,7 @@ T.cuts.forEach((c, n) => {
 });
 const maxAbs = (xs) => Math.max(...xs.filter((v) => v !== null).map(Math.abs));
 report.max = {
+  dotAcrossBoundary: { dx: maxAbs(report.pairs.map((p) => p.dot.dx)), dy: maxAbs(report.pairs.map((p) => p.dot.dy)) },
   slotAcrossBoundary: { dx: maxAbs(report.pairs.map((p) => p.dx)), dy: maxAbs(report.pairs.map((p) => p.dy)) },
   slotVsWanted: { dx: maxAbs(report.pairs.map((p) => p.off?.x ?? null)), dy: maxAbs(report.pairs.map((p) => p.off?.y ?? null)) },
   lensAcrossBoundary: { dx: maxAbs(report.pairs.map((p) => p.lens.dx)), dy: maxAbs(report.pairs.map((p) => p.lens.dy)) },
@@ -95,10 +100,10 @@ report.max = {
 };
 writeFileSync(`renders/wordcut/drift-${aspect}.json`, JSON.stringify(report, null, 1));
 console.log(`== drift ${aspect} (${W}x${H}, slot centre wanted at ${r2(want.x)}, ${r2(want.y)} px)`);
-for (const p of report.pairs) console.log(`  slot  f${p.before}→f${p.after}  Δ ${p.dx?.toFixed(2)}, ${p.dy?.toFixed(2)} px  (centre − wanted ${p.off?.x.toFixed(2)}, ${p.off?.y.toFixed(2)})  lens Δ ${p.lens.dx?.toFixed(2)}, ${p.lens.dy?.toFixed(2)}`);
+for (const p of report.pairs) console.log(`  slot  f${p.before}→f${p.after}  Δ ${p.dx?.toFixed(2)}, ${p.dy?.toFixed(2)} px  (centre − wanted ${p.off?.x.toFixed(2)}, ${p.off?.y.toFixed(2)})  lens Δ ${p.lens.dx?.toFixed(2)}, ${p.lens.dy?.toFixed(2)}  dot Δ ${p.dot.dx?.toFixed(2)}, ${p.dot.dy?.toFixed(2)}`);
 for (const p of report.rest) console.log(`  sheet ${p.sheet.padEnd(9)} f${p.frame}  word − slot ${p.dx?.toFixed(2)}, ${p.dy?.toFixed(2)} px`);
 const m = report.max, xy = (v) => `${v.dx.toFixed(2)}, ${v.dy.toFixed(2)} px`;
-console.log(`max |Δ| slot across boundaries ${xy(m.slotAcrossBoundary)} · slot vs wanted ${xy(m.slotVsWanted)} · sheet word vs slot ${xy(m.sheetWordVsSlot)} · lens (noisy) ${xy(m.lensAcrossBoundary)}`);
-const missing = [...report.pairs, ...report.rest].filter((r) => r.dx === null).length;
+console.log(`max |Δ| word centre point across boundaries ${xy(m.dotAcrossBoundary)} · slot box across boundaries ${xy(m.slotAcrossBoundary)} · slot vs wanted ${xy(m.slotVsWanted)} · sheet word vs slot ${xy(m.sheetWordVsSlot)} · lens (noisy) ${xy(m.lensAcrossBoundary)}`);
+const missing = [...report.pairs, ...report.rest, ...report.pairs.map((p) => p.dot)].filter((r) => r.dx === null).length;
 if (missing) console.log(`FAIL ${missing} measurements found no word (frame on a whip, or the word left the window)`);
-process.exit(missing || Math.max(m.slotAcrossBoundary.dx, m.slotAcrossBoundary.dy, m.sheetWordVsSlot.dx, m.sheetWordVsSlot.dy) > 0.5 ? 1 : 0);
+process.exit(missing || Math.max(m.dotAcrossBoundary.dx, m.dotAcrossBoundary.dy, m.sheetWordVsSlot.dx, m.sheetWordVsSlot.dy) > 0.5 ? 1 : 0);

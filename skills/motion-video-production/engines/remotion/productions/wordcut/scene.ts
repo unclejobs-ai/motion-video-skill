@@ -39,6 +39,9 @@ export type Cam = {
   hl: number;
   /** opener lens, design px: blur outside the word's line (focus band) and the RGB split offset; 0 after cut 0 */
   band: number; split: number;
+  /** the shot (timing.ts `shots`): tilt about the word (degrees), RGB split on the out-of-focus rings (design px), the
+   *  ground round the page (null: the sheet's own paper) and lens multipliers */
+  rx: number; rz: number; oof: number; ground: string | null; light: number; grain: number;
 };
 
 /** The textbook's word size at the end of its push, so the dictionary head word continues it without a jump. */
@@ -64,15 +67,17 @@ export function cam(f: number, a: Aspect): Cam {
   const bx = horizontal ? blur : blur * 0.15, by = horizontal ? blur * 0.15 : blur;
 
   const kind = kindOf(cur.k);
-  let scale = kind === 'dict' ? 1 : V.close;
+  const shot = T.shots[i];
+  let scale = kind === 'dict' ? 1 : V.close * shot.push;
   if (i === 0) scale *= T.opener.push[a];
   if (kind === 'textbook') scale *= 1 + T.textbook.push * ease.io(prog(f, T.textbook.pushFrom, T.textbook.pushTo - T.textbook.pushFrom));
   if (kind === 'dict') scale = 1 + T.dict.push * ease.io(prog(f, cur.f, T.seconds * T.fps - cur.f));
   const hl = kind === 'textbook' ? ease.out(prog(f, T.textbook.hlFrom, T.textbook.hlFrames)) : 1;
   const O = T.opener, rack = 1 - ease.out(prog(f, 1, O.rack - 1));
-  const band = i === 0 ? V.h * (O.bandRest + (O.band - O.bandRest) * rack) : 0;
+  // every shot keeps its own depth of field; the opener racks from its wide-open band down to it
+  const band = V.h * (i === 0 ? shot.dof + (O.band - shot.dof) * rack : shot.dof);
   const split = i === 0 ? V.h * (O.splitRest + (O.split - O.splitRest) * rack) : 0;
-  return { i, dx, dy, bx, by, scale, hl, band, split };
+  return { i, dx, dy, bx, by, scale, hl, band, split, rx: shot.rx, rz: shot.rz, oof: shot.split, ground: shot.ground, light: shot.light, grain: shot.grain };
 }
 
 // ---- beat-local values ----
