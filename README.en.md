@@ -204,7 +204,7 @@ Free tiers and commercial-use conditions are in [`NOTICE.md`](NOTICE.md) and [`r
 
 - **The carry probe is Remotion-only.** It reads the boxes declared before rendering (`track.ts`). HyperFrames renders are measured on the mp4 with `verify.sh`, `gate.py final` and `gate.py ref`. There is no mp4-side carry measurement yet.
 - **The wordcut demo is an untuned first render.** Against the reference targets, `gate.py ref` blocks 10 of 12 metrics; grain, sharpness ratio and contrast are furthest off. Re-running `look-fit.mjs` and `plan.mjs` to close that gap is how the skill is meant to be used.
-- **A closing image lowers the carry score to 0.50 (WARN).** The boundary where the image covers the page counts as bare. If the score drops below 0.5, turn another boundary into a carry.
+- **A closing image drops the carry score to 0.00 (FAIL).** The only counted boundary is the one where the image covers the page, and it counts as bare; the other detected boundary is exempt as a declared cut. Turn that boundary into a carry to get out of FAIL.
 - **The full text of the GSAP license clauses was not verified.** GSAP 3.14.2, used by the HyperFrames demo, says in its README that it is free including commercial use. Before releasing a commercial video, check https://gsap.com/standard-license.
 
 ## Repository structure

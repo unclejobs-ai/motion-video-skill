@@ -2,7 +2,7 @@
 
 화면을 만드는 엔진은 바꿔 끼울 수 있습니다. 엔진이 무엇이든 마지막 산출물은 mp4 하나이고, 믹스(`scripts/mix-mux.sh`), 측정(`scripts/verify.sh`), 레퍼런스 비교(`gate.py ref`), 최종 게이트(`gate.py final`)는 그 mp4만 봅니다.
 
-![엔진을 바꿔 끼우는 분석 파이프라인](../../../docs/assets/ref-pipeline.png)
+![엔진을 바꿔 끼우는 분석 파이프라인](assets/ref-pipeline.png)
 
 ## 어느 쪽을 고를까
 
