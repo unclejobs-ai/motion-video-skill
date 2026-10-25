@@ -47,11 +47,14 @@ test('boundaries in the last 1.2 s and at declared cuts are exempt', () => {
 
 test('a declared cut and the boundary it marks count once: two transitions are not a burst', () => {
   const track = (t: number): Box[] => [{ id: t < 2 ? 'a' : t < 3 ? 'b' : 'c', role: 'element', x: 600, y: 300, w: 600, h: 300, opacity: 1 }];
-  const r = probe({ width: 1920, height: 1080, fps: 30, seconds: 6, cuts: [2], beatBoundaries: [2, 3], track });
-  assert.deepEqual(r.boundaries.map((b) => b.exempt), ['cut', undefined]);
-  assert.equal(r.considered, 1);
-  assert.equal(r.score, 0);
-  assert.equal(r.verdict, 'fail');
+  // a cut on the boundary's frame, and one 0.1 s off but still inside the cut window
+  for (const cut of [2, 2.1]) {
+    const r = probe({ width: 1920, height: 1080, fps: 30, seconds: 6, cuts: [cut], beatBoundaries: [2, 3], track });
+    assert.deepEqual(r.boundaries.map((b) => b.exempt), ['cut', undefined], `cut at ${cut}`);
+    assert.equal(r.considered, 1, `cut at ${cut}`);
+    assert.equal(r.score, 0, `cut at ${cut}`);
+    assert.equal(r.verdict, 'fail', `cut at ${cut}`);
+  }
 });
 
 test('an entrance onto an empty ground is not a boundary; an exit and a later entrance are bridged into one', () => {

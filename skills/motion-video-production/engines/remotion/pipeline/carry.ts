@@ -121,14 +121,14 @@ export function probe(film: Film): Report {
   }
   flush();
 
-  // a detected boundary and a declared cut within one frame of each other are the same transition, counted once
-  const hits = [...found.map((b) => b.t), ...film.cuts].sort((a, b) => a - b)
-    .reduce<number[]>((kept, t) => (kept.length && Math.round((t - kept[kept.length - 1]) * fps) <= 1 ? kept : [...kept, t]), []);
+  // a declared cut marks a detected boundary within one window of it: the same transition, counted once in a burst
+  const marks = (c: number, t: number) => Math.abs(c - t) <= CARRY.window;
+  const hits = [...found.map((b) => b.t), ...film.cuts.filter((c) => !found.some((b) => marks(c, b.t)))].sort((a, b) => a - b);
   // in a burst: some 1.5 s window that contains the boundary holds ≥ 3 boundaries or declared cuts
   const inBurst = (t: number) => hits.some((t0) => t0 <= t && t - t0 <= CARRY.burst.within
     && hits.filter((h) => h >= t0 && h - t0 <= CARRY.burst.within).length >= CARRY.burst.cuts);
   for (const b of found) {
-    if (film.cuts.some((c) => Math.abs(c - b.t) <= CARRY.window)) b.exempt = 'cut';
+    if (film.cuts.some((c) => marks(c, b.t))) b.exempt = 'cut';
     else if (inBurst(b.t)) b.exempt = 'burst';
     else if (b.t > film.seconds - CARRY.tail) b.exempt = 'tail';
   }
