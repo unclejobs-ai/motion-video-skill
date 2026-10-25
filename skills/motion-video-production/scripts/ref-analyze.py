@@ -141,6 +141,8 @@ def analyze(path):
         i += 1
     cap.release()
     n = i
+    if n == 0:
+        raise SystemExit(f"no decodable frames in {path}")
     seconds = n / fps
     norm = fps / PER
     raw_diffs = diffs

@@ -8,6 +8,7 @@
 // Every frame is scaled to 540×960 first so grain and sharpness compare like for like (ref-analyze.py measures the same six).
 // Usage: node look.mjs <video|png>@<seconds|-> …   → JSON lines {src, t, …} then the mean of each metric.
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 const W = Number(process.env.LOOK_W ?? 540), H = Number(process.env.LOOK_H ?? 960); // 16:9: LOOK_W=960 LOOK_H=540
 
@@ -51,7 +52,7 @@ export function metrics(rgb) {
   return { sharpRatio: edge / mid, rms: Math.sqrt(v2 / n) / 255, sat: sat / n, chroma: chroma / n, black: sorted[Math.floor(n * 0.01)], grain: flat[flat.length >> 1] };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const rows = process.argv.slice(2).map((spec) => {
     const at = spec.lastIndexOf('@'), src = spec.slice(0, at), t = spec.slice(at + 1);
     const r = { src: src.split('/').pop(), t, ...metrics(frame(src, t)) };

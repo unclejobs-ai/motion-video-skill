@@ -28,7 +28,7 @@ python3 "$SKILL_ROOT/harness/gate.py" ref "$PROJECT_ROOT"
 python3 "$SKILL_ROOT/harness/gate.py" ref "$PROJECT_ROOT"
 ```
 
-게이트는 `targets.json`의 지표마다 `목표, 값, 몇 % 차이, 허용 범위`를 한 줄씩 적고, 하나라도 허용 범위를 벗어나면 종료 코드 1로 끝납니다. 렌더 분석이 최종본보다 오래됐으면 비교하지 않고 막습니다. 게이트는 완성된 mp4만 재기 때문에 Remotion, HyperFrames, 손 편집 어느 쪽으로 만들었든 같은 방식으로 동작합니다. 허용 오차를 한꺼번에 넓히거나 좁히려면 `GATE_REF_TOL_SCALE`을 씁니다. 지표별로 바꾸려면 `targets.json`을 고치고 `ANALYSIS.md`에 이유를 적습니다.
+게이트는 `targets.json`의 지표마다 `목표, 값, 몇 % 차이, 허용 범위`를 한 줄씩 적고, 하나라도 허용 범위를 벗어나면 종료 코드 1로 끝납니다. 렌더 분석이 최종본보다 오래됐으면 비교하지 않고 막습니다. 게이트는 완성된 mp4만 재기 때문에 Remotion, HyperFrames, 손 편집 어느 쪽으로 만들었든 같은 방식으로 동작합니다. 허용 오차를 한꺼번에 넓히거나 좁히려면 `GATE_REF_TOL_SCALE`을 씁니다. 지표별로 바꾸려면 `targets.json`을 고치고 `ANALYSIS.md`에 이유를 적습니다. `tol`은 목표 대비 비율이고, 목표가 0인 지표에서만 절대 차이로 읽습니다.
 
 ## 지표
 

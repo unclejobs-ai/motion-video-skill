@@ -41,7 +41,8 @@ Use the manual Codex/Claude commands in either README when you do not want the N
 Never run `npm ci` inside the installed skill folder: it is one shared copy, often a symlink target. Copy an engine into the output project and install it there:
 
 ```bash
-cp -R "$SKILL_ROOT/engines/remotion" "$PROJECT_ROOT/engine"    # or engines/hyperframes
+# mkdir stops if engine/ exists; to reinstall, remove it first (cp -R into an existing folder nests engine/remotion)
+mkdir "$PROJECT_ROOT/engine" && cp -R "$SKILL_ROOT/engines/remotion/." "$PROJECT_ROOT/engine"    # or engines/hyperframes
 (cd "$PROJECT_ROOT/engine" && npm ci)
 ```
 

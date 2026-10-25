@@ -13,6 +13,7 @@
 // --check exits 1 when a frame fails: |offset x| > 5 % W, |offset y| > 12 % H, focus < LIMIT.focus.
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 
 const LIMIT = { x: 0.05, y: 0.12, focus: 2 };
 
@@ -101,7 +102,7 @@ export function frame0({ W, H, rgb }) {
 
 const pass = (m) => !m.error && Math.abs(m.fx) <= LIMIT.x && Math.abs(m.fy) <= LIMIT.y && m.focus !== null && m.focus >= LIMIT.focus;
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const args = process.argv.slice(2), check = args.includes('--check');
   let files = args.filter((a) => a !== '--check');
   if (!files.length) files = ['9x16', '16x9'].map((a) => `renders/wordcut/wordcut-${a}.mp4`).filter(existsSync).map((p) => `${p}@0`);

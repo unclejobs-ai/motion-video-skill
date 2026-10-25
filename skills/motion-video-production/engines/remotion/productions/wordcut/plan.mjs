@@ -10,6 +10,7 @@
 // gate is the judge.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { DATA } from './data.ts';
 
 const [, , path, secArg = '20', fpsArg = '30'] = process.argv;
 if (!path) { console.error('usage: node productions/wordcut/plan.mjs <analysis.json> [seconds] [fps]'); process.exit(2); }
@@ -24,9 +25,11 @@ const open = fr(Math.min(2, Math.max(0.8, shots.find((s) => s > 0.25) ?? 1.2)));
 const hold = fr(median(mid) ?? 1);
 const burstStep = Math.max(3, fr(median(short) ?? 0.17));
 const burstCount = Math.min(12, Math.max(4, short.length));
-// the six slow landings and the burst take what they take; the textbook gets the longer of the reference's mean hold
-// and 4 s, and the dictionary keeps at least 2.5 s
-const used = open + 5 * hold + burstCount * burstStep;
+// the slow landings (same count as buildCuts in timing.ts) and the burst take what they take; the textbook gets the
+// longer of the reference's mean hold and 4 s, and the dictionary keeps at least 2.5 s
+const n = DATA.sheets.length;
+const slowHolds = Math.min(n, Math.max(1, Math.ceil(n * 0.6))) - 1;
+const used = open + slowHolds * hold + burstCount * burstStep;
 const textbook = Math.max(fr(Math.max(4, a.edit.holdMeanS)), Math.min(fr(5.5), seconds * fps - used - fr(2.5)));
 const toDir = { 0: 'r', 180: 'l', 90: 'd', 270: 'u' };
 const dirs = a.motion.transitions.map((t) => toDir[t.dir]).filter(Boolean).join('').slice(0, 12) || 'lrulrdlr';
@@ -40,7 +43,7 @@ const plan = {
   refocus: [Math.round(blur * 0.7), Math.round(blur * 0.25), 1.5],
   dirs,
 };
-if (open + 5 * hold + burstCount * burstStep + textbook + fr(2) > seconds * fps) throw new Error(`plan does not fit in ${seconds} s: raise seconds`);
+if (used + textbook + fr(2) > seconds * fps) throw new Error(`plan does not fit in ${seconds} s: raise seconds`);
 const out = fileURLToPath(new URL('./plan.ts', import.meta.url));
 writeFileSync(out, `// Written by plan.mjs from a reference analysis (scripts/ref-analyze.py → analysis.json). Edit by re-running plan.mjs,
 // or by hand for a first draft. Every time is in frames at \`fps\`.

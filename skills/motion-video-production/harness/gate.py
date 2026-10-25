@@ -18,6 +18,7 @@
 """
 import hashlib
 import json
+import math
 import os
 import re
 import subprocess
@@ -29,6 +30,8 @@ LUFS_TARGET = float(os.environ.get("GATE_LUFS", "-14"))
 LUFS_TOL = float(os.environ.get("GATE_LUFS_TOL", "1.5"))
 TP_MAX = float(os.environ.get("GATE_TP_MAX", "-1.0"))
 REF_TOL_SCALE = float(os.environ.get("GATE_REF_TOL_SCALE", "1.0"))
+if not (math.isfinite(REF_TOL_SCALE) and REF_TOL_SCALE >= 0):
+    sys.exit(f"GATE_REF_TOL_SCALE 는 0 이상의 유한한 수여야 함: {REF_TOL_SCALE}")
 IMG = {".png", ".jpg", ".jpeg", ".webp"}
 
 
@@ -138,8 +141,9 @@ def g_ref(root, r):
     metrics = (targets or {}).get("metrics") if isinstance(targets, dict) else None
     if targets is not None and not r.check(isinstance(metrics, dict) and metrics and all(
             isinstance(m, dict) and isinstance(m.get("target"), (int, float)) and isinstance(m.get("tol"), (int, float))
+            and math.isfinite(m["target"]) and math.isfinite(m["tol"]) and m["tol"] >= 0
             for m in metrics.values()), "R03", f"targets.json 지표 {len(metrics or {})}개",
-            "targets.json 형식 오류 - {\"metrics\": {\"edit.stillShare\": {\"target\": 0.46, \"tol\": 0.25}, ...}}"):
+            "targets.json 형식 오류(target·tol 은 유한한 수, tol 은 0 이상) - {\"metrics\": {\"edit.stillShare\": {\"target\": 0.46, \"tol\": 0.25}, ...}}"):
         return
     final = root / "out" / "final.mp4"
     if not final.exists() or not metrics:
@@ -156,8 +160,12 @@ def g_ref(root, r):
         if not isinstance(value, (int, float)):
             r.block("R05", f"{path}: 렌더 분석에 값 없음")
             continue
-        off = (value - target) / abs(target) if target else (0.0 if value == 0 else float("inf"))
-        line = f"{path}: 목표 {target:g}, 값 {value:g}, {off * 100:+.0f}% (허용 ±{tol * 100:.0f}%)"
+        if target:
+            off = (value - target) / abs(target)
+            line = f"{path}: 목표 {target:g}, 값 {value:g}, {off * 100:+.0f}% (허용 ±{tol * 100:.0f}%)"
+        else:  # 목표 0 은 비율이 없으므로 tol 을 절대 차이로 읽는다
+            off = value
+            line = f"{path}: 목표 0, 값 {value:g} (허용 ±{tol:g}, 목표가 0이라 절대 차이)"
         r.check(abs(off) <= tol, "R05", line, line + " - 허용 범위 밖")
 
 
