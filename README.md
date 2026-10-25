@@ -10,7 +10,7 @@ Codex, Claude Code와 다른 스킬 지원 런타임에서 같은 스킬 폴더�
 
 빠른 시작으로 만드는 5초 타이포그래피 데모예요. carry는 컷이 바뀔 때 화면 요소가 하나라도 이어지는 컷 전환의 비율이에요. 완성 mp4에는 음악만 있고 목소리는 없어요. 위 GIF에는 소리가 없어요. 캐릭터와 목소리를 넣는 흐름은 [첫 요청](#첫-요청)에서 시작해요.
 
-**바로 가기** · [빠른 시작](#빠른-시작) · [설치](#설치) · [들어 있는 것](#들어-있는-것) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [캐릭터 일관성 7가지](#캐릭터-일관성-7가지) · [자주 겪는 함정](#자주-겪는-함정) · [필요한 도구](#필요한-도구) · [알려진 한계](#알려진-한계) · [검증 범위](#검증-범위)
+**바로 가기** · [빠른 시작](#빠른-시작) · [설치](#설치) · [들어 있는 것](#들어-있는-것) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [캐릭터 일관성 7가지](#캐릭터-일관성-7가지) · [자주 겪는 함정](#자주-겪는-함정) · [참고 문서](#참고-문서) · [필요한 도구](#필요한-도구) · [알려진 한계](#알려진-한계) · [검증 범위](#검증-범위)
 
 ## 빠른 시작
 
@@ -20,7 +20,8 @@ Codex, Claude Code와 다른 스킬 지원 런타임에서 같은 스킬 폴더�
 SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # 실제 설치 경로
 # 찾기: ls -d .agents/skills/motion-video-production .claude/skills/motion-video-production ~/.agents/skills/motion-video-production ~/.claude/skills/motion-video-production 2>/dev/null
 # 개인 설치면 "$HOME/.agents/skills/motion-video-production" 또는 "$HOME/.claude/skills/motion-video-production"
-cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
+# engine/이 이미 있으면 mkdir에서 멈춰요. 지우거나 다른 이름을 써요(있는 폴더에 cp -R 하면 engine/remotion으로 중첩돼요)
+mkdir engine && cp -R "$SKILL_ROOT/engines/remotion/." engine && cd engine && npm ci
 # 컷 전환의 carry를 검사해요
 node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
 node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
@@ -106,6 +107,7 @@ cp -r motion-video-skill/skills/motion-video-production ~/.claude/skills/
 SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # 실제 설치 경로
 PROJECT_ROOT="$PWD"   # reference.mp4와 ref/를 둘 산출물 폴더
 python3 -m venv .venv && . .venv/bin/activate && python3 -m pip install -r "$SKILL_ROOT/scripts/requirements-ref.txt"
+mkdir -p ref qa && cp -n "$SKILL_ROOT/templates/ANALYSIS.md" ref/ANALYSIS.md   # 빈칸(<...>)은 분석을 보고 채워요
 python3 -I "$SKILL_ROOT/scripts/ref-analyze.py" reference.mp4 -o ref/analysis.json --targets ref/targets.json
 python3 "$SKILL_ROOT/harness/gate.py" ref "$PROJECT_ROOT"
 ```
@@ -164,9 +166,29 @@ SSIM 같은 유사도 값은 인물의 움직임과 변형을 구분하지 못�
 - `검사 | tail`처럼 자르면 종료 코드가 사라져요. (G21)
 - 아무것도 살아남지 않는 매끄러운 장면 전환도 carry 0.00이에요. 요소 하나를 컷 전환 너머로 옮겨요.
 
+## 참고 문서
+
+설치된 스킬 폴더 안에 함께 들어 있어요. 에이전트가 단계마다 필요한 문서를 읽어요.
+
+| 문서 | 내용 |
+|---|---|
+| [`SKILL.md`](skills/motion-video-production/SKILL.md) | 스킬 본문. 단계 순서, 처음 묻는 6가지, 게이트 호출 |
+| [`references/reference-analysis.md`](skills/motion-video-production/references/reference-analysis.md) | 레퍼런스 분석 지표와 목표값 만들기 |
+| [`references/engines.md`](skills/motion-video-production/references/engines.md) | Remotion과 HyperFrames 비교, 엔진별 명령 |
+| [`references/art-direction.md`](skills/motion-video-production/references/art-direction.md) | carry, 모션 어휘, 스타일 고정 |
+| [`references/glossary.md`](skills/motion-video-production/references/glossary.md) | 편집·카메라·질감 용어(한국어·영어) |
+| [`references/beat-grid.md`](skills/motion-video-production/references/beat-grid.md) | BPM에서 컷 길이 계산 |
+| [`references/consistency-7.md`](skills/motion-video-production/references/consistency-7.md) | 캐릭터 일관성 7가지 |
+| [`references/brand-intro.md`](skills/motion-video-production/references/brand-intro.md) | 브랜드 소개 영상과 홈페이지 한 장 만들기 |
+| [`references/providers.md`](skills/motion-video-production/references/providers.md) | 이미지·영상·목소리 도구 사용 메모 |
+| [`references/cost-rules.md`](skills/motion-video-production/references/cost-rules.md) | 무료 먼저, 유료는 필요한 곳만 |
+| [`references/gotchas.md, pitfalls.md`](skills/motion-video-production/references/gotchas.md) | 자주 겪는 함정과 실수 |
+| [`references/licensing.md`](skills/motion-video-production/references/licensing.md) | 외부 도구 라이선스와 확인 날짜 |
+| [`templates/`](skills/motion-video-production/templates/) | STORY.md, ANALYSIS.md, BEATSHEET.md 등 단계 산출물 서식 |
+
 ## 필요한 도구
 
-무료 범위와 상업 이용 조건은 `NOTICE.md`와 `references/licensing.md`(출처 URL 포함)에 있어요. Remotion은 직원 4명 이상 영리 조직에 Company License가 필요하고, HyperFrames는 Apache-2.0이에요. 약관은 자주 바뀌니 작업 직전에 다시 확인해요.
+무료 범위와 상업 이용 조건은 [`NOTICE.md`](NOTICE.md)와 [`references/licensing.md`](skills/motion-video-production/references/licensing.md)(출처 URL 포함)에 있어요. Remotion은 직원 4명 이상 영리 조직에 Company License가 필요하고, HyperFrames는 Apache-2.0이에요. 약관은 자주 바뀌니 작업 직전에 다시 확인해요.
 
 | 도구 | 용도 |
 |---|---|
@@ -211,4 +233,4 @@ skills/motion-video-production/        설치하는 스킬 폴더 (아래 전체
 
 ## 책임 범위
 
-생성물의 권리와 책임은 `NOTICE.md`와 `references/licensing.md`에 있어요.
+생성물의 권리와 책임은 [`NOTICE.md`](NOTICE.md)와 [`references/licensing.md`](skills/motion-video-production/references/licensing.md)에 있어요.

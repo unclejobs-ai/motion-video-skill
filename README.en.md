@@ -10,7 +10,7 @@ Codex, Claude Code, and other skill-capable runtimes use the same skill folder.
 
 The quick start renders this 5-second typography demo. Carry is the fraction of cut transitions where at least one on-screen element continues into the next shot. The finished mp4 has music but no voice; the GIF is silent and the on-screen text is Korean. For character and voice production, start at [First request](#first-request).
 
-**Jump to** · [Quick start](#quick-start) · [Installation](#installation) · [What's inside](#whats-inside) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Seven consistency criteria](#seven-consistency-criteria) · [Gotchas](#gotchas) · [Required tools](#required-tools) · [Known limitations](#known-limitations) · [Verification scope](#verification-scope)
+**Jump to** · [Quick start](#quick-start) · [Installation](#installation) · [What's inside](#whats-inside) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Seven consistency criteria](#seven-consistency-criteria) · [Gotchas](#gotchas) · [Reference docs](#reference-docs) · [Required tools](#required-tools) · [Known limitations](#known-limitations) · [Verification scope](#verification-scope)
 
 ## Quick start
 
@@ -20,7 +20,8 @@ After installing the skill (see [Installation](#installation)), copy an engine i
 SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # your actual install path
 # Find it: ls -d .agents/skills/motion-video-production .claude/skills/motion-video-production ~/.agents/skills/motion-video-production ~/.claude/skills/motion-video-production 2>/dev/null
 # Personal install: use "$HOME/.agents/skills/motion-video-production" or "$HOME/.claude/skills/motion-video-production"
-cp -R "$SKILL_ROOT/engines/remotion" engine && cd engine && npm ci
+# mkdir stops if engine/ already exists. Remove it or pick another name (cp -R into an existing folder nests engine/remotion)
+mkdir engine && cp -R "$SKILL_ROOT/engines/remotion/." engine && cd engine && npm ci
 # Check carry across cut transitions
 node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
 node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
@@ -106,6 +107,7 @@ Run this from your project folder, not `engine/`. Set `SKILL_ROOT` as in Quick s
 SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # your actual install path
 PROJECT_ROOT="$PWD"   # output folder containing reference.mp4 and ref/
 python3 -m venv .venv && . .venv/bin/activate && python3 -m pip install -r "$SKILL_ROOT/scripts/requirements-ref.txt"
+mkdir -p ref qa && cp -n "$SKILL_ROOT/templates/ANALYSIS.md" ref/ANALYSIS.md   # fill the <...> blanks from the analysis
 python3 -I "$SKILL_ROOT/scripts/ref-analyze.py" reference.mp4 -o ref/analysis.json --targets ref/targets.json
 python3 "$SKILL_ROOT/harness/gate.py" ref "$PROJECT_ROOT"
 ```
@@ -164,9 +166,29 @@ All 29 are in [`references/gotchas.md`](skills/motion-video-production/reference
 - Piping a check through `| tail` loses its exit code. (G21)
 - A smooth scene change where nothing survives still scores carry 0.00. Move one element across the cut transition.
 
+## Reference docs
+
+They ship inside the installed skill folder. The agent reads the one each stage needs; most are in Korean.
+
+| Doc | What it covers |
+|---|---|
+| [`SKILL.md`](skills/motion-video-production/SKILL.md) | Skill instructions: stage order, the six opening questions, gate calls |
+| [`references/reference-analysis.md`](skills/motion-video-production/references/reference-analysis.md) | Reference analysis metrics and building targets |
+| [`references/engines.md`](skills/motion-video-production/references/engines.md) | Remotion vs HyperFrames, per-engine commands |
+| [`references/art-direction.md`](skills/motion-video-production/references/art-direction.md) | Carry, motion vocabulary, holding one style |
+| [`references/glossary.md`](skills/motion-video-production/references/glossary.md) | Editing, camera and texture terms (Korean and English) |
+| [`references/beat-grid.md`](skills/motion-video-production/references/beat-grid.md) | Cut lengths from BPM |
+| [`references/consistency-7.md`](skills/motion-video-production/references/consistency-7.md) | Seven character consistency criteria |
+| [`references/brand-intro.md`](skills/motion-video-production/references/brand-intro.md) | A brand intro video plus a one-page homepage |
+| [`references/providers.md`](skills/motion-video-production/references/providers.md) | Notes on image, video and voice tools |
+| [`references/cost-rules.md`](skills/motion-video-production/references/cost-rules.md) | Free first, paid only where needed |
+| [`references/gotchas.md, pitfalls.md`](skills/motion-video-production/references/gotchas.md) | Common gotchas and mistakes |
+| [`references/licensing.md`](skills/motion-video-production/references/licensing.md) | External tool licenses and check dates |
+| [`templates/`](skills/motion-video-production/templates/) | Stage output forms such as STORY.md, ANALYSIS.md, BEATSHEET.md |
+
 ## Required tools
 
-Free tiers and commercial-use conditions are in `NOTICE.md` and `references/licensing.md` (with source URLs). Remotion needs a Company License for for-profit organizations with four or more employees; HyperFrames is Apache-2.0. Terms change often, so check them right before work.
+Free tiers and commercial-use conditions are in [`NOTICE.md`](NOTICE.md) and [`references/licensing.md`](skills/motion-video-production/references/licensing.md) (with source URLs). Remotion needs a Company License for for-profit organizations with four or more employees; HyperFrames is Apache-2.0. Terms change often, so check them right before work.
 
 | Tool | Purpose |
 |---|---|
@@ -211,4 +233,4 @@ This skill distills the review criteria the team behind [SceneSteller](https://w
 
 ## Rights and responsibilities
 
-Rights and responsibilities for generated outputs are described in `NOTICE.md` and `references/licensing.md`.
+Rights and responsibilities for generated outputs are described in [`NOTICE.md`](NOTICE.md) and [`references/licensing.md`](skills/motion-video-production/references/licensing.md).
