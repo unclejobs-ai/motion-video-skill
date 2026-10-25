@@ -1,40 +1,59 @@
-<p>
-  <img src="docs/assets/logo.svg" width="80" height="80" alt="Motion Video Production 로고" />
-</p>
-
 # motion-video-production
 
 **한국어** · [English](README.en.md)
 
-모션 그래픽과 영상(30~90초)을 처음부터 끝까지 만드는 순서와 점검 기준을 담은 **Agent Skills 형식의 제작 스킬**입니다. Codex, Claude Code 및 다른 스킬 지원 런타임에서 같은 스킬 폴더를 사용합니다.
-제작 6단계마다 산출물을 측정해 통과 여부를 종료 코드로 판정하는 검사 스크립트(`harness/gate.py`, 이하 게이트)와, 자주 생기는 함정 29가지의 예방법(`references/gotchas.md`)이 들어 있습니다.
+음악과 목소리를 담은 15~90초 mp4를 만드는 **Agent Skills 형식의 제작 스킬**이에요. 모션 그래픽, 홍보 영상, 캐릭터 영상을 만들어요. 단계별 게이트, 레퍼런스 분석기, 렌더 엔진 두 개(Remotion, HyperFrames)가 들어 있어요.
 
-**바로 가기** · [설치](#설치) · [사용 흐름](#사용-흐름) · [실행 예시](#게이트-실행-예시) · [하네스](#하네스) · [필요한 도구](#필요한-도구)
+Codex, Claude Code와 다른 스킬 지원 런타임에서 같은 스킬 폴더를 써요.
 
----
+![5초 carry 데모의 움직이는 결과](docs/assets/carry-demo.gif)
+
+빠른 시작으로 만드는 5초 타이포그래피 데모예요. carry는 컷이 바뀔 때 화면 요소가 하나라도 이어지는 컷 전환의 비율이에요. 완성 mp4에는 음악만 있고 목소리는 없어요. 위 GIF에는 소리가 없어요. 캐릭터와 목소리를 넣는 흐름은 [첫 요청](#첫-요청)에서 시작해요.
+
+**바로 가기** · [빠른 시작](#빠른-시작) · [설치](#설치) · [들어 있는 것](#들어-있는-것) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [캐릭터 일관성 7가지](#캐릭터-일관성-7가지) · [자주 겪는 함정](#자주-겪는-함정) · [참고 문서](#참고-문서) · [필요한 도구](#필요한-도구) · [알려진 한계](#알려진-한계) · [검증 범위](#검증-범위)
+
+## 빠른 시작
+
+스킬을 설치한 뒤(방법은 [설치](#설치)) 엔진을 작업 폴더로 복사해 데모 하나를 렌더해요. Node.js 24 이상과 ffmpeg가 필요해요. 스킬 폴더 안에서 `npm ci`를 실행하지 않아요. MacBook Air M3에서 아래 명령 전체는 약 28초 걸렸어요(엔진 의존성 설치 포함, 브라우저는 캐시 사용).
+
+```bash
+SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # 실제 설치 경로
+# 찾기: ls -d .agents/skills/motion-video-production .claude/skills/motion-video-production ~/.agents/skills/motion-video-production ~/.claude/skills/motion-video-production 2>/dev/null
+# 개인 설치면 "$HOME/.agents/skills/motion-video-production" 또는 "$HOME/.claude/skills/motion-video-production"
+# engine/이 이미 있으면 mkdir에서 멈춰요. 지우거나 다른 이름을 써요(있는 폴더에 cp -R 하면 engine/remotion으로 중첩돼요)
+mkdir engine && cp -R "$SKILL_ROOT/engines/remotion/." engine && cd engine && npm ci
+# 컷 전환의 carry를 검사해요
+node pipeline/probe.mjs productions/carry-demo              # carry 1.00 PASS
+node pipeline/render.mjs carry-demo --stills 1.5 3.0        # renders/carry-demo/contact.png
+node pipeline/render.mjs carry-demo                         # renders/carry-demo/picture.mp4
+node pipeline/score.mjs productions/carry-demo              # 절차적 스코어
+# <영상> <fps> <초> <음악> <대사, -는 없음> <출력>
+bash "$SKILL_ROOT/scripts/mix-mux.sh" renders/carry-demo/picture.mp4 60 5 productions/carry-demo/audio/score.wav - out/final.mp4
+bash "$SKILL_ROOT/scripts/verify.sh" out/final.mp4
+```
+
+렌더 브라우저는 `CHROME_PATH`나 캐시된 Playwright 헤드리스 셸을 써요. 둘 다 없으면 `npx remotion browser ensure`가 내려받아요(내려받기 전에 에이전트가 먼저 물어요).
 
 ## 설치
 
-### 공통 설치 (Codex·Claude Code·다른 런타임)
-
-스킬을 사용할 프로젝트 폴더에서 실행합니다. Node.js와 npx가 필요하며, 사용할 런타임을 선택해 설치합니다.
+스킬을 쓸 프로젝트 폴더에서 실행해요. Node.js와 npx가 필요하고, 쓸 런타임을 골라 설치해요.
 
 ```bash
 npx skills add unclejobs-ai/motion-video-skill --skill motion-video-production
 ```
 
-Codex만 지정하려면 아래처럼 실행합니다. 개인 범위로 설치하려면 `--global`을 추가합니다.
+Codex만 지정하려면 아래처럼 실행해요. 개인 범위로 설치하려면 `--global`을 더해요.
 
 ```bash
 npx skills add unclejobs-ai/motion-video-skill --skill motion-video-production --agent codex
 ```
 
-[Vercel skills CLI](https://github.com/vercel-labs/skills)가 Codex, Claude Code, Gemini CLI, Cursor, GitHub Copilot, OpenCode, Amp, Antigravity, Windsurf 등 지원 대상의 설치 위치를 처리합니다. **설치 호환성과 전체 영상 제작 검증은 다릅니다.** 생성 도구 연결과 이미지 보기·명령 실행 권한은 각 런타임 환경에 달려 있습니다. [런타임별 설치·호출과 검증 범위](docs/runtimes.md)를 참고합니다.
+[Vercel skills CLI](https://github.com/vercel-labs/skills)가 Codex, Claude Code, Gemini CLI, Cursor, GitHub Copilot, OpenCode, Amp, Antigravity, Windsurf 등의 설치 위치를 처리해요. 엔진은 스킬 폴더 안에 있어서 함께 설치돼요. **설치 호환성과 전체 영상 제작 검증은 달라요.** [런타임별 설치·호출과 검증 범위](docs/runtimes.md)를 참고해요.
 
 <details>
 <summary><strong>수동 설치 (Node.js 없이)</strong></summary>
 
-Codex는 프로젝트 `.agents/skills/`와 개인 `~/.agents/skills/`에서 스킬을 읽습니다. 아래는 개인 설치 예시입니다.
+Codex는 프로젝트 `.agents/skills/`와 개인 `~/.agents/skills/`에서 스킬을 읽어요. 아래는 개인 설치 예시예요.
 
 ```bash
 git clone https://github.com/unclejobs-ai/motion-video-skill.git
@@ -42,7 +61,7 @@ mkdir -p ~/.agents/skills
 cp -r motion-video-skill/skills/motion-video-production ~/.agents/skills/
 ```
 
-Claude Code는 프로젝트 `.claude/skills/`와 개인 `~/.claude/skills/`에서 스킬을 읽습니다. 기존 설치 명령도 계속 사용할 수 있습니다.
+Claude Code는 프로젝트 `.claude/skills/`와 개인 `~/.claude/skills/`에서 스킬을 읽어요.
 
 ```bash
 git clone https://github.com/unclejobs-ai/motion-video-skill.git
@@ -50,114 +69,168 @@ mkdir -p ~/.claude/skills
 cp -r motion-video-skill/skills/motion-video-production ~/.claude/skills/
 ```
 
-특정 프로젝트에서만 쓰려면 해당 프로젝트의 런타임별 스킬 폴더 아래에 같은 폴더를 복사합니다. 한 런타임에 같은 이름을 여러 경로로 중복 설치하지 않습니다.
+한 프로젝트에서만 쓰려면 그 프로젝트의 런타임별 스킬 폴더에 같은 폴더를 복사해요. 한 런타임에 같은 이름을 여러 경로로 중복 설치하지 않아요.
 
 </details>
 
 ### 첫 요청
 
-설치한 뒤 런타임의 스킬 목록에서 `motion-video-production`을 확인합니다. 보이지 않으면 런타임을 새로 시작합니다. Codex에서는 `$motion-video-production`, Claude Code와 Cursor에서는 `/motion-video-production`으로 명시적으로 호출하거나 아래처럼 요청합니다.
+설치한 뒤 런타임의 스킬 목록에서 `motion-video-production`을 확인해요. 보이지 않으면 런타임을 새로 시작해요. Codex에서는 `$motion-video-production`, Claude Code와 Cursor에서는 `/motion-video-production`으로 부르거나 아래처럼 요청해요.
 
-> 캐릭터가 나오는 30초짜리 오프닝 영상을 만들고 싶어.
+> 이 레퍼런스 영상 느낌으로 20초짜리 홍보 영상을 만들고 싶어.
 
-에이전트가 먼저 4가지(공개 방식, 길이와 화면비, 쓸 수 있는 도구, 금지 요소)를 묻고, `STORY.md`부터 단계 순서대로 진행합니다. 생성 도구가 없으면 프롬프트를 전달하고 사용자가 생성한 파일을 받아 이어갑니다. 이미지를 볼 수 없으면 사용자의 실제 눈 검수를 요청합니다.
+에이전트가 먼저 6가지(공개 방식, 길이와 화면비, 쓸 수 있는 도구, 금지 요소, 레퍼런스 영상, 엔진)를 묻고 단계 순서대로 진행해요. 생성 도구가 없으면 프롬프트를 건네고, 사용자가 만든 파일을 받아 이어가요.
+
+## 들어 있는 것
+
+| 무엇 | 하는 일 | 위치 |
+|---|---|---|
+| Remotion 엔진 | 버전이 고정된 렌더 파이프라인, 모션 모듈, 데모 | `engines/remotion/` |
+| carry 검사 | 컷 전환마다 화면 요소가 이어지는지를 렌더 전에 숫자로 재요 | `pipeline/carry.ts`, `probe.mjs` |
+| wordcut 템플릿 | 단어 하나를 한 자리에 두고 여러 장면이 넘겨받는 영상. `data.ts`만 바꿔요 | `productions/wordcut/` |
+| 질감 맞추기 | 레퍼런스의 대비·색·그레인·심도에 렌즈 값을 맞춰요 | `look-fit.mjs` |
+| 목소리와 음악 | composio CLI로 ElevenLabs·Fish Audio 목소리, 타이밍에 맞춘 절차적 스코어 | `vo.mjs`, `score.mjs` |
+| HyperFrames 엔진 | HTML/CSS 페이지를 GSAP으로 움직여 mp4로 렌더해요 | `engines/hyperframes/` |
+| 레퍼런스 분석 | 레퍼런스 영상을 OpenCV로 분해해 목표값을 만들어요 | `scripts/ref-analyze.py` |
+
+엔진은 바꿔 끼울 수 있어요. carry와 wordcut이 필요하면 Remotion, 재료가 웹페이지라면 HyperFrames가 맞아요. 비교는 [`references/engines.md`](skills/motion-video-production/references/engines.md)에 있어요.
+
+## 레퍼런스 분석
+
+<img src="docs/assets/ref-pipeline.png" width="480" alt="레퍼런스 분석 파이프라인">
+
+"이 영상처럼"이 가리키는 건 보통 질감보다 움직임과 편집이에요. 0단계에서 레퍼런스를 OpenCV로 분해해 컷과 홀드, 광학 흐름, 블러, 심도, 그레인, 질감을 숫자로 남겨요. 계획은 그 숫자를 인용해요. 렌더한 뒤에는 같은 분석으로 결과를 재고, `gate.py ref`가 지표마다 목표와 차이를 적고 범위를 벗어나면 막아요.
+
+엔진 폴더가 아니라 프로젝트 폴더에서 실행해요. `SKILL_ROOT`는 빠른 시작과 같게 정해요.
+
+```bash
+SKILL_ROOT="$PWD/.agents/skills/motion-video-production"   # 실제 설치 경로
+PROJECT_ROOT="$PWD"   # reference.mp4와 ref/를 둘 산출물 폴더
+python3 -m venv .venv && . .venv/bin/activate && python3 -m pip install -r "$SKILL_ROOT/scripts/requirements-ref.txt"
+mkdir -p ref qa && cp -n "$SKILL_ROOT/templates/ANALYSIS.md" ref/ANALYSIS.md   # 빈칸(<...>)은 분석을 보고 채워요
+python3 -I "$SKILL_ROOT/scripts/ref-analyze.py" reference.mp4 -o ref/analysis.json --targets ref/targets.json
+python3 "$SKILL_ROOT/harness/gate.py" ref "$PROJECT_ROOT"
+```
+
+움직임은 1/30초당 값으로 재서 fps가 달라도 비교돼요. 레퍼런스 파일은 커밋하지 않고 숫자만 남겨요. 지표 설명과 실제 예시는 [`references/reference-analysis.md`](skills/motion-video-production/references/reference-analysis.md)에 있어요.
 
 ## 사용 흐름
 
-![제작 6단계와 단계별 게이트](docs/assets/workflow.png)
+<img src="docs/assets/workflow-ref.png" width="480" alt="제작 단계와 단계별 게이트">
 
-1. 스킬이 단계 산출물을 만듭니다 (`STORY.md`, `character.txt`, `key/`, `clip/`, `voices.json`, `edit.json`).
-2. 설치된 `SKILL.md`의 부모 폴더를 `SKILL_ROOT`, 산출물 폴더를 `PROJECT_ROOT`로 정하고, 단계가 끝나면 `python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"`를 실행합니다.
-3. 종료 코드 0이면 다음 단계로 넘어갑니다. 1(BLOCK)이면 `qa/gate-<단계>.txt`의 BLOCK 줄을 읽고 산출물을 고쳐 같은 게이트를 다시 실행합니다.
-4. 눈으로 봐야 하는 검사는 스크립트가 판정할 수 없습니다. 프레임 스트립을 보고 남긴 기록 파일(`qa/clips-review.md`, `qa/review.md`)이 있어야 통과합니다.
+1. 스킬이 단계 산출물을 만들어요 (`ref/`, `STORY.md`, `character.txt`, `key/`, `clip/`, `voices.json`, `edit.json`).
+2. 설치된 `SKILL.md`의 부모 폴더를 `SKILL_ROOT`, 산출물 폴더를 `PROJECT_ROOT`로 정하고, 단계가 끝나면 `python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"`를 실행해요.
+3. 종료 코드 0이면 다음 단계로 가요. 1(BLOCK)이면 `qa/gate-<단계>.txt`의 BLOCK 줄을 읽고 고친 뒤 같은 게이트를 다시 실행해요.
+4. 눈으로 봐야 하는 검사는 스크립트가 판정하지 못해요. 프레임을 보고 남긴 기록(`qa/clips-review.md`, `qa/review.md`)이 있어야 통과해요.
 
-### 게이트 실행 예시
+시작 화면이 같아도 1초 뒤에 인물이 달라질 수 있어요(G01). `gate clips`가 클립마다 `qa/strip-<클립>.png`를 만들어요.
 
-`gate.py clips` 실행 예시입니다. 눈 검수 기록이 없어서 BLOCK(종료 코드 1)이 나오고, 기록을 남기면 PASS(종료 코드 0)가 됩니다. 기록은 프레임 스트립 이미지(`qa/strip-<클립>.png`)를 연 뒤에 씁니다.
+![인물 변화가 보이는 프레임 스트립](docs/assets/strip.png)
+
+`gate.py clips` 실행 예시예요. 눈 검수 기록이 없어서 BLOCK(종료 코드 1)이 나오고, 기록을 남기면 PASS(종료 코드 0)가 돼요.
 
 ![gate clips 실행: BLOCK, 눈 검수 기록, PASS](docs/assets/gate-demo.gif)
 
 ## 하네스
 
-![게이트 동작: 자동 측정, 눈으로 확인, 기록 파일](docs/assets/harness.png)
+<img src="docs/assets/harness.png" width="480" alt="게이트 동작: 자동 측정, 눈으로 확인, 기록 파일">
 
 | 제작 단계 | 게이트 | 하는 검사 |
 |---|---|---|
-| 1. 스토리·장면 기획 | `story` | 빈칸, BPM, 음악 싱크 지점 표(시간이 숫자인지), 장면 표 |
-| 2. 캐릭터 시트 | `character` | `character.txt`가 1개 문단 평문인지, 색 표현, 시트 이미지 |
+| 0. 레퍼런스 분석 | `ref` | 계획 전: ANALYSIS.md 빈칸, targets.json 형식. 렌더 후: 지표마다 목표와 비교 |
+| 1. 스토리·장면 기획 | `story` | 빈칸, BPM, 음악 싱크 지점 표, 장면 표 |
+| 2. 캐릭터 시트 | `character` | `character.txt`가 1개 문단인지, 색 표현, 시트 이미지 |
 | 3. 키프레임 | `keyframes` | 중복 파일, 클립과의 화면비 |
-| 4. 영상 변환 | `clips` | 길이, 프레임 수, 시작 화면 일치, 프레임 스트립 생성, 클립별 판정 기록 |
+| 4. 영상 변환 | `clips` | 길이, 프레임 수, 시작 화면 일치, 프레임 스트립, 클립별 판정 기록 |
 | 5. 음악·목소리 | `audio` | 음성 ID 1개, 대사 파일 |
 | 6. 조립 | `edit`, `final` | 박 격자, 컷 연결, 반복 컷, 대사 길이, 프레임 수, 오디오, 라우드니스, true peak, 검수 기록 |
 
-### 프레임 스트립
+게이트는 엔진 내부가 아니라 산출물 파일과 완성된 mp4만 읽어요. 그래서 어느 엔진으로 만들었든 같은 기준이에요.
 
-시작 화면이 키프레임과 같아도 1~2초 뒤에 인물이 달라지는 클립이 있습니다. `gate clips`가 클립마다 키프레임, 0, 1.0, 1.5, 2.0, 3.0초를 한 줄에 놓은 이미지를 만듭니다.
+SSIM 같은 유사도 값은 인물의 움직임과 변형을 구분하지 못해요(`gotchas.md` G02). 게이트는 시작 화면 일치만 숫자로 판정하고, 뒤쪽 프레임은 사람이 프레임 스트립을 보고 기록하게 해요.
 
-![프레임 스트립 예시](docs/assets/strip.png)
-
-SSIM 같은 화면 유사도 값은 인물의 움직임과 인물의 변형을 구분하지 못합니다(`gotchas.md` G02). 게이트는 시작 화면 일치만 숫자로 판정하고, 뒤쪽 프레임은 사람이 보고 기록하게 합니다.
-
-### 하네스 점검
-
-저장소 폴더에서 `bash skills/motion-video-production/harness/selftest.sh`를 실행합니다. 설치된 사본을 점검하려면 `bash "$SKILL_ROOT/harness/selftest.sh"`를 실행합니다. 종료 코드 0이면 이 컴퓨터에서 셀프테스트의 검사 사례가 기대대로 동작합니다. (Bash, ffmpeg, ffprobe, Python 3 필요)
+저장소 폴더에서 `bash skills/motion-video-production/harness/selftest.sh`를 실행해요. 설치된 사본은 `bash "$SKILL_ROOT/harness/selftest.sh"`로 점검해요. 종료 코드 0이면 이 컴퓨터에서 검사 사례가 기대대로 동작해요.
 
 ## 캐릭터 일관성 7가지
 
-장면이 바뀌어도 얼굴과 목소리를 같게 유지하는 7가지 기준(캐릭터 시트, 외형 고정문, 키프레임 시작 화면, 목소리 고정, 대사와 입 모양, 음악 박자, 품질 검수)이 제작 6단계의 어느 이음새에 놓이는지는 아래 그림과 `skills/motion-video-production/references/consistency-7.md`에 있습니다.
+장면이 바뀌어도 얼굴과 목소리를 같게 지키는 기준 7가지예요. 어느 제작 단계에서 적용하는지는 아래 그림과 [`references/consistency-7.md`](skills/motion-video-production/references/consistency-7.md)에 있어요.
 
-![일관성 7가지가 놓이는 자리](docs/assets/seams.png)
+<img src="docs/assets/seams.png" width="480" alt="일관성 7가지가 놓이는 자리">
 
-## Gotchas
+## 자주 겪는 함정
 
-전체 29가지는 [`references/gotchas.md`](skills/motion-video-production/references/gotchas.md)에 증상, 원인, 예방, 하네스 검사 ID로 정리되어 있습니다. 자주 부딪히는 것:
+전체 29가지는 [`references/gotchas.md`](skills/motion-video-production/references/gotchas.md)에 증상, 원인, 예방, 검사 ID로 정리돼 있어요. 엔진 쪽 함정은 [`references/pitfalls.md`](skills/motion-video-production/references/pitfalls.md)에 있어요. 자주 부딪히는 것:
 
-- 클립은 시작 화면이 같아도 1~2초 뒤에 옷, 안경, 머리가 바뀝니다. (G01)
-- 컷 길이는 초가 아니라 박의 배수로 정하고, 시작 프레임은 누적 시간에서 한 번만 반올림합니다. (G11, G12)
-- 대사 길이를 먼저 재고 컷 길이를 정합니다. (G13)
-- `검사 | tail`처럼 파이프로 자르면 종료 코드가 사라집니다. (G21)
-- ICC 프로파일이 붙은 영상에서 `ffprobe -of csv=p=0`은 프레임 수를 `30,`처럼 출력합니다. `-of default=nw=1:nk=1`을 씁니다. (G27)
-- ffmpeg에서 `adelay` 뒤에 `apad`, `atrim`을 쓰면 지연이 사라집니다. `asetpts=N/SR/TB`가 필요합니다. (G26)
+- 컷 길이는 박의 배수로 정하고, 시작 프레임은 누적 시간에서 한 번만 반올림해요. (G11, G12)
+- 대사 길이를 먼저 재고 컷 길이를 정해요. (G13)
+- `검사 | tail`처럼 자르면 종료 코드가 사라져요. (G21)
+- 아무것도 살아남지 않는 매끄러운 장면 전환도 carry 0.00이에요. 요소 하나를 컷 전환 너머로 옮겨요.
+
+## 참고 문서
+
+설치된 스킬 폴더 안에 함께 들어 있어요. 에이전트가 단계마다 필요한 문서를 읽어요.
+
+| 문서 | 내용 |
+|---|---|
+| [`SKILL.md`](skills/motion-video-production/SKILL.md) | 스킬 본문. 단계 순서, 처음 묻는 6가지, 게이트 호출 |
+| [`references/reference-analysis.md`](skills/motion-video-production/references/reference-analysis.md) | 레퍼런스 분석 지표와 목표값 만들기 |
+| [`references/engines.md`](skills/motion-video-production/references/engines.md) | Remotion과 HyperFrames 비교, 엔진별 명령 |
+| [`references/art-direction.md`](skills/motion-video-production/references/art-direction.md) | carry, 모션 어휘, 스타일 고정 |
+| [`references/glossary.md`](skills/motion-video-production/references/glossary.md) | 편집·카메라·질감 용어(한국어·영어) |
+| [`references/beat-grid.md`](skills/motion-video-production/references/beat-grid.md) | BPM에서 컷 길이 계산 |
+| [`references/consistency-7.md`](skills/motion-video-production/references/consistency-7.md) | 캐릭터 일관성 7가지 |
+| [`references/brand-intro.md`](skills/motion-video-production/references/brand-intro.md) | 브랜드 소개 영상과 홈페이지 한 장 만들기 |
+| [`references/providers.md`](skills/motion-video-production/references/providers.md) | 이미지·영상·목소리 도구 사용 메모 |
+| [`references/cost-rules.md`](skills/motion-video-production/references/cost-rules.md) | 무료 먼저, 유료는 필요한 곳만 |
+| [`references/gotchas.md, pitfalls.md`](skills/motion-video-production/references/gotchas.md) | 자주 겪는 함정과 실수 |
+| [`references/licensing.md`](skills/motion-video-production/references/licensing.md) | 외부 도구 라이선스와 확인 날짜 |
+| [`templates/`](skills/motion-video-production/templates/) | STORY.md, ANALYSIS.md, BEATSHEET.md 등 단계 산출물 서식 |
 
 ## 필요한 도구
 
-무료 범위와 상업 이용 조건은 `NOTICE.md` 요약과 `skills/motion-video-production/references/licensing.md`(2026-10-02 확인, 출처 URL 포함)에 있습니다. 요금과 약관은 자주 바뀌므로 작업 직전에 다시 확인합니다.
+무료 범위와 상업 이용 조건은 [`NOTICE.md`](NOTICE.md)와 [`references/licensing.md`](skills/motion-video-production/references/licensing.md)(출처 URL 포함)에 있어요. Remotion은 직원 4명 이상 영리 조직에 Company License가 필요하고, HyperFrames는 Apache-2.0이에요. 약관은 자주 바뀌니 작업 직전에 다시 확인해요.
 
 | 도구 | 용도 |
 |---|---|
 | Codex, Claude Code 등 스킬 지원 에이전트 | 제작 진행·조립 |
-| ffmpeg, ffprobe, Python 3 | 하네스·스크립트 실행 |
-| Bash (macOS/Linux, Windows는 WSL) | `.sh` 스크립트 실행 |
-| Node.js + Remotion | 모션 그래픽·조립 |
+| ffmpeg, ffprobe, Python 3, Bash | 하네스·스크립트 실행 (Windows는 WSL) |
+| Node.js 24 이상 | 엔진 (Remotion 4.0.529, HyperFrames 0.8.143, 버전 고정) |
+| OpenCV, numpy (`scripts/requirements-ref.txt`) | 레퍼런스 분석 |
 | ChatGPT / Grok Imagine | 이미지·영상 생성 |
-| Suno | 음악 |
-| ElevenLabs, Fish Audio | 목소리 |
-| whisper | 받아쓰기 검수 (`verify.sh`의 받아쓰기 연동은 미검증) |
+| ElevenLabs, Fish Audio (composio CLI) | 목소리 |
+| whisper | 받아쓰기 검수 |
+
+## 알려진 한계
+
+- **carry 검사는 Remotion 전용이에요.** 렌더 전에 선언한 상자(`track.ts`)를 읽기 때문이에요. HyperFrames 렌더는 `verify.sh`, `gate.py final`, `gate.py ref`로 mp4에서 재요. mp4에서 carry를 재는 방식은 아직 없어요.
+- **wordcut 데모는 조정 전 첫 렌더예요.** 레퍼런스 목표와 비교하면 `gate.py ref`가 12개 지표 중 10개에서 막아요. 그레인, 선명도 비, 대비가 특히 멀어요. `look-fit.mjs`와 `plan.mjs`를 다시 돌려 맞추는 과정이 이 스킬의 사용법이에요.
+- **마무리 이미지를 켜면 carry 점수가 0.00(FAIL)이에요.** 세지는 경계가 이미지가 페이지를 덮는 경계 하나뿐이고, 이 경계는 아무것도 넘어가지 않는 경계로 세지기 때문이에요. 다른 경계는 선언한 컷이라 면제돼요. 이 경계를 carry로 바꿔야 FAIL을 벗어나요.
+- **GSAP 라이선스 조항 전문은 확인하지 못했어요.** HyperFrames 데모가 쓰는 GSAP 3.14.2는 README에 상업 이용도 무료라고 적혀 있어요. 상업용 영상을 공개하기 전에 https://gsap.com/standard-license 를 확인해요.
 
 ## 저장소 구조
 
 ```
-README.md
-README.en.md                영문 README
-LICENSE                     MIT
-NOTICE.md                   외부 도구 안내 요약
-docs/assets/                README 이미지
-docs/runtimes.md            런타임별 설치·호출과 검증 범위
-skills/motion-video-production/        설치하는 스킬 폴더 (아래 전체가 함께 복사됩니다)
+README.md, README.en.md     한국어·영문 README
+NOTICE.md, LICENSE          외부 도구 안내, MIT
+docs/                       README 이미지(그림 원본 SVG 포함), 런타임별 설치·검증 범위
+skills/motion-video-production/        설치하는 스킬 폴더 (아래 전체가 함께 복사돼요)
   SKILL.md                  스킬 본문
-  agents/openai.yaml        Codex 표시 이름·호출 예시
-  references/               일관성 7가지, 박 격자, 비용 규칙, 도구 메모, gotchas, licensing(외부 도구 이용 조건)
-  harness/                  gate.py(단계별 통과 여부 판정), selftest.sh(하네스 자체 검증)
-  scripts/                  dupcheck.py, clipsheet.sh, key-plate.sh, mix-mux.sh, verify.sh, beat-grid.py
-  templates/                STORY.md, CHARACTER_SHEET.md, PROMPTS.md, SCENE_AUDIT.md
+  references/               레퍼런스 분석, 엔진, 아트 디렉션, 일관성, 박 격자, 도구 메모, gotchas, licensing
+  harness/                  gate.py(단계별 판정), selftest.sh(하네스 자체 검증)
+  scripts/                  ref-analyze.py, mix-mux.sh, verify.sh, key-plate.sh, clipsheet.sh 외
+  templates/                ANALYSIS.md, STORY.md, BEATSHEET.md, MUSIC_BRIEF.md 외
+  engines/remotion/         carry 데모, wordcut 템플릿, 렌더·목소리·스코어 파이프라인
+  engines/hyperframes/      HTML/GSAP carry 데모
 ```
 
-Remotion 컴포지션 코드는 이 저장소에 포함되어 있지 않습니다. Remotion을 직접 설치해 사용합니다.
+## 검증 범위
+
+2026-10-25에 커밋한 트리를 그대로 꺼내 설치하고 확인했어요. 스킬 파일 76개가 모두 설치됐어요. 엔진 `npm ci`, 타입 검사, 테스트 13개, carry 검사, selftest가 통과했어요. 두 엔진의 렌더를 `verify.sh`와 `gate.py ref`로 쟀고, HyperFrames 렌더는 `gate.py final`을 통과했어요. 외부 생성, 목소리 크레딧, 오디오 청취, 다른 일곱 런타임 안에서의 호출은 확인하지 않았어요. 자세한 내용은 [docs/runtimes.md](docs/runtimes.md)에 있어요.
 
 ## 만든 곳
 
-이 스킬은 [SceneSteller](https://www.scenesteller.com/?utm_source=github&utm_medium=readme&utm_campaign=motion-video-skill)를 만드는 팀이 영상 제작 과정에서 쌓은 점검 기준을 정리한 것입니다. 스토리에서 영상까지 브라우저에서 바로 만들어 보고 싶다면 SceneSteller를 사용해 보세요.
+이 스킬은 [SceneSteller](https://www.scenesteller.com/?utm_source=github&utm_medium=readme&utm_campaign=motion-video-skill)를 만드는 팀이 영상 제작 과정에서 쌓은 점검 기준을 정리한 것이에요. 스토리에서 영상까지 브라우저에서 바로 만들어 보고 싶다면 SceneSteller를 써 보세요.
 
 ## 책임 범위
 
-생성물의 권리와 책임은 `NOTICE.md`와 `skills/motion-video-production/references/licensing.md`에 있습니다.
+생성물의 권리와 책임은 [`NOTICE.md`](NOTICE.md)와 [`references/licensing.md`](skills/motion-video-production/references/licensing.md)에 있어요.

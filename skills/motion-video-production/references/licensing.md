@@ -1,6 +1,6 @@
 # 외부 도구 라이선스·이용 안내
 
-- 확인 날짜: **2026-10-02**
+- 확인 날짜: **2026-10-02** (1장 Remotion, 1-2장 HyperFrames·GSAP, 1-3장 글꼴은 **2026-10-25**에 다시 확인)
 - 확인 방법: 아래 각 출처 URL의 공개 페이지를 이 날짜에 조회했습니다. "요약 확인" 표시 항목은 원문 전체가 아니라 요약본으로 확인한 내용입니다. 상업 공개 전에 원문으로 다시 확인합니다.
 - 확인하지 못한 항목은 "미확인"으로 두었습니다.
 - 이 문서는 법률 자문이 아닙니다. (4장 참조)
@@ -9,7 +9,7 @@
 
 출처
 - https://www.remotion.dev/docs/license (미확인)
-- https://github.com/remotion-dev/remotion/blob/main/LICENSE.md (요약 확인)
+- https://github.com/remotion-dev/remotion/blob/main/LICENSE.md (2026-10-25 원문 확인: https://raw.githubusercontent.com/remotion-dev/remotion/main/LICENSE.md)
 - https://www.remotion.pro/license (요약 확인)
 
 확인한 내용
@@ -19,10 +19,38 @@
 - 금지: Remotion 코드를 복사·수정해 자신의 파생 제품을 판매·대여·라이선스·재라이선스·서브라이선스하는 목적의 사용.
 - 미확인: "직원"의 정의(계약직·프리랜서 포함 여부 등). 원문 LICENSE.md와 Remotion FAQ에서 확인해야 합니다.
 
+- 2026-10-25 원문 문구: 무료 라이선스 대상은 "an individual", "a for-profit organization with up to 3 employees", "a non-profit or not-for-profit organization", "evaluating whether Remotion is a good fit, and are not yet using it in a commercial way". 원문에는 "In Remotion 5.0, the license will slightly change."라는 예고가 있습니다. 엔진은 4.0.529로 고정돼 있습니다.
+
 이 저장소와의 관계
-- 이 저장소는 Remotion 코드를 포함하거나 재배포하지 않습니다.
-- 사용자가 `remotion/` 템플릿을 프로젝트 폴더로 복사한 뒤 `npm install`로 Remotion을 직접 설치하고, 본인 또는 소속 조직의 해당 여부를 스스로 확인한 뒤 사용합니다.
-- 소속 조직의 직원이 4명 이상이면 영상 제작 전에 Company License를 구매해야 합니다.
+- 이 저장소는 Remotion 소스 코드를 포함하거나 재배포하지 않습니다. `engines/remotion/`에는 Remotion을 쓰는 이 저장소의 코드(MIT)와 `package.json`·`package-lock.json`(버전 고정)만 있습니다.
+- 사용자가 엔진 폴더를 작업 폴더로 복사한 뒤 `npm ci`로 Remotion을 직접 설치합니다. 본인 또는 소속 조직이 무료 대상인지 스스로 확인한 뒤 사용합니다.
+- 소속 조직의 직원이 4명 이상인 영리 조직이면 영상 제작 전에 Company License를 구매해야 합니다. 이 조건이 맞지 않으면 HyperFrames 엔진을 씁니다(1-2장).
+
+## 1-2. HyperFrames와 GSAP (HTML 엔진)
+
+출처
+- https://github.com/heygen-com/hyperframes/blob/main/LICENSE (2026-10-25 원문 확인: Apache License, Version 2.0, 저작권 HeyGen, Inc.)
+- npm `hyperframes` 0.8.143의 `license` 필드: `Apache-2.0`
+- npm `gsap` 3.14.2의 `license` 필드: "Standard 'no charge' license: https://gsap.com/standard-license"
+- https://gsap.com/standard-license (2026-10-25 조회. 페이지에는 "GSAP is now free for everyone, thanks to Webflow's support!"만 보였고 조항 전문은 확인하지 못함)
+
+확인한 내용
+- HyperFrames는 Apache-2.0입니다. 회사 규모에 따른 조건이 없습니다. 재배포할 때는 라이선스 사본과 고지를 함께 둡니다(이 저장소는 재배포하지 않고 npm으로 설치합니다).
+- GSAP 3.14.2의 README에는 "the entire GSAP toolset is FREE, even for commercial use"라고 적혀 있습니다. 표준 무료 라이선스의 제한 조항(예: 경쟁 제품 관련)은 미확인입니다. 상업 공개 전에 위 URL에서 원문을 확인합니다.
+
+## 1-2-1. Three.js (홈페이지 템플릿)
+
+- `templates/homepage-intro.html`이 `three@0.170.0`을 jsDelivr에서 불러옵니다. npm `license` 필드: MIT (2026-10-25 확인). 저장소에는 Three.js 파일을 넣지 않았습니다.
+
+## 1-3. 글꼴
+
+| 글꼴 | 패키지(고정 버전) | 라이선스 | 확인 |
+|---|---|---|---|
+| Pretendard | `pretendard` 1.3.9 | SIL Open Font License 1.1 | 패키지 `license` 필드와 동봉 LICENSE (2026-10-25) |
+| 나눔명조 | `@fontsource/nanum-myeongjo` 5.3.0 | SIL Open Font License 1.1 | 패키지 `license` 필드 (2026-10-25) |
+| JetBrains Mono | `@fontsource/jetbrains-mono` 5.3.0 | SIL Open Font License 1.1 | 패키지 `license` 필드 (2026-10-25) |
+
+- 글꼴 파일은 저장소에 커밋하지 않고 `npm ci`로 받습니다. OFL은 글꼴을 영상에 쓰는 것을 허용하고, 글꼴 파일 자체를 단독으로 판매하는 것을 금지합니다.
 
 ## 2. 음악·목소리 도구의 무료 플랜과 상업 이용
 

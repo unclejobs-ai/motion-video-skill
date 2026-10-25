@@ -2,21 +2,23 @@
 """단계 게이트: 산출물을 측정해 PASS/BLOCK을 종료 코드로 판정한다.
 
 사용법:  python3 harness/gate.py <단계> [프로젝트폴더=.]
-단계:    story | character | keyframes | clips | audio | edit | final | all
+단계:    ref | story | character | keyframes | clips | audio | edit | final | all
 종료 코드: 0 = 모든 검사 통과(WARN 허용), 1 = BLOCK 하나 이상, 2 = 사용법 오류
 보고서:  <프로젝트>/qa/gate-<단계>.txt 에 같은 내용을 저장한다.
 
 프로젝트 폴더 규칙
+  ref/ANALYSIS.md  ref/targets.json  qa/render-analysis.json   (레퍼런스가 있을 때만, ref/ 폴더가 없으면 ref 게이트는 건너뜀)
   STORY.md  character.txt  voices.json  edit.json
   sheet/*.png  key/<이름>.png  clip/<이름>.mp4  out/final.mp4  qa/clips-review.md  qa/review.md
 클립 이름 = 키프레임 이름 = edit.json 의 src 클립 ID (clip:<이름>@<시작초>)
 
-임계값은 환경 변수로 바꾼다: GATE_SSIM_START(0.55) GATE_LUFS(-14) GATE_LUFS_TOL(1.5) GATE_TP_MAX(-1.0)
+임계값은 환경 변수로 바꾼다: GATE_REF_TOL_SCALE(1.0, targets.json 의 허용 오차에 곱함) GATE_SSIM_START(0.55) GATE_LUFS(-14) GATE_LUFS_TOL(1.5) GATE_TP_MAX(-1.0)
 주의: 클립 뒤쪽의 인물 변형은 SSIM으로 구분되지 않는다(정상 클립도 움직이면 값이 떨어진다). 그래서 프레임 스트립을 만들고 눈 검수 기록을 요구한다.
 의존: python3 표준 라이브러리, ffmpeg, ffprobe
 """
 import hashlib
 import json
+import math
 import os
 import re
 import subprocess
@@ -27,6 +29,9 @@ SSIM_START = float(os.environ.get("GATE_SSIM_START", "0.55"))
 LUFS_TARGET = float(os.environ.get("GATE_LUFS", "-14"))
 LUFS_TOL = float(os.environ.get("GATE_LUFS_TOL", "1.5"))
 TP_MAX = float(os.environ.get("GATE_TP_MAX", "-1.0"))
+REF_TOL_SCALE = float(os.environ.get("GATE_REF_TOL_SCALE", "1.0"))
+if not (math.isfinite(REF_TOL_SCALE) and REF_TOL_SCALE >= 0):
+    sys.exit(f"GATE_REF_TOL_SCALE 는 0 이상의 유한한 수여야 함: {REF_TOL_SCALE}")
 IMG = {".png", ".jpg", ".jpeg", ".webp"}
 
 
@@ -107,6 +112,61 @@ def table_rows(text, heading):
     for ln in rows[2:]:
         out.append([c.strip() for c in ln.strip().strip("|").split("|")])
     return out
+
+
+PLACEHOLDER = re.compile(r"<[^<>\n]{1,40}>")
+
+
+def pick(d, path):
+    for k in path.split("."):
+        if not isinstance(d, dict) or k not in d:
+            return None
+        d = d[k]
+    return d
+
+
+def g_ref(root, r):
+    """레퍼런스 분석: 계획 전에는 ANALYSIS.md 와 targets.json 을, 렌더 후에는 렌더 분석을 목표값과 비교한다.
+    어느 엔진(Remotion, HyperFrames, 손 편집)으로 만들었든 out/final.mp4 를 분석한 숫자만 본다."""
+    ref = root / "ref"
+    if not ref.is_dir():
+        r.warn("R00", "ref/ 폴더 없음 - 레퍼런스 영상 없이 진행(레퍼런스가 있으면 ref/ 를 만들고 분석할 것)")
+        return
+    md = ref / "ANALYSIS.md"
+    if r.check(md.exists(), "R01", "ref/ANALYSIS.md 있음", "ref/ANALYSIS.md 없음 - templates/ANALYSIS.md 를 복사해 채울 것"):
+        text = md.read_text(encoding="utf-8")
+        left = PLACEHOLDER.findall(text)
+        r.check(not left, "R02", "ANALYSIS.md 빈칸 없음", f"ANALYSIS.md 에 채우지 않은 칸 {len(left)}개: {' '.join(left[:3])}")
+    targets = load_json(ref / "targets.json", r, "R03")
+    metrics = (targets or {}).get("metrics") if isinstance(targets, dict) else None
+    if targets is not None and not r.check(isinstance(metrics, dict) and metrics and all(
+            isinstance(m, dict) and isinstance(m.get("target"), (int, float)) and isinstance(m.get("tol"), (int, float))
+            and math.isfinite(m["target"]) and math.isfinite(m["tol"]) and m["tol"] >= 0
+            for m in metrics.values()), "R03", f"targets.json 지표 {len(metrics or {})}개",
+            "targets.json 형식 오류(target·tol 은 유한한 수, tol 은 0 이상) - {\"metrics\": {\"edit.stillShare\": {\"target\": 0.46, \"tol\": 0.25}, ...}}"):
+        return
+    final = root / "out" / "final.mp4"
+    if not final.exists() or not metrics:
+        return
+    ra = root / "qa" / "render-analysis.json"
+    if not r.check(ra.exists() and ra.stat().st_mtime >= final.stat().st_mtime, "R04", "qa/render-analysis.json 이 최종본보다 새것",
+                   "최종본을 분석할 것: python3 -I \"$SKILL_ROOT/scripts/ref-analyze.py\" out/final.mp4 -o qa/render-analysis.json"):
+        return
+    got = load_json(ra, r, "R04")
+    if got is None:
+        return
+    for path, m in metrics.items():
+        value, target, tol = pick(got, path), float(m["target"]), float(m["tol"]) * REF_TOL_SCALE
+        if not isinstance(value, (int, float)):
+            r.block("R05", f"{path}: 렌더 분석에 값 없음")
+            continue
+        if target:
+            off = (value - target) / abs(target)
+            line = f"{path}: 목표 {target:g}, 값 {value:g}, {off * 100:+.0f}% (허용 ±{tol * 100:.0f}%)"
+        else:  # 목표 0 은 비율이 없으므로 tol 을 절대 차이로 읽는다
+            off = value
+            line = f"{path}: 목표 0, 값 {value:g} (허용 ±{tol:g}, 목표가 0이라 절대 차이)"
+        r.check(abs(off) <= tol, "R05", line, line + " - 허용 범위 밖")
 
 
 def g_story(root, r):
@@ -369,7 +429,7 @@ def g_final(root, r):
             "qa/review.md 가 out/final.mp4 보다 오래됨 - 최종본을 다시 렌더했다면 다시 보고 기록할 것")
 
 
-STAGES = {"story": g_story, "character": g_character, "keyframes": g_keyframes,
+STAGES = {"ref": g_ref, "story": g_story, "character": g_character, "keyframes": g_keyframes,
           "clips": g_clips, "audio": g_audio, "edit": g_edit, "final": g_final}
 
 

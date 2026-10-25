@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>carry demo</title>
+    <!-- The same 5 s carry demo as engines/remotion/productions/carry-demo, as one HTML page.
+         96 BPM, beat 0.625 s: the first word rises at 0.9 s, an ink circle opens behind it centred on beat 3 (1.875 s)
+         while the word lifts and shrinks into a label (the carry), the big line pops on beat 3, the tail at 2.5 s. -->
+    <script src="node_modules/gsap/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Pretendard";
+        src: url("node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2") format("woff2-variations");
+        font-weight: 45 920;
+      }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #1d1d1f; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #ffffff; font-family: Pretendard, sans-serif; }
+      .ink { position: absolute; inset: 0; background: #1d1d1f; clip-path: circle(0% at 50% 50%); }
+      .line { position: absolute; left: 0; width: 1920px; text-align: center; line-height: 1.1; white-space: nowrap; letter-spacing: -0.035em; }
+      #big { top: 360px; font-size: 280px; font-weight: 900; color: #ffffff; opacity: 0; }
+      #tail { top: 720px; font-size: 72px; font-weight: 700; color: #a1a1a6; opacity: 0; }
+      #lead { top: 420px; font-size: 150px; font-weight: 800; color: #1d1d1f; opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="root" data-start="0" data-width="1920" data-height="1080" data-duration="5">
+      <div class="ink" id="ink">
+        <div class="line" id="big">한 장에</div>
+        <div class="line" id="tail">정리돼요</div>
+      </div>
+      <div class="line" id="lead">모아 두면</div>
+    </div>
+    <script>
+      const beat = 60 / 96;
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#lead", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.9);
+      tl.to("#ink", { clipPath: "circle(75% at 50% 50%)", duration: 0.4, ease: "power2.inOut" }, 3 * beat - 0.2);
+      tl.to("#lead", { y: -200, scale: 0.4, color: "#a1a1a6", duration: 0.4, ease: "power2.inOut" }, 3 * beat - 0.2);
+      tl.fromTo("#big", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.7)" }, 3 * beat);
+      tl.to("#tail", { opacity: 1, duration: 0.4, ease: "power3.out" }, 4 * beat);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["root"] = tl;
+    </script>
+  </body>
+</html>

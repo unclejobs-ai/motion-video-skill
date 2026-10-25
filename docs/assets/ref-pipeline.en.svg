@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1444" viewBox="0 0 720 1444" role="img" aria-labelledby="ref-pipeline-title ref-pipeline-desc">
+  <title id="ref-pipeline-title">Reference analysis pipeline</title>
+  <desc id="ref-pipeline-desc">Analyze the reference, set targets, plan and render, then compare the result. The dotted arrow carries targets to the ref gate.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
+      .title { font-size: 34px; font-weight: 700; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
+      .muted { fill: #626860; }
+      .label { font-size: 24px; fill: #626860; }
+      .accent { fill: #B8441A; }
+      .rule { stroke: #626860; stroke-opacity: .24; }
+      .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="1444" fill="#FFFFFF"/>
+  <text x="40" y="68" class="title">Reference analysis pipeline</text>
+  <text x="40" y="112" class="muted">Compare targets and results with the same metrics.</text>
+  <path d="M40 152H680" class="rule"/>
+  <text x="100" y="192" class="heading">Reference video</text>
+  <text x="100" y="230" class="mono">reference.mp4</text>
+  <text x="100" y="264" class="muted">Keep numbers, not the source file.</text>
+  <path d="M56 212v50" class="flow"/>
+  <path d="M40 292H680" class="rule"/>
+  <text x="100" y="332" class="heading">Analysis · ref-analyze.py</text>
+  <text x="100" y="370" class="muted">Cuts · holds · optical flow · blur</text>
+  <text x="100" y="404" class="muted">Depth bands · grain · look</text>
+  <path d="M56 352v50" class="flow"/>
+  <path d="M40 432H680" class="rule"/>
+  <text x="100" y="472" class="heading">Targets · ref/targets.json</text>
+  <text x="100" y="510" class="muted">Targets and tolerances per metric</text>
+  <text x="100" y="544" class="muted">Cited in ANALYSIS.md</text>
+  <path d="M56 492v50" class="flow"/>
+  <path d="M40 572H680" class="rule"/>
+  <text x="100" y="612" class="heading">Plan</text>
+  <text x="100" y="650" class="mono">plan.mjs · look-fit.mjs</text>
+  <text x="100" y="684" class="mono">BEATSHEET.md</text>
+  <path d="M56 632v50" class="flow"/>
+  <path d="M40 712H680" class="rule"/>
+  <text x="100" y="752" class="heading">Swappable engine</text>
+  <text x="100" y="790" class="mono">Remotion · carry</text>
+  <text x="100" y="824" class="mono">HyperFrames · HTML</text>
+  <path d="M56 772v50" class="flow"/>
+  <path d="M40 852H680" class="rule"/>
+  <text x="100" y="892" class="heading">Result · out/final.mp4</text>
+  <text x="100" y="930" class="mono">mix-mux.sh · verify.sh</text>
+  <text x="100" y="964" class="muted">Finished video with music and voice</text>
+  <path d="M56 912v50" class="flow"/>
+  <path d="M40 992H680" class="rule"/>
+  <text x="100" y="1032" class="heading">Render analysis · ref-analyze.py</text>
+  <text x="100" y="1070" class="mono">qa/render-analysis.json</text>
+  <text x="100" y="1104" class="muted">Measure with the same analyzer.</text>
+  <path d="M56 1052v50" class="flow"/>
+  <text x="674" y="512" class="label" text-anchor="end">Targets</text>
+  <path d="M680 506H704V1160H680" class="flow" stroke-dasharray="5 7"/>
+  <rect x="40" y="1132" width="640" height="184" rx="12" fill="#FFFFFF" stroke="#626860" stroke-width="2"/>
+  <text x="64" y="1172" class="mono accent">gate.py ref</text>
+  <text x="64" y="1212">Compare target, measured value, and difference.</text>
+  <text x="64" y="1252">PASS · exit 0: next stage</text>
+  <text x="64" y="1290" class="accent">BLOCK · exit 1: revise the plan</text>
+  <text x="40" y="1368" class="muted">Motion per 1/30 s: compare across frame rates.</text>
+  <text x="40" y="1408" class="muted">The same criteria apply to either engine.</text>
+</svg>

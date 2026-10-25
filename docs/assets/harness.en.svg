@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="788" viewBox="0 0 720 788" role="img" aria-labelledby="harness-title harness-desc">
+  <title id="harness-title">How gates work</title>
+  <desc id="harness-desc">Gates combine automated measurement and human review records, returning exit code 0 or 1. Each check leaves its own record; these are not sequential steps.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
+      .title { font-size: 34px; font-weight: 700; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
+      .muted { fill: #626860; }
+      .label { font-size: 24px; fill: #626860; }
+      .accent { fill: #B8441A; }
+      .rule { stroke: #626860; stroke-opacity: .24; }
+      .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="788" fill="#FFFFFF"/>
+  <text x="40" y="68" class="title">How gates work</text>
+  <text x="40" y="112" class="muted">Measurement + human review + records</text>
+  <path d="M40 152H680" class="rule"/>
+  <text x="40" y="190" class="label">AUTOMATED MEASUREMENT</text>
+  <text x="64" y="232">ffprobe · ffmpeg · start-frame SSIM</text>
+  <text x="64" y="270" class="mono accent">gate.py &lt;stage&gt; &lt;folder&gt;</text>
+  <path d="M40 300H680" class="rule"/>
+  <text x="40" y="338" class="label">VISUAL REVIEW</text>
+  <text x="64" y="380">Compare clothes, glasses, and hair in the strips.</text>
+  <path d="M40 412H680" class="rule"/>
+  <text x="40" y="450" class="label">RECORD FILES (ONE PER CHECK)</text>
+  <text x="64" y="492" class="mono">qa/gate-&lt;stage&gt;.txt</text>
+  <text x="64" y="530" class="mono">qa/clips-review.md · qa/review.md</text>
+  <rect x="40" y="568" width="640" height="180" rx="12" fill="#FFFFFF" stroke="#626860" stroke-width="2"/>
+  <text x="64" y="610" class="heading">Exit code</text>
+  <text x="64" y="650">0 = PASS · 1 = BLOCK</text>
+  <text x="64" y="690" class="muted">clips / final also require a visual review record.</text>
+  <text x="64" y="726" class="accent">A BLOCK must be fixed before proceeding.</text>
+</svg>

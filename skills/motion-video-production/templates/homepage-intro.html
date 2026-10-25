@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>동네빵집 모퉁이</title>
+  <!-- Brand-intro homepage template (references/brand-intro.md). One HTML file: the intro video plays as a texture on a
+       gently tilting card in a Three.js scene inside the hero, the rest is plain HTML.
+       Files next to this page: media/intro.mp4 (the wordcut render, muted), media/poster.jpg (its last frame).
+       Reduced motion or no WebGL: the poster image and the plain page, nothing moves.
+       The example business is invented. Replace the copy, colours and media with your own.
+       Where the clip belongs (references/brand-intro.md, section 5): this file is the minimal starting point and still
+       plays the clip in the hero card on every width. On a finished page:
+       - the hero is a Three.js scene whose t=0 frame is the clip's closing image (media/poster.jpg);
+       - the 9:16 clip is a short card on phones only and hidden on desktop, where a narrow vertical strip reads as foreign;
+       - the YouTube opening joins the clip to this page with a match cut made in the video edit, not on the page.
+       Below the hero: one shared spacing scale, text and visual swap sides every section (zig-zag), and no two
+       neighbouring sections share a pattern (full-bleed band, cards, mosaic, statement line). -->
+  <style>
+    :root { --paper: #f6efe4; --ink: #2a211b; --muted: #6b5d52; --accent: #b4552d; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; word-break: keep-all; }
+    .hero { position: relative; min-height: 100svh; display: grid; grid-template-columns: 1fr; align-items: center; align-content: center; padding: 24px 16px 48px; gap: 24px; }
+    @media (min-width: 900px) { .hero { grid-template-columns: 1fr 1fr; padding: 48px 64px; } }
+    .stage { position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: 78svh; margin: 0 auto; container-type: size; }
+    .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    /* the poster takes the same box as the 3D card (88 % of the stage height, 0.03-unit white border), so switching
+       between the live card and the poster does not move or resize the picture */
+    .stage img { position: absolute; left: 50%; top: 50%; height: 88cqh; width: auto; aspect-ratio: 1.06 / 1.8378; transform: translate(-50%, -50%);
+      box-sizing: border-box; border: 1.44cqh solid #fff; border-width: 1.44cqh 1.44cqh; object-fit: cover; background: #fff; display: block; }
+    .stage.live img { visibility: hidden; }
+    /* phones: keep the card, headline, copy and both buttons on the first screen */
+    @media (max-width: 899px) { .stage { max-height: 52svh; } }
+    h1 { font-size: clamp(32px, 6vw, 56px); line-height: 1.2; margin: 0 0 16px; }
+    p { font-size: 18px; line-height: 1.7; color: var(--muted); margin: 0 0 24px; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1.5px solid var(--ink); color: var(--ink); text-decoration: none; font-weight: 700; }
+    .btn.primary { background: var(--ink); color: var(--paper); }
+    /* spacing: replace these values with the page's one shared spacing scale (brand-intro.md, 간격 기준) */
+    section.info { padding: 48px 16px; max-width: 960px; margin: 0 auto; }
+  </style>
+  <!-- extra libraries (GSAP + ScrollTrigger, Lenis, Motion, Floating UI) are fine when they earn it: exact version
+       from a CDN like three below, respect reduced motion, no layout shift, one library per job -->
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }</script>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="stage" id="stage">
+        <img src="media/poster.jpg" alt="오늘 구운 빵이 놓인 진열대" width="1080" height="1920">
+        <video id="intro" src="media/intro.mp4" muted loop playsinline preload="auto" hidden></video>
+      </div>
+      <div>
+        <h1>아침 일곱 시,<br>오늘 빵이 나와요</h1>
+        <p>매일 아침 그날 반죽한 빵만 진열해요. 남은 빵은 저녁에 이웃과 나눠요.</p>
+        <div class="actions"><a class="btn" href="#visit">오시는 길</a><a class="btn primary" href="#info">오늘의 빵 보기</a></div>
+      </div>
+    </section>
+    <section class="info" id="info">
+      <h2>오늘의 빵</h2>
+      <p>식빵, 바게트, 단팥빵. 진열은 오전 7시와 오후 3시에 두 번 해요.</p>
+    </section>
+    <section class="info" id="visit">
+      <h2>오시는 길</h2>
+      <p>모퉁이길 12, 1층. 오전 7시부터 오후 8시까지 열고 월요일은 쉬어요.</p>
+    </section>
+  </main>
+  <script type="module">
+    const stage = document.getElementById('stage');
+    const video = document.getElementById('intro');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const webgl = (() => { try { return !!document.createElement('canvas').getContext('webgl2'); } catch { return false; } })();
+    if (!reduce && webgl) start();
+
+    async function start() {
+      const THREE = await import('three');
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      stage.appendChild(renderer.domElement);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(30, 9 / 16, 0.1, 10);
+      camera.position.set(0, 0, 3.9);
+      const texture = new THREE.VideoTexture(video);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      // the video as a card: 9:16 plane with a thin paper border behind it
+      const card = new THREE.Group();
+      card.add(new THREE.Mesh(new THREE.PlaneGeometry(1.06, 16 / 9 + 0.06), new THREE.MeshBasicMaterial({ color: 0xffffff })));
+      const screen = new THREE.Mesh(new THREE.PlaneGeometry(1, 16 / 9), new THREE.MeshBasicMaterial({ map: texture }));
+      screen.position.z = 0.002;
+      card.add(screen);
+      scene.add(card);
+      const resize = () => {
+        const { width, height } = stage.getBoundingClientRect();
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+      };
+      new ResizeObserver(resize).observe(stage);
+      resize();
+      // one simple move: the card follows the pointer a little and breathes
+      let tx = 0, ty = 0;
+      addEventListener('pointermove', (e) => { tx = (e.clientX / innerWidth - 0.5) * 0.25; ty = (e.clientY / innerHeight - 0.5) * 0.18; });
+      await video.play().catch(() => {});
+      if (video.paused) return; // autoplay refused: keep the poster
+      stage.classList.add('live');
+      renderer.setAnimationLoop((t) => {
+        card.rotation.y += (tx - card.rotation.y) * 0.06;
+        card.rotation.x += (ty - card.rotation.x) * 0.06;
+        card.position.y = Math.sin(t / 1600) * 0.02;
+        renderer.render(scene, camera);
+      });
+    }
+  </script>
+</body>
+</html>

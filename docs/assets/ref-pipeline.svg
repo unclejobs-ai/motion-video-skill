@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1444" viewBox="0 0 720 1444" role="img" aria-labelledby="ref-pipeline-title ref-pipeline-desc">
+  <title id="ref-pipeline-title">레퍼런스 분석 파이프라인</title>
+  <desc id="ref-pipeline-desc">레퍼런스에서 목표를 정하고 계획과 엔진을 거쳐 완성본을 만들어요. 같은 지표로 분석해 비교해요. 점선은 ref 게이트에 목표값을 전달해요.</desc>
+  <defs>
+    <style>
+      text { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; font-size: 26px; fill: #242824; }
+      .title { font-size: 34px; font-weight: 700; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .mono { font-family: 'IBM Plex Mono', 'SFMono-Regular', monospace; font-size: 24px; }
+      .muted { fill: #626860; }
+      .label { font-size: 24px; fill: #626860; }
+      .accent { fill: #B8441A; }
+      .rule { stroke: #626860; stroke-opacity: .24; }
+      .flow { fill: none; stroke: #626860; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#626860" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="720" height="1444" fill="#FFFFFF"/>
+  <text x="40" y="68" class="title">레퍼런스 분석 파이프라인</text>
+  <text x="40" y="112" class="muted">같은 지표로 목표와 완성본을 비교해요.</text>
+  <path d="M40 152H680" class="rule"/>
+  <text x="100" y="192" class="heading">레퍼런스 영상</text>
+  <text x="100" y="230" class="mono">reference.mp4</text>
+  <text x="100" y="264" class="muted">원본 대신 숫자만 남겨요.</text>
+  <path d="M56 212v50" class="flow"/>
+  <path d="M40 292H680" class="rule"/>
+  <text x="100" y="332" class="heading">분석 · ref-analyze.py</text>
+  <text x="100" y="370" class="muted">컷·홀드 · 광학 흐름 · 블러</text>
+  <text x="100" y="404" class="muted">심도 띠 · 그레인 · 질감</text>
+  <path d="M56 352v50" class="flow"/>
+  <path d="M40 432H680" class="rule"/>
+  <text x="100" y="472" class="heading">목표 · ref/targets.json</text>
+  <text x="100" y="510" class="muted">지표별 목표와 허용 오차</text>
+  <text x="100" y="544" class="muted">ANALYSIS.md에서 인용해요.</text>
+  <path d="M56 492v50" class="flow"/>
+  <path d="M40 572H680" class="rule"/>
+  <text x="100" y="612" class="heading">계획</text>
+  <text x="100" y="650" class="mono">plan.mjs · look-fit.mjs</text>
+  <text x="100" y="684" class="mono">BEATSHEET.md</text>
+  <path d="M56 632v50" class="flow"/>
+  <path d="M40 712H680" class="rule"/>
+  <text x="100" y="752" class="heading">바꿔 끼우는 엔진</text>
+  <text x="100" y="790" class="mono">Remotion · carry</text>
+  <text x="100" y="824" class="mono">HyperFrames · HTML</text>
+  <path d="M56 772v50" class="flow"/>
+  <path d="M40 852H680" class="rule"/>
+  <text x="100" y="892" class="heading">완성본 · out/final.mp4</text>
+  <text x="100" y="930" class="mono">mix-mux.sh · verify.sh</text>
+  <text x="100" y="964" class="muted">음악·목소리를 입힌 완성본이에요.</text>
+  <path d="M56 912v50" class="flow"/>
+  <path d="M40 992H680" class="rule"/>
+  <text x="100" y="1032" class="heading">렌더 분석 · ref-analyze.py</text>
+  <text x="100" y="1070" class="mono">qa/render-analysis.json</text>
+  <text x="100" y="1104" class="muted">레퍼런스와 같은 분석기로 재요.</text>
+  <path d="M56 1052v50" class="flow"/>
+  <text x="674" y="512" class="label" text-anchor="end">목표값</text>
+  <path d="M680 506H704V1160H680" class="flow" stroke-dasharray="5 7"/>
+  <rect x="40" y="1132" width="640" height="184" rx="12" fill="#FFFFFF" stroke="#626860" stroke-width="2"/>
+  <text x="64" y="1172" class="mono accent">gate.py ref</text>
+  <text x="64" y="1212">지표마다 목표·측정값·차이를 비교해요.</text>
+  <text x="64" y="1252">PASS · exit 0: 다음 단계로 가요</text>
+  <text x="64" y="1290" class="accent">BLOCK · exit 1: 계획을 고쳐요</text>
+  <text x="40" y="1368" class="muted">움직임은 1/30초당 값으로 비교해요.</text>
+  <text x="40" y="1408" class="muted">fps나 엔진이 달라도 기준은 같아요.</text>
+</svg>

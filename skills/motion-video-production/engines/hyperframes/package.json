@@ -1,0 +1,17 @@
+{
+  "name": "motion-video-hyperframes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "HyperFrames engine for the motion-video-production skill: plain HTML/CSS pages animated with GSAP, rendered to MP4",
+  "scripts": {
+    "preview": "hyperframes preview",
+    "check": "hyperframes lint && hyperframes validate",
+    "render": "hyperframes render --fps 30 --quality high -o renders/carry-demo.mp4"
+  },
+  "dependencies": {
+    "gsap": "3.14.2",
+    "hyperframes": "0.8.143",
+    "pretendard": "1.3.9"
+  }
+}
