@@ -8,6 +8,8 @@ description: Plan, build and verify 15–90 second motion graphics, promo and ch
 이 스킬은 모션 그래픽과 영상(예: 한 명의 캐릭터가 나오는 30~90초 영상)을 만드는 순서와 점검 기준을 제공합니다.
 이 스킬을 따라가면 레퍼런스 분석(`ref/ANALYSIS.md`, `ref/targets.json`), STORY.md, 캐릭터 시트, 키프레임, 장면 영상, 음악·목소리, 최종 mp4를 얻어가십니다. 화면은 스킬에 들어 있는 엔진(Remotion 또는 HyperFrames)으로 만들고, 완성된 mp4를 숫자로 판정합니다.
 
+편집·카메라·질감 용어(매치 컷, 휩 팬, 푸시 인, 얕은 심도 등)는 `references/glossary.md`에 한국어와 영어로 정리돼 있습니다.
+
 모든 답변은 사용자의 언어(기본 한국어)로 합니다. 도구를 대신 로그인하거나 결제하지 않습니다. 로그인·결제·대용량 다운로드가 필요한 시점에서는 사용자에게 먼저 묻습니다.
 
 ## 실행 환경과 경로
@@ -45,7 +47,7 @@ description: Plan, build and verify 15–90 second motion graphics, promo and ch
 | 3. 키프레임 | 장면마다 시작 화면 1장씩 생성 | 이미지 생성 도구 | 키프레임 PNG |
 | 4. 영상 변환 | 키프레임을 시작 화면으로 고정하고 3~6초 클립 생성 | 영상 생성 도구 | 장면별 mp4 |
 | 5. 음악·목소리 | 음악 1곡, 캐릭터 목소리 1개(ID 고정), 대사 음성 | 음악·음성 도구 | 음악 wav/mp3, 대사 wav |
-| 6. 조립 | 박 격자에 맞춰 컷 배치, 자막·타이틀·엔드카드 모션 그래픽, 믹스, mux | 엔진(Remotion 또는 HyperFrames), ffmpeg | 최종 mp4 |
+| 6. 조립 | 박 격자(beat grid)에 맞춰 컷 배치, 자막·타이틀·엔드카드 모션 그래픽, 믹스, mux | 엔진(Remotion 또는 HyperFrames), ffmpeg | 최종 mp4 |
 
 ## Gotchas (먼저 읽을 것)
 
@@ -131,10 +133,10 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 
 ### 6단계. 조립
 - 엔진 폴더를 작업 폴더로 복사하고 `npm ci`로 설치합니다(스킬 폴더 안에서 설치하지 않음).
-- **carry가 기본 경계입니다.** 비트 경계마다 화면에 있던 요소가 살아남아 다음 비트로 움직이거나 커집니다. 아무것도 남지 않는 장면 교체는 몰아치기 안이나 엔드카드로 갈 때만 씁니다. 어휘는 `references/art-direction.md`에 있습니다.
+- **carry가 기본 경계입니다.** carry는 이 스킬의 용어로, 경계를 넘어 살아남는 요소입니다. 비트 경계마다 화면에 있던 요소가 살아남아 다음 비트로 움직이거나 커집니다. 아무것도 남지 않는 장면 교체(하드 컷, 디졸브, 와이프)는 몰아치기(몽타주) 안이나 엔드카드로 갈 때만 씁니다. 어휘는 `references/art-direction.md`에 있습니다.
 - Remotion: 모션은 `motions/`의 순수 함수로, 작품별 기하는 순수 `scene(t)`로 씁니다. 화면과 `track.ts`가 같은 `scene(t)`를 읽습니다. 렌더 전에 `node pipeline/probe.mjs productions/<id>`로 carry를 재고(0.5 미만 FAIL), 스틸(`node pipeline/render.mjs <id> --stills 0.5 1.5 3.0`)을 직접 본 뒤 영상을 렌더합니다(`renders/<id>/`). `productions/carry-demo/`가 모든 파일의 예시입니다.
 - 비트 시트는 `templates/BEATSHEET.md`로 `timing.ts`와 함께 씁니다. 모든 경계에 살아남는 요소를 적습니다.
-- 단어 하나를 여러 장면이 넘겨받는 영상은 `productions/wordcut/`의 `data.ts`만 바꿔서 만듭니다. 레퍼런스가 있으면 `node productions/wordcut/plan.mjs "$PROJECT_ROOT/ref/analysis.json" <초>`로 타이밍을 뽑고, `node productions/wordcut/drift.mjs`가 단어가 한 자리에 있는지 픽셀로 잽니다(0.5px 초과면 종료 코드 1). 첫 프레임은 페이지가 아니라 미드숏입니다. 단어가 가운데, 단어 줄만 선명한 초점 띠, 0프레임부터 렌즈 질감, 페이지 크롬 없음, 하이라이트만 색. `node productions/wordcut/frame0.mjs --check`가 확인합니다.
+- 단어 하나를 여러 장면이 넘겨받는 영상(매치 컷, graphic match cut)은 `productions/wordcut/`의 `data.ts`만 바꿔서 만듭니다. 레퍼런스가 있으면 `node productions/wordcut/plan.mjs "$PROJECT_ROOT/ref/analysis.json" <초>`로 타이밍을 뽑고, `node productions/wordcut/drift.mjs`가 단어가 한 자리에 있는지 픽셀로 잽니다(0.5px 초과면 종료 코드 1). 첫 프레임은 페이지가 아니라 미드숏(medium shot)입니다. 단어가 가운데, 단어 줄만 선명한 초점 띠(얕은 심도, shallow depth of field), 0프레임부터 렌즈 질감(RGB 분리, 그레인, 비네트), 페이지 크롬 없음, 하이라이트만 색. `node productions/wordcut/frame0.mjs --check`가 확인합니다.
 - 목소리는 대사를 먼저 생성하고 길이를 잰 뒤 타이밍을 정합니다(`pipeline/vo.mjs`, `pipeline/vo-assemble.mjs`, composio CLI. `references/providers.md`). 크레딧이 드므로 생성 전에 사용자에게 알립니다.
 - 음악은 `node pipeline/score.mjs productions/<id>`의 기본 스코어로 시작하거나, `templates/MUSIC_BRIEF.md`로 워커에게 맡깁니다.
 - 믹스와 mux는 `bash "$SKILL_ROOT/scripts/mix-mux.sh" <picture.mp4> <fps> <초> <music.wav> <vo.wav|-> <out.mp4>`로 합니다. 프레임 수가 맞을 때만 mux하고, 대사가 나올 때 음악을 낮춥니다.
@@ -146,7 +148,7 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 2. 이미지 프롬프트와 마무리를 정하는 키워드 3~6개를 고릅니다. 하나는 wordcut의 단어가 됩니다.
 3. 마무리 이미지를 생성합니다. 화면비는 영상과 같게, 단어 자리는 비워 둡니다.
 4. wordcut으로 컷을 만듭니다. `data.ts`의 `closing`에 마무리 이미지를 넣으면 마지막 비트가 그 이미지에서 멈춥니다.
-5. 홈페이지 한 장: 영상을 Three.js 장면 안의 카드에서 재생하는 HTML 한 장(`templates/homepage-intro.html`)이 산출물입니다. reduced motion이나 WebGL이 없으면 포스터(마지막 프레임)와 일반 페이지만 보여 줍니다.
+5. 홈페이지 한 장: 히어로는 t=0 프레임이 영상의 마무리 이미지인 Three.js 장면입니다. 9:16 영상은 휴대폰에서만 짧은 카드로 보여 주고 데스크톱에서는 숨깁니다. 유튜브 오프닝에서 영상 끝을 사이트 첫 프레임으로 잇는 매치 컷은 페이지가 아니라 영상 편집에서 만듭니다. 출발점은 `templates/homepage-intro.html`이고, reduced motion이나 WebGL이 없으면 포스터(마지막 프레임)와 일반 페이지만 보여 줍니다. 간격, 섹션 배치, 외부 라이브러리 규칙도 `references/brand-intro.md`에 있습니다.
 
 ## 캐릭터 일관성 7가지
 

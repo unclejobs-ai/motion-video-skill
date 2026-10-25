@@ -8,7 +8,14 @@
        gently tilting card in a Three.js scene inside the hero, the rest is plain HTML.
        Files next to this page: media/intro.mp4 (the wordcut render, muted), media/poster.jpg (its last frame).
        Reduced motion or no WebGL: the poster image and the plain page, nothing moves.
-       The example business is invented. Replace the copy, colours and media with your own. -->
+       The example business is invented. Replace the copy, colours and media with your own.
+       Where the clip belongs (references/brand-intro.md, section 5): this file is the minimal starting point and still
+       plays the clip in the hero card on every width. On a finished page:
+       - the hero is a Three.js scene whose t=0 frame is the clip's closing image (media/poster.jpg);
+       - the 9:16 clip is a short card on phones only and hidden on desktop, where a narrow vertical strip reads as foreign;
+       - the YouTube opening joins the clip to this page with a match cut made in the video edit, not on the page.
+       Below the hero: one shared spacing scale, text and visual swap sides every section (zig-zag), and no two
+       neighbouring sections share a pattern (full-bleed band, cards, mosaic, statement line). -->
   <style>
     :root { --paper: #f6efe4; --ink: #2a211b; --muted: #6b5d52; --accent: #b4552d; }
     * { box-sizing: border-box; }
@@ -29,8 +36,11 @@
     .actions { display: flex; gap: 12px; flex-wrap: wrap; }
     .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1.5px solid var(--ink); color: var(--ink); text-decoration: none; font-weight: 700; }
     .btn.primary { background: var(--ink); color: var(--paper); }
+    /* spacing: replace these values with the page's one shared spacing scale (brand-intro.md, 간격 기준) */
     section.info { padding: 48px 16px; max-width: 960px; margin: 0 auto; }
   </style>
+  <!-- extra libraries (GSAP + ScrollTrigger, Lenis, Motion, Floating UI) are fine when they earn it: exact version
+       from a CDN like three below, respect reduced motion, no layout shift, one library per job -->
   <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }</script>
 </head>
 <body>
