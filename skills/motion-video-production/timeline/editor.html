@@ -378,10 +378,14 @@ function renderInspector() {
   }));
 }
 function bind(id, patch, ev = 'change') {
-  $(id)[`on${ev}`] = (e) => commit([{ op: 'update', track: track(S.sel.kind), id: S.sel.id, patch: patch(e.target.value) }], { label: id.slice(2) });
+  $(id)[`on${ev}`] = (e) => {
+    const x = find(S.sel), change = patch(e.target.value);
+    if (Object.entries(change).every(([k, v]) => (v ?? undefined) === x[k])) return; // a blur repeats the last change
+    commit([{ op: 'update', track: track(S.sel.kind), id: S.sel.id, patch: change }], { label: id.slice(2) });
+  };
 }
 function addText() {
-  const t = S.snapOn !== false ? snapTo(S.doc, S.t) : S.t;
+  const t = $('snap').checked ? snapTo(S.doc, S.t) : S.t;
   const id = freshId(S.doc, 'text');
   commit([{ op: 'create', track: 'text', item: { id, t, d: beat(S.doc) * 4, text: '' } }], { label: 'new text' }).then(() => {
     S.sel = { kind: 'text', id }; render(); $('f-text')?.focus();
@@ -448,7 +452,7 @@ lanes.addEventListener('pointerup', () => {
   const D = S.drag; S.drag = null; showSnap(0, false);
   if (!D) return;
   if (D.mode === 'roll' && D.t != null) return commit(rollOps(S.doc, D.id, D.t), { label: 'cut point' });
-  if (D.mode === 'select' || !D.moved || !D.patch) { const x = find({ kind: D.kind, id: D.id }); if (x && !D.moved) seek(Math.max(S.t, 0)); return; }
+  if (D.mode === 'select' || !D.moved || !D.patch) return;
   const changed = Object.fromEntries(Object.entries(D.patch).filter(([k, v]) => Math.abs(v - D.orig[k]) > 1e-4));
   if (Object.keys(changed).length) commit([{ op: 'update', track: track(D.kind), id: D.id, patch: changed }], { label: D.mode === 'move' ? 'move' : 'trim' });
 });
@@ -565,7 +569,7 @@ async function run(path, title) {
   S.busy = true; $('gate').disabled = $('build').disabled = true;
   $('dlgTitle').textContent = `${title} …`; $('dlgBody').textContent = ''; $('dlg').showModal();
   try {
-    const r = await (await fetch(path, { method: 'POST' })).json();
+    const r = await (await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).json();
     $('dlgTitle').textContent = `${title} · ${r.code === 0 ? 'exit 0' : `exit ${r.code}`}`;
     $('dlgBody').textContent = r.text || '(no output)';
   } finally { S.busy = false; $('gate').disabled = $('build').disabled = false; }

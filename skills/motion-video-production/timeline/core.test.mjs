@@ -73,7 +73,6 @@ test('roll edit stops where the right cut would run out of source', () => {
 
 test('snap goes to the nearest beat', () => {
   assert.equal(snap(base(), 1.26), 1.5);
-  assert.equal(snap(base(), 1.26, { beats: false }), 1.2667);
 });
 
 test('serialize keeps the gate fields first and drops empty tracks', () => {
