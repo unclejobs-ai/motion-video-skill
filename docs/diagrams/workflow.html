@@ -1,0 +1,90 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="size" content="1600x866">
+<title>workflow</title>
+<link rel="stylesheet" href="uj.css">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="sketch.js"></script>
+<style>
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); column-gap: 40px; }
+  .nodes { margin-top: 56px; }
+  .node { padding: 20px 18px 22px; min-height: 172px; }
+  .node .num { font-size: 22px; color: var(--fg-muted); }
+  .node .name { font-size: 26px; margin-top: 8px; }
+  .node .sub { font-size: 21px; margin-top: 6px; }
+  .tags { margin-top: 26px; }
+  .tag { text-align: center; }
+  .tag .mono { color: var(--fg); }
+  .loop { height: 112px; position: relative; }
+  #fix { position: absolute; top: 10px; white-space: nowrap; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+  .shots { align-items: start; }
+  .shots .media { aspect-ratio: 16 / 9; }
+  .shots .mono { margin-top: 10px; font-size: 19px; text-align: center; }
+  .legend { margin-top: 40px; display: flex; gap: 40px; align-items: center; }
+  .legend .sub { color: var(--fg); }
+</style>
+<body class="light" role="img" aria-label="Seven production stages from reference analysis to assembly, each followed by a gate that must exit 0 before the next stage">
+<div class="frame">
+  <div class="eyebrow">python3 gate.py &lt;stage&gt; "$PROJECT_ROOT"</div>
+  <div class="title" style="margin-top:14px" data-t="title"></div>
+  <div class="grid nodes">
+    <div class="node" id="n0"><div class="num">0</div><div class="name" data-t="s0"></div><div class="sub">OpenCV</div></div>
+    <div class="node" id="n1"><div class="num">1</div><div class="name" data-t="s1"></div><div class="sub" data-t="t1"></div></div>
+    <div class="node" id="n2"><div class="num">2</div><div class="name" data-t="s2"></div><div class="sub" data-t="t2"></div></div>
+    <div class="node" id="n3"><div class="num">3</div><div class="name" data-t="s3"></div><div class="sub" data-t="t2"></div></div>
+    <div class="node" id="n4"><div class="num">4</div><div class="name" data-t="s4"></div><div class="sub" data-t="t4"></div></div>
+    <div class="node" id="n5"><div class="num">5</div><div class="name" data-t="s5"></div><div class="sub">composio<br>score</div></div>
+    <div class="node" id="n6"><div class="num">6</div><div class="name" data-t="s6"></div><div class="sub">Remotion<br>HyperFrames</div></div>
+  </div>
+  <div class="grid tags">
+    <div class="tag"><span class="mono" id="g0">ref</span></div>
+    <div class="tag"><span class="mono" id="g1">story</span></div>
+    <div class="tag"><span class="mono" id="g2">character</span></div>
+    <div class="tag"><span class="mono" id="g3">keyframes</span></div>
+    <div class="tag"><span class="mono" id="g4">clips</span></div>
+    <div class="tag"><span class="mono" id="g5">audio</span></div>
+    <div class="tag"><span class="mono" id="g6">edit · final</span></div>
+  </div>
+  <div class="loop"><div id="fix"><span class="pill block">BLOCK · exit 1</span><span class="note" data-t="fix"></span></div></div>
+  <div class="grid shots">
+    <div></div><div></div><div></div>
+    <div><div class="media" id="m3"><img src="img/strip-key.png"></div><div class="mono">key/03.png</div></div>
+    <div><div class="media" id="m4"><img src="img/strip-1.0.png"></div><div class="mono">clip/03.mp4</div></div>
+    <div></div>
+    <div><div class="media" id="m6"><img src="img/carry-3.0.png"></div><div class="mono">out/final.mp4</div></div>
+  </div>
+  <div class="legend">
+    <span class="pill pass">PASS · exit 0</span><span class="sub" data-t="pass"></span>
+  </div>
+</div>
+<script>
+UJ.ready({
+  en: {
+    title: 'Seven stages. None moves on until its gate exits 0.',
+    s0: 'Reference analysis', s1: 'Story and scenes', s2: 'Character sheet', s3: 'Keyframes',
+    s4: 'Video clips', s5: 'Music and voice', s6: 'Assembly',
+    t1: 'Agent', t2: 'Image tool', t4: 'Video tool',
+    fix: 'read qa/gate-clips.txt, fix, rerun',
+    pass: 'moves to the next stage. Gates read only stage files and the mp4, never engine internals.',
+  },
+  ko: {
+    title: '7단계. 게이트가 0으로 끝나야 다음 단계로 갑니다.',
+    s0: '레퍼런스 분석', s1: '스토리·장면', s2: '캐릭터 시트', s3: '키프레임',
+    s4: '영상 클립', s5: '음악·목소리', s6: '조립',
+    t1: '에이전트', t2: '이미지 도구', t4: '영상 도구',
+    fix: 'qa/gate-clips.txt를 읽고 고쳐서 다시 실행',
+    pass: '다음 단계로 넘어갑니다. 게이트는 단계 산출물과 mp4만 읽고 엔진 내부는 보지 않습니다.',
+  },
+}, (S) => {
+  for (let i = 0; i < 7; i++) S.box('#n' + i);
+  for (let i = 0; i < 6; i++) S.link('#n' + i, '#n' + (i + 1), { gap: 6, head: 16 });
+  for (let i = 0; i < 7; i++) S.link('#n' + i, '#g' + i, { dir: 'v', gap: 6, head: 14 });
+  // BLOCK loop on the clips gate: down, around, back into the same gate
+  const g = S.rect('#g4'), b = g.y + g.h + 8;
+  S.curve([[g.cx + 30, b], [g.cx + 96, b + 46], [g.cx, b + 86], [g.cx - 96, b + 46], [g.cx - 30, b + 2]],
+    { accent: true, arrow: true, head: 16 });
+  const fix = document.getElementById('fix');
+  fix.style.left = (g.cx - 128 - fix.offsetWidth - S.rect('.loop').x) + 'px';
+});
+</script>
+</body>

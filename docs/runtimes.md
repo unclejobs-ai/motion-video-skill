@@ -1,6 +1,6 @@
 # Runtime installation and invocation
 
-[한국어 README](../README.md) | [English README](../README.en.md)
+[한국어 README](../README.ko.md) | [English README](../README.md)
 
 The source of truth is `skills/motion-video-production/`. Its `SKILL.md`, references, templates, harness, scripts, and engines are shared by all runtimes. The engines (`engines/remotion/`, `engines/hyperframes/`) live inside the skill folder so that installers that copy only the skill still ship them; they contain this repository's code plus pinned `package.json` and `package-lock.json`, not the third-party packages themselves. The repository does not include model API adapters, service credentials, or media generation connectors.
 

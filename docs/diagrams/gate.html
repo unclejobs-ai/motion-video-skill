@@ -1,0 +1,70 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="size" content="1600x820">
+<title>gate</title>
+<link rel="stylesheet" href="uj.css">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="sketch.js"></script>
+<style>
+  .row { display: flex; align-items: center; gap: 56px; margin-top: 70px; }
+  .node { padding: 22px 22px; }
+  .node .sub { margin-top: 6px; }
+  .node .mono { margin-top: 8px; }
+  .checks { display: flex; flex-direction: column; gap: 34px; width: 340px; }
+  .out { display: flex; flex-direction: column; gap: 46px; }
+  .out .sub { color: var(--fg); margin-top: 8px; }
+  .loopnote { margin-top: 96px; text-align: center; }
+  .foot { margin-top: 40px; }
+</style>
+<body class="night" role="img" aria-label="How a gate decides: it reads stage files and the mp4, measures them, requires a visual review record, writes a verdict, and exits 0 for PASS or 1 for BLOCK">
+<div class="frame">
+  <div class="eyebrow">harness/gate.py</div>
+  <div class="title" style="margin-top:14px" data-t="title"></div>
+  <div class="row">
+    <div class="node" id="in" style="width:220px"><div class="name" data-t="in"></div><div class="mono">STORY.md<br>clip/*.mp4<br>out/final.mp4</div></div>
+    <div class="node" id="gate"><div class="name">gate.py</div><div class="mono">&lt;stage&gt;</div></div>
+    <div class="checks">
+      <div class="node" id="m"><div class="name" data-t="m"></div><div class="sub">ffprobe · ffmpeg<br>SSIM · loudness</div></div>
+      <div class="node" id="v"><div class="name" data-t="v"></div><div class="mono">qa/clips-review.md<br>qa/review.md</div></div>
+    </div>
+    <div class="node" id="verdict"><div class="name" data-t="verdict"></div><div class="mono">qa/gate-&lt;stage&gt;.txt</div></div>
+    <div class="out">
+      <div><span class="pill pass" id="pass">PASS · exit 0</span><div class="sub" data-t="pass"></div></div>
+      <div><span class="pill block" id="block">BLOCK · exit 1</span></div>
+    </div>
+  </div>
+  <div class="note loopnote" id="back" data-t="back"></div>
+  <div class="caption foot" data-t="cap"></div>
+</div>
+<script>
+UJ.ready({
+  en: {
+    title: 'Measure what a number can. Record what only eyes can.',
+    in: 'Stage files', m: 'Measured', v: 'Looked at, recorded', verdict: 'Verdict', pass: 'next stage',
+    back: 'Read the BLOCK lines, fix the files, rerun the same gate.',
+    cap: 'A review record counts only when someone wrote it after looking at the frames.',
+  },
+  ko: {
+    title: '숫자로 잴 것은 재고, 눈으로 볼 것은 기록합니다.',
+    in: '단계 산출물', m: '측정', v: '눈으로 보고 기록', verdict: '판정', pass: '다음 단계',
+    back: 'BLOCK 줄을 읽고 산출물을 고친 뒤 같은 게이트를 다시 돌립니다.',
+    cap: '검수 기록은 실제로 프레임을 보고 쓴 것만 인정합니다.',
+  },
+}, (S) => {
+  for (const id of ['#in', '#gate', '#m', '#v', '#verdict']) S.box(id);
+  S.link('#in', '#gate', { gap: 10, head: 16 });
+  const g = S.rect('#gate'), m = S.rect('#m'), v = S.rect('#v'), d = S.rect('#verdict');
+  S.arrow(g.x + g.w + 10, g.cy - 8, m.x - 10, m.cy, { head: 16 });
+  S.arrow(g.x + g.w + 10, g.cy + 8, v.x - 10, v.cy, { head: 16 });
+  S.arrow(m.x + m.w + 10, m.cy, d.x - 10, d.cy - 8, { head: 16 });
+  S.arrow(v.x + v.w + 10, v.cy, d.x - 10, d.cy + 8, { head: 16 });
+  const p = S.rect('#pass'), b = S.rect('#block');
+  S.arrow(d.x + d.w + 10, d.cy - 8, p.x - 10, p.cy, { head: 16 });
+  S.arrow(d.x + d.w + 10, d.cy + 8, b.x - 10, b.cy, { head: 16 });
+  // the BLOCK loop, back to the stage files
+  const i = S.rect('#in'), low = Math.max(b.y + b.h, v.y + v.h) + 60;
+  S.curve([[b.cx, b.y + b.h + 10], [b.cx - 30, low], [800, low + 24], [i.cx + 120, low], [i.cx, i.y + i.h + 14]],
+    { accent: true, arrow: true, head: 18 });
+});
+</script>
+</body>
