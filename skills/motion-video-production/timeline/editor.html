@@ -50,6 +50,9 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .transport { display: flex; align-items: center; gap: 14px; justify-content: center; }
 .tc { font-size: 22px; letter-spacing: -0.01em; }
 .tc small { font-size: 13px; color: var(--ink-400); }
+.clock { display: flex; flex-direction: column; gap: 3px; min-width: 210px; margin-left: 6px; }
+.tc { line-height: 1; }
+.beatpos { font-size: 11px; line-height: 1; letter-spacing: .02em; }
 
 .inspector { border-left: 1px solid var(--line); padding: 20px; overflow: auto; }
 .inspector h2 { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
@@ -137,8 +140,7 @@ dialog h3 { font-size: 15px; font-weight: 800; }
         <button class="btn icon" id="back" title="Previous beat (←)"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="2.5" width="1.6" height="9" rx=".5"/><path d="M12 2.8v8.4a.5.5 0 0 1-.8.4L5 7.4a.5.5 0 0 1 0-.8l6.2-4.2a.5.5 0 0 1 .8.4z"/></svg></button>
         <button class="btn icon primary" id="play" title="Play (Space)"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M3.5 2.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L4.4 1.7a.6.6 0 0 0-.9.5z"/></svg></button>
         <button class="btn icon" id="fwd" title="Next beat (→)"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="10.4" y="2.5" width="1.6" height="9" rx=".5"/><path d="M2 2.8v8.4a.5.5 0 0 0 .8.4L9 7.4a.5.5 0 0 0 0-.8L2.8 2.4a.5.5 0 0 0-.8.4z"/></svg></button>
-        <span class="tc mono" id="tc">00:00.00 <small>/ 00:00.00</small></span>
-        <span class="mono muted" id="beatpos"></span>
+        <div class="clock"><span class="tc mono" id="tc">00:00.00 <small>/ 00:00.00</small></span><span class="mono muted beatpos" id="beatpos"></span></div>
       </div>
     </div>
     <aside class="inspector" id="inspector"></aside>
