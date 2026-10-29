@@ -146,7 +146,7 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 - 만든 영상을 사용자가 타임라인으로 보고 고치게 하려면 `node "$SKILL_ROOT/timeline/serve.mjs" "$PROJECT_ROOT"`를 실행합니다. 브라우저에 영상·텍스트·목소리·음악 네 트랙이 뜹니다. Node 표준 라이브러리와 ffmpeg만 씁니다(설치 없음).
 - 기준 파일은 `edit.json` 하나입니다. 게이트가 읽는 `cuts`에 선택 트랙 `text`(자막)와 `audio`(목소리·음악: `file`, `t`, `in`, `d`, `gain` dB, `fadeIn`, `fadeOut`, 음악의 `duck`)를 더합니다. 형식은 `timeline/README.md`에 있습니다. 목소리 항목의 `id`는 `voices.json`의 대사 id와 같게 씁니다.
 - 에이전트도 같은 코어로 고칩니다: `node "$SKILL_ROOT/timeline/apply.mjs" "$PROJECT_ROOT" ops.json`(인자 없이 실행하면 타임라인과 문제 목록 출력). 열린 편집기는 2초 안에 바뀐 내용을 받습니다. 사용자가 편집기에서 고친 뒤에는 `apply.mjs`로 다시 읽고 이어갑니다.
-- 결과물은 `node "$SKILL_ROOT/timeline/build.mjs" "$PROJECT_ROOT"`(편집기의 Build 버튼과 같음)로 `out/final.mp4`를 만듭니다. 컷은 소스에서 프레임 단위로 자르고, 오디오는 항목마다 위치·게인·페이드를 적용해 섞고(음악은 목소리 아래로 낮춤), 텍스트는 `out/captions.srt`와 자막 트랙으로 넣습니다. ffmpeg에 subtitles 필터가 있으면 `--burn`으로 화면에 새깁니다. 그다음 `gate.py edit`, `gate.py final`을 돌립니다.
+- 결과물은 `node "$SKILL_ROOT/timeline/build.mjs" "$PROJECT_ROOT"`(편집기의 Build 버튼과 같음)로 `out/final.mp4`를 만듭니다. 컷은 소스에서 프레임 단위로 자르고, 오디오는 항목마다 위치·게인·페이드를 적용해 섞고(음악은 목소리 아래로 낮춤), 텍스트는 화면에 새기고(libass 필요. macOS는 `brew install ffmpeg-full`, 빌드가 자동으로 찾음) `out/captions.srt`도 씁니다. libass가 없거나 `--no-burn`이면 자막 트랙으로만 넣습니다. 그다음 `gate.py edit`, `gate.py final`을 돌립니다.
 - 첫 저장 때 원래 `edit.json`을 `qa/timeline/`에 복사해 둡니다.
 
 ### 브랜드 소개 영상과 홈페이지 (레시피)

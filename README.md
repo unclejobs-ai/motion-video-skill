@@ -124,7 +124,7 @@ node "$SKILL_ROOT/timeline/serve.mjs" "$PROJECT_ROOT"     # opens the editor in 
 
 - **One file, two editors.** The browser and the agent change the same `edit.json` through the same core (`timeline/apply.mjs` for the agent). Each sees the other's edit within two seconds; undo works on both.
 - **The gate is live.** The pill in the top bar runs the edit gate's timing checks on every change: cuts on the beat, no gaps, each line inside its cut. The item at fault turns orange.
-- **Build is the same as the agent's.** `timeline/build.mjs` cuts the sources frame-exact, mixes every sound with its gain and fades (music ducks under voice) and writes captions as a subtitle track and `out/captions.srt`.
+- **Build is the same as the agent's.** `timeline/build.mjs` cuts the sources frame-exact, mixes every sound with its gain and fades (music ducks under voice) and burns the captions into the picture as they look in the preview (needs ffmpeg with libass; on macOS `brew install ffmpeg-full`).
 
 Format, ops and limits: [`timeline/README.md`](skills/motion-video-production/timeline/README.md).
 

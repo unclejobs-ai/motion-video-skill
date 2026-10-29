@@ -6,7 +6,7 @@ See the finished edit as four tracks (picture, text, voice, music), change it in
 node "$SKILL_ROOT/timeline/serve.mjs" "$PROJECT_ROOT"          # opens http://127.0.0.1:4321/
 node "$SKILL_ROOT/timeline/apply.mjs" "$PROJECT_ROOT"          # print the timeline and its problems
 node "$SKILL_ROOT/timeline/apply.mjs" "$PROJECT_ROOT" ops.json # agent edit (or - for stdin)
-node "$SKILL_ROOT/timeline/build.mjs" "$PROJECT_ROOT" [--burn] # edit.json -> out/final.mp4
+node "$SKILL_ROOT/timeline/build.mjs" "$PROJECT_ROOT" [--no-burn] # edit.json -> out/final.mp4
 ```
 
 Needs Node.js 24+ and ffmpeg. No `npm install`. The page loads Pretendard and JetBrains Mono from jsDelivr and falls back to system fonts offline.
@@ -74,5 +74,5 @@ A patch field set to `null` removes it. Shape errors (a missing file name, gain 
 
 - Preview plays the clips and sounds as they are, with the same gains and fades; it does not apply the build's loudness normalization, and ducking is approximated.
 - Text is plain captions. Styled on-screen type belongs in the engine (Remotion or HyperFrames); render it, then place the render as a `file:` cut.
-- Burning captions into the picture needs an ffmpeg with libass (`--burn`). Without it, the text goes in as a subtitle track and `out/captions.srt`.
+- Captions are burned into the picture, matching the preview, when ffmpeg has libass. The build uses `$FFMPEG`, else `ffmpeg` on PATH, else Homebrew's keg-only `ffmpeg-full` (`brew install ffmpeg-full`; the plain `ffmpeg` formula has no libass). Without libass, or with `--no-burn`, the text goes in as a subtitle track. `out/captions.srt` is always written.
 - Cuts can be re-timed but not reordered or added in the editor yet; ask the agent (one `create` or `update` op).

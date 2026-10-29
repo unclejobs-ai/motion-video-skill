@@ -122,7 +122,7 @@ node "$SKILL_ROOT/timeline/serve.mjs" "$PROJECT_ROOT"     # 브라우저에서 �
 
 - **파일 하나, 편집자 둘.** 브라우저와 에이전트가 같은 코어로 같은 `edit.json`을 고쳐요(에이전트는 `timeline/apply.mjs`). 서로 고친 내용이 2초 안에 보이고, 되돌리기도 돼요.
 - **게이트가 실시간이에요.** 위쪽 알약이 고칠 때마다 편집 게이트의 타이밍 검사를 돌려요. 컷이 박자 위에 있는지, 빈틈이 없는지, 대사가 컷 안에 있는지. 문제가 있는 항목은 주황색 테두리가 생겨요.
-- **빌드는 에이전트와 같아요.** `timeline/build.mjs`가 소스를 프레임 단위로 자르고, 소리마다 게인·페이드를 적용해 섞고(음악은 목소리 아래로 낮춰요), 자막을 자막 트랙과 `out/captions.srt`로 넣어요.
+- **빌드는 에이전트와 같아요.** `timeline/build.mjs`가 소스를 프레임 단위로 자르고, 소리마다 게인·페이드를 적용해 섞고(음악은 목소리 아래로 낮춰요), 자막을 미리보기와 같은 모양으로 화면에 새겨요(libass가 있는 ffmpeg 필요, macOS는 `brew install ffmpeg-full`).
 
 형식, op, 한계는 [`timeline/README.md`](skills/motion-video-production/timeline/README.md)에 있어요.
 

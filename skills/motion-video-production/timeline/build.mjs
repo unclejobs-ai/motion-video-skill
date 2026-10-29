@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Build out/final.mp4 from edit.json: cuts from their sources, every audio item at its place with its gain and fades
 // (music ducks under voice unless duck is false), text as out/captions.srt plus a subtitle track.
-//   node build.mjs <project> [--burn]    --burn draws the text into the picture when ffmpeg has the subtitles filter
+//   node build.mjs <project> [--no-burn]   text is drawn into the picture (libass); --no-burn keeps it as a subtitle track only
+// ffmpeg: $FFMPEG, else the first of `ffmpeg` on PATH and Homebrew's keg-only ffmpeg-full that has the subtitles filter.
 // Frame starts are rounded once from cumulative time (G12), so the frame count matches gate.py final.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -12,6 +13,10 @@ import { inside, media, open, read, srcPath } from './project.mjs';
 const [, , root, ...flags] = process.argv;
 if (!root) { console.error('usage: node build.mjs <project> [--burn]'); process.exit(2); }
 const p = open(root);
+const hasSubs = (bin) => { try { return execFileSync(bin, ['-hide_banner', '-filters'], { encoding: 'utf8' }).includes(' subtitles '); } catch { return false; } };
+const FFMPEG = process.env.FFMPEG
+  || ['ffmpeg', '/opt/homebrew/opt/ffmpeg-full/bin/ffmpeg', '/usr/local/opt/ffmpeg-full/bin/ffmpeg'].find((b) => (b === 'ffmpeg' || existsSync(b)) && hasSubs(b))
+  || 'ffmpeg';
 const doc = read(p);
 const errors = validate(doc, media(p, doc)).filter((d) => d.severity === 'error');
 if (errors.length) {
@@ -73,23 +78,24 @@ const tc = (s) => { const ms = Math.round(s * 1000); return `${String(Math.floor
 const texts = [...doc.text].sort((a, b) => a.t - b.t);
 writeFileSync(srt, texts.map((x, i) => `${i + 1}\n${tc(x.t)} --> ${tc(Math.min(total, x.t + x.d))}\n${x.text}\n`).join('\n'));
 
-const canBurn = execFileSync('ffmpeg', ['-hide_banner', '-filters'], { encoding: 'utf8' }).includes(' subtitles ');
-const burn = flags.includes('--burn') && texts.length;
-if (burn && !canBurn) console.warn('this ffmpeg has no subtitles filter (libass); the text goes in as a subtitle track instead');
+const canBurn = hasSubs(FFMPEG);
+const burn = !flags.includes('--no-burn') && texts.length > 0;
+if (burn && !canBurn) console.warn(`${FFMPEG} has no subtitles filter (libass), so the text goes in as a subtitle track only. macOS: brew install ffmpeg-full; elsewhere: an ffmpeg built with libass, or set FFMPEG=<path>`);
 let vout = 'vout';
 if (burn && canBurn) {
-  graph.push(`[vout]subtitles=${srt.replace(/([\\:'])/g, '\\$1')}:force_style='FontName=Pretendard,FontSize=22,PrimaryColour=&H00F7FAFA,OutlineColour=&H00090A0A,Outline=2,Shadow=0,MarginV=48'[vsub]`);
+  // same look as the editor preview: bold paper text with an ink outline, 7% above the bottom (sizes on libass's 288-line canvas)
+  graph.push(`[vout]subtitles=captions.srt:force_style='FontName=Pretendard,Bold=1,FontSize=23,PrimaryColour=&H00F7FAFA,OutlineColour=&H00090A0A,BorderStyle=1,Outline=2,Shadow=0,MarginV=20,MarginL=24,MarginR=24'[vsub]`);
   vout = 'vsub';
 }
 const subIn = texts.length && !(burn && canBurn) ? ['-i', srt] : [];
 const subIndex = cuts.length + doc.audio.length;
 const out = join(p.root, 'out', 'final.mp4');
-execFileSync('ffmpeg', [
+execFileSync(FFMPEG, [
   '-v', 'error', '-y', ...inputs, ...subIn,
   '-filter_complex', graph.join(';'),
   '-map', `[${vout}]`, '-map', `[${audio}]`, ...(subIn.length ? ['-map', `${subIndex}:s`, '-c:s', 'mov_text', '-metadata:s:s:0', 'language=und'] : []),
   '-frames:v', String(frames), '-r', String(F), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18',
   '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', out,
-], { stdio: 'inherit' });
-console.log(`built ${out}: ${frames} frames at ${F} fps, ${cuts.length} cuts, ${doc.audio.length} audio items, ${texts.length} text items${burn && canBurn ? ' (burned in)' : texts.length ? ' (subtitle track + out/captions.srt)' : ''}`);
+], { stdio: 'inherit', cwd: join(p.root, 'out') }); // cwd so the subtitles filter gets a plain file name
+console.log(`built ${out}: ${frames} frames at ${F} fps, ${cuts.length} cuts, ${doc.audio.length} audio items, ${texts.length} text items${burn && canBurn ? ' (burned in, also out/captions.srt)' : texts.length ? ' (subtitle track + out/captions.srt)' : ''} with ${FFMPEG}`);
 console.log(`next: python3 "$SKILL_ROOT/harness/gate.py" final "${p.root}"`);
