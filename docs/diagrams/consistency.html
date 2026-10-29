@@ -1,0 +1,75 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="size" content="1600x1016">
+<title>consistency</title>
+<link rel="stylesheet" href="uj.css">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="sketch.js"></script>
+<style>
+  .table { margin-top: 48px; display: grid; grid-template-columns: 560px repeat(5, 1fr); }
+  .table > div { border-bottom: 2px solid var(--line); padding: 12px 0; min-height: 78px; display: flex; align-items: center; }
+  .table > .h { border-bottom: 3px solid var(--rule); align-items: flex-end; padding-bottom: 14px; min-height: 0; }
+  .h.stage { flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; }
+  .h .num { font-size: 20px; color: var(--fg-muted); }
+  .h .name { font-size: 22px; margin-top: 4px; }
+  .crit { gap: 18px; }
+  .crit .num { font-size: 22px; color: var(--fg-muted); width: 34px; flex: none; }
+  .crit .name { font-size: 25px; }
+  .crit .sub { font-size: 20px; margin-top: 2px; }
+  .cell { justify-content: center; }
+  .dot { width: 34px; height: 34px; }
+  .foot { margin-top: 30px; }
+</style>
+<body class="light" role="img" aria-label="Seven consistency criteria and the production stages where each one is checked">
+<div class="frame">
+  <div class="eyebrow">references/consistency-7.md</div>
+  <div class="title" style="margin-top:14px" data-t="title"></div>
+  <div class="table" id="tb"></div>
+  <div class="caption foot" data-t="foot"></div>
+</div>
+<script>
+const STAGES = [2, 3, 4, 5, 6];
+const ROWS = [[1, [2, 3]], [2, [2, 3]], [3, [4]], [4, [5]], [5, [6]], [6, [5, 6]], [7, [4, 6]]];
+const FOCUS = 3; // the criterion the frame strip shows failing
+const tb = document.getElementById('tb');
+tb.insertAdjacentHTML('beforeend', '<div class="h"><span class="sub" data-t="crit"></span></div>');
+for (const s of STAGES) tb.insertAdjacentHTML('beforeend', `<div class="h stage"><span class="num">${s}</span><span class="name" data-t="s${s}"></span></div>`);
+for (const [n, at] of ROWS) {
+  tb.insertAdjacentHTML('beforeend', `<div class="crit"><span class="num">0${n}</span><div><div class="name" data-t="c${n}"></div><div class="sub" data-t="m${n}"></div></div></div>`);
+  for (const s of STAGES) tb.insertAdjacentHTML('beforeend', `<div class="cell">${at.includes(s) ? `<span class="dot" data-dot="${n}"></span>` : ''}</div>`);
+}
+UJ.ready({
+  en: {
+    title: 'Seven things that keep one character the same person',
+    crit: 'criterion · what breaks without it',
+    s2: 'Character sheet', s3: 'Keyframes', s4: 'Video clips', s5: 'Music and voice', s6: 'Assembly',
+    c1: 'One character sheet', m1: 'the face changes from scene to scene',
+    c2: 'One look paragraph', m2: 'glasses, clothes and hair drift',
+    c3: 'Keyframe as start frame', m3: 'later frames drift from the first',
+    c4: 'One voice ID', m4: 'a different voice in each scene',
+    c5: 'Line length before cut length', m5: 'lines get cut off mid-word',
+    c6: 'Cuts on the beat', m6: 'cuts miss the music',
+    c7: 'A visual review record', m7: 'mistakes reach the final cut',
+    foot: 'The look paragraph lives in character.txt and is pasted into every prompt unchanged.',
+  },
+  ko: {
+    title: '한 캐릭터를 끝까지 같은 사람으로 지키는 7가지',
+    crit: '기준 · 안 맞으면 생기는 문제',
+    s2: '캐릭터 시트', s3: '키프레임', s4: '영상 클립', s5: '음악·목소리', s6: '조립',
+    c1: '캐릭터 시트 하나', m1: '장면마다 얼굴이 달라짐',
+    c2: '외형 고정문 하나', m2: '안경, 옷, 머리색이 바뀜',
+    c3: '키프레임을 시작 화면으로', m3: '첫 프레임과 뒤 프레임의 인물이 달라짐',
+    c4: '목소리 ID 하나', m4: '장면마다 다른 목소리',
+    c5: '대사 길이를 먼저 재기', m5: '대사 도중에 컷이 잘림',
+    c6: '박자에 맞춘 컷', m6: '장면 전환이 음악과 어긋남',
+    c7: '눈으로 본 검수 기록', m7: '틀린 채로 완성본이 나옴',
+    foot: '외형 고정문은 character.txt에 두고 모든 프롬프트에 그대로 붙입니다.',
+  },
+}, (S) => {
+  document.querySelectorAll('[data-dot]').forEach((el) => {
+    const r = S.rect(el), focus = +el.dataset.dot === FOCUS;
+    S.ellipse(r.cx, r.cy, 34, 34, focus ? { accent: true, fill: 'accent', gap: 5 } : { fill: 'fg', gap: 5 });
+  });
+});
+</script>
+</body>

@@ -1,0 +1,61 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="size" content="1600x684">
+<title>carry</title>
+<link rel="stylesheet" href="uj.css">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="sketch.js"></script>
+<style>
+  .row { display: flex; gap: 92px; margin-top: 52px; }
+  .shot { width: 424px; }
+  .shot .media { height: 239px; }
+  .t { margin-top: 14px; display: flex; justify-content: space-between; align-items: baseline; }
+  .foot { margin-top: 40px; display: flex; gap: 48px; align-items: flex-start; }
+  .foot .lead { flex: 1; }
+</style>
+<body class="light" role="img" aria-label="Carry: three frames of the carry demo; the first line stays on screen across the iris transition">
+<div class="frame">
+  <div class="eyebrow" data-t="eyebrow"></div>
+  <div class="title" style="margin-top:14px" data-t="title"></div>
+  <div class="row">
+    <div class="shot"><div class="media" id="a"><img src="img/carry-1.5.png"></div>
+      <div class="t"><span class="name" data-t="a"></span><span class="mono">1.5 s</span></div></div>
+    <div class="shot"><div class="media" id="b"><img src="img/carry-1.9.png"></div>
+      <div class="t"><span class="name" data-t="b"></span><span class="mono">1.9 s</span></div></div>
+    <div class="shot"><div class="media" id="c"><img src="img/carry-3.0.png"></div>
+      <div class="t"><span class="name" data-t="c"></span><span class="mono">3.0 s</span></div></div>
+  </div>
+  <div class="foot">
+    <div class="lead" data-t="lead"></div>
+    <div><span class="pill pass">carry 1.00 · PASS</span></div>
+  </div>
+</div>
+<script>
+UJ.ready({
+  en: {
+    eyebrow: 'Carry probe · Remotion',
+    title: 'Something on screen survives every cut',
+    a: 'Before', b: 'Iris closes', c: 'After',
+    lead: 'The first line lifts and shrinks into a label while the next scene opens around it. The probe reads the boxes declared before rendering, so it counts this transition as carried.',
+  },
+  ko: {
+    eyebrow: 'Carry 검사 · Remotion',
+    title: '컷이 바뀌어도 화면의 무언가는 이어집니다',
+    a: '전환 전', b: '아이리스가 닫힘', c: '전환 후',
+    lead: '첫 줄이 위로 올라가며 작아져 다음 장면의 라벨이 됩니다. 검사는 렌더 전에 선언한 상자를 읽고, 이 전환을 이어진 전환으로 셉니다.',
+  },
+}, (S) => {
+  // ink boxes of the first line on the 1920x1080 frame (track.ts), mapped onto each thumbnail
+  const mark = (id, x, y, w, h, o) => {
+    const r = S.rect(id), k = r.w / 1920, p = 12;
+    S.rectAt(r.x + x * k - p, r.y + y * k - p, w * k + 2 * p, h * k + 2 * p, o);
+    return { x: r.x + (x + w) * k + p, y: r.y + (y + h / 2) * k };
+  };
+  mark('#a', 700, 435, 519, 135, { accent: true });
+  mark('#b', 833, 290, 254, 72, { accent: true });
+  mark('#c', 856, 275, 208, 54, { accent: true });
+  S.link('#a', '#b', { gap: 18 });
+  S.link('#b', '#c', { gap: 18 });
+});
+</script>
+</body>

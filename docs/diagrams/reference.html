@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="size" content="1600x930">
+<title>reference</title>
+<link rel="stylesheet" href="uj.css">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="sketch.js"></script>
+<style>
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); column-gap: 56px; }
+  .top { margin-top: 60px; align-items: stretch; }
+  .bottom { margin-top: 120px; align-items: center; }
+  .node { padding: 20px 20px 22px; }
+  .node .sub { margin-top: 6px; }
+  .node .mono { margin-top: 8px; }
+  .media { aspect-ratio: 16 / 9; }
+  .pills { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .pills .sub { color: var(--fg); }
+  #tlabel { position: absolute; }
+  .foot { margin-top: 48px; }
+</style>
+<body class="light" role="img" aria-label="Reference analysis: the reference video becomes targets, the plan cites them, the render is measured by the same analyzer, and gate.py ref compares the two">
+<div class="frame">
+  <div class="eyebrow">scripts/ref-analyze.py · gate.py ref</div>
+  <div class="title" style="margin-top:14px" data-t="title"></div>
+  <div class="grid top">
+    <div class="node" id="r"><div class="name" data-t="r"></div><div class="mono">reference.mp4</div><div class="sub" data-t="rs"></div></div>
+    <div class="node" id="a"><div class="name" data-t="a"></div><div class="mono">ref-analyze.py</div><div class="sub" data-t="as"></div></div>
+    <div class="node" id="t"><div class="name" data-t="t"></div><div class="mono">ref/targets.json</div><div class="sub" data-t="ts"></div></div>
+    <div class="node" id="p"><div class="name" data-t="p"></div><div class="mono">plan.mjs<br>look-fit.mjs</div><div class="sub">BEATSHEET.md</div></div>
+    <div class="node" id="e"><div class="name" data-t="e"></div><div class="sub">Remotion<br>HyperFrames</div></div>
+  </div>
+  <div class="grid bottom">
+    <div></div>
+    <div class="pills" id="pills"><span class="pill pass">PASS · exit 0</span><span class="sub" data-t="next"></span></div>
+    <div class="node" id="g"><div class="name">gate.py ref</div><div class="sub" data-t="gs"></div></div>
+    <div class="node" id="a2"><div class="name" data-t="a2"></div><div class="mono">qa/render-<br>analysis.json</div></div>
+    <div><div class="media" id="f"><img src="img/carry-3.0.png"></div><div class="mono" style="margin-top:10px;text-align:center">out/final.mp4</div></div>
+  </div>
+  <div class="mono" id="tlabel" data-t="tl"></div>
+  <div class="note" id="blk" style="position:absolute" data-t="blk"></div>
+  <div class="lead foot" data-t="lead"></div>
+</div>
+<script>
+UJ.ready({
+  en: {
+    title: 'Turn a reference into numbers, then hit them',
+    r: 'Reference', rs: 'keep the numbers, not the file',
+    a: 'Analyze', as: 'cuts · holds · flow<br>blur · depth<br>grain · look',
+    t: 'Targets', ts: 'target and tolerance<br>per metric',
+    p: 'Plan', e: 'Render',
+    a2: 'Same analyzer', gs: 'target, measured, difference',
+    next: 'next stage', tl: 'targets', blk: 'BLOCK · revise the plan',
+    lead: 'Motion is measured per 1/30 s, so a reference and a render at different frame rates still compare. Either engine is judged by the same numbers.',
+  },
+  ko: {
+    title: '레퍼런스를 숫자로 바꾸고, 렌더로 맞춥니다',
+    r: '레퍼런스', rs: '파일은 두지 않고 숫자만 남김',
+    a: '분석', as: '컷 · 정지 · 움직임<br>블러 · 심도<br>그레인 · 룩',
+    t: '목표값', ts: '지표별 목표와<br>허용 범위',
+    p: '기획', e: '렌더',
+    a2: '같은 분석기', gs: '목표, 측정값, 차이',
+    next: '다음 단계', tl: 'targets', blk: 'BLOCK · 기획 수정',
+    lead: '움직임은 1/30초 단위로 재므로 프레임 레이트가 다른 레퍼런스와 렌더도 비교할 수 있습니다. 어느 엔진이든 같은 숫자로 판정합니다.',
+  },
+}, (S) => {
+  for (const id of ['#r', '#a', '#t', '#p', '#e', '#a2']) S.box(id);
+  S.box('#g', { accent: true, width: 4 });
+  S.link('#r', '#a', { gap: 8, head: 16 });
+  S.link('#a', '#t', { gap: 8, head: 16 });
+  S.link('#t', '#p', { gap: 8, head: 16 });
+  S.link('#p', '#e', { gap: 8, head: 16 });
+  S.link('#e', '#f', { dir: 'v', gap: 10, head: 16 });
+  S.link('#f', '#a2', { gap: 10, head: 16 });
+  S.link('#a2', '#g', { gap: 10, head: 16 });
+  S.link('#g', '#pills', { gap: 10, head: 16 });
+  // targets go straight down to the gate
+  const t = S.rect('#t'), g = S.rect('#g'), p = S.rect('#p');
+  S.arrow(t.cx, t.y + t.h + 12, g.cx, g.y - 14, { dash: true, head: 16 });
+  const tl = document.getElementById('tlabel');
+  tl.style.left = (t.cx + 14) + 'px'; tl.style.top = ((t.y + t.h + g.y) / 2 - 14) + 'px';
+  // BLOCK goes back to the plan
+  S.curve([[g.x + g.w + 6, g.y + 10], [p.x + 30, (t.y + t.h + g.y) / 2 + 20], [p.cx - 30, p.y + p.h + 14]],
+    { arrow: true, head: 16 });
+  const blk = document.getElementById('blk');
+  blk.style.left = (p.cx - 10) + 'px'; blk.style.top = ((p.y + p.h + g.y) / 2 - 16) + 'px';
+});
+</script>
+</body>

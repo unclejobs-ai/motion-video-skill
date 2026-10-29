@@ -1,26 +1,31 @@
 # README assets
 
-## Editable diagrams
+## Diagrams
 
-`ref-pipeline`, `workflow-ref`, `harness`, `seams`, and `strip` each have Korean (`.svg`) and English (`.en.svg`) sources. The paired layouts match. The four vertical diagrams retain the type, colors, grid, and arrow style from `d8b8b44`. Orange marks gate names and BLOCK messages only. Both READMEs display the four vertical diagrams at 480 pixels wide. Reference-flow steps are unnumbered; workflow stages use 0–6. The harness table owns the gate-name column, and the consistency map shows only stages with applicable criteria.
+`hero`, `carry`, `workflow`, `gate`, `reference`, `consistency` and `strip` are rendered from the HTML sources in [`../diagrams/`](../diagrams/). Each source holds its English and Korean strings; `name.png` is English (used by `README.md`) and `name.ko.png` is Korean (used by `README.ko.md`). `skills/motion-video-production/references/assets/ref-pipeline.png` is a copy of `reference.ko.png`, because the skill's reference docs are Korean.
 
-Export at 2x with librsvg, from the repository root:
+The diagrams follow the Uncle Jobs design system:
+
+- Paper (`#fafaf7`) or ink (`#0a0a09`) ground, one orange accent (`#ff5a14`, `#b83802` for small text on paper). In every diagram the accent marks one thing, usually the BLOCK loop.
+- Pretendard for text, JetBrains Mono for paths, numbers and code. Hierarchy comes from size, weight and space; structure from 2px hairlines and 3px rules.
+- Hand-drawn lines through rough.js 4.6.6 (`sketch.js`): roughness 1.3, bowing 1.2, hachure gap 11, fixed seeds so re-renders do not move. Only lines wobble; text stays in HTML.
+- Real frames, not decoration: every image in a diagram is a frame from the carry demo or the QA strip.
+
+Edit the HTML, then render from the repository root (needs Chrome and network for the fonts and rough.js on jsDelivr):
 
 ```bash
-for name in ref-pipeline workflow-ref harness seams strip; do
-  for lang in '' .en; do
-    rsvg-convert --zoom 2 "docs/assets/$name$lang.svg" -o "docs/assets/$name$lang.png"
-  done
-done
+bash docs/diagrams/render.sh            # all diagrams, English and Korean
+bash docs/diagrams/render.sh workflow   # one diagram
 ```
 
-Fonts: Noto Sans KR (fallback: Apple SD Gothic Neo) and IBM Plex Mono (fallback: SFMono-Regular). Font availability can change text metrics; inspect both language exports after editing.
+Each page declares its size in `<meta name="size">`. If the content is taller, the script still renders a full-height image for a look and exits 1, so fix the size or the layout before committing.
 
-## Result and frame-strip sources
+## Frames used inside the diagrams
 
-- `carry-demo.gif` is the five-second quick-start render at 15 fps and 720 pixels wide, looping without audio. Export from the copied Remotion engine: `ffmpeg -i renders/carry-demo/picture.mp4 -vf "fps=15,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse" -loop 0 carry-demo.gif`, then copy it here. Both READMEs embed this moving result.
-- `carry-demo.png` remains the quick-start result contact sheet: the existing carry-demo stills at 1.5 and 3.0 seconds, scaled to 480×270 and placed left to right. The demo's Korean typography is real rendered content, not a translated diagram. It is five seconds long and the quick start adds music, not voice.
-- To reproduce it, run the README's `node pipeline/render.mjs carry-demo --stills 1.5 3.0` in the copied Remotion engine, then copy `renders/carry-demo/contact.png` here as `carry-demo.png`.
-- `strip-frames.png` preserves only the six image tiles from the previous `strip.png` at `cd1e75b`. Crop: 3036×280 at (82, 180), resized to 1518×140. No new character footage was generated. The strip is a QA example, not the quick-start result.
-- `strip.svg` and `strip.en.svg` crop six separate tiles from that shared image. Keep it beside them when exporting. Both PNGs are 1600×420; labels are 36 pixels in the export (18 pixels at an 800-pixel README width). A 32-pixel gap after the keyframe becomes 16 pixels at that display width. The explanatory caption lives only in the README, not the image.
-- `gate-demo.gif` is unchanged real gate output in Korean. Both READMEs keep it next to the strip; the English caption identifies the output language.
+- `diagrams/img/carry-1.5.png`, `carry-1.9.png`, `carry-3.0.png`: frames of `carry-demo.gif` at those times (`ffmpeg -ss <t> -i carry-demo.gif -frames:v 1`). The boxes in `carry.html` are the first line's ink boxes from `productions/carry-demo/track.ts`, scaled to the thumbnail.
+- `diagrams/img/strip-frames.png`: the six tiles of the earlier QA strip (`cd1e75b`, crop 3036×280 at (82, 180), resized to 1518×140). No new character footage was generated. `strip-key.png` and `strip-1.0.png` are its first and third tiles.
+
+## Result animations
+
+- `carry-demo.gif` is the five-second quick-start render at 15 fps and 720 pixels wide, looping without audio. Export from the copied Remotion engine: `ffmpeg -i renders/carry-demo/picture.mp4 -vf "fps=15,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse" -loop 0 carry-demo.gif`.
+- `gate-demo.gif` is real `gate.py clips` output in Korean. Both READMEs keep it next to the strip; the English caption names the output language.

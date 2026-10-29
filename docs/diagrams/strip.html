@@ -1,0 +1,62 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="size" content="1600x622">
+<title>strip</title>
+<link rel="stylesheet" href="uj.css">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="sketch.js"></script>
+<style>
+  .strip { display: flex; gap: 14px; margin-top: 100px; }
+  .tile { width: 222px; }
+  .tile .media { height: 123px; background: url(img/strip-frames.png) no-repeat; background-size: 1332px 123px; }
+  .tile:first-child { margin-right: 34px; }
+  .tile:nth-child(2) { margin-right: 24px; }
+  .tile .mono { margin-top: 22px; text-align: center; }
+  #note { position: absolute; top: 218px; }
+  .foot { margin-top: 46px; }
+</style>
+<body class="light" role="img" aria-label="Frame strip of one generated clip: the keyframe and 0 s match, from 1.0 s the outfit and lighting change">
+<div class="frame">
+  <div class="eyebrow">gate.py clips · qa/strip-&lt;clip&gt;.png</div>
+  <div class="title" style="margin-top:14px" data-t="title"></div>
+  <div class="strip">
+    <div class="tile"><div class="media" id="k" style="background-position:0 0"></div><div class="mono" data-t="key"></div></div>
+    <div class="tile"><div class="media" id="t0" style="background-position:-222px 0"></div><div class="mono">0 s</div></div>
+    <div class="tile"><div class="media" id="t1" style="background-position:-444px 0"></div><div class="mono">1.0 s</div></div>
+    <div class="tile"><div class="media" style="background-position:-666px 0"></div><div class="mono">1.5 s</div></div>
+    <div class="tile"><div class="media" style="background-position:-888px 0"></div><div class="mono">2.0 s</div></div>
+    <div class="tile"><div class="media" id="t3" style="background-position:-1110px 0"></div><div class="mono">3.0 s</div></div>
+  </div>
+  <div class="note" id="note" data-t="note"></div>
+  <div class="lead foot" data-t="lead"></div>
+</div>
+<script>
+UJ.ready({
+  en: {
+    title: 'The first frame matches. One second later, it does not.',
+    key: 'keyframe',
+    note: 'outfit and light change (G01)',
+    lead: 'Start-frame SSIM passes on the keyframe and at 0 s. A person reads the rest of the strip and writes the verdict to <span class="mono" style="font-size:inherit">qa/clips-review.md</span>.',
+  },
+  ko: {
+    title: '첫 프레임은 같습니다. 1초 뒤에는 달라집니다.',
+    key: '키프레임',
+    note: '옷과 조명이 바뀜 (G01)',
+    lead: '시작 프레임 SSIM은 키프레임과 0초 프레임에서 통과합니다. 나머지는 사람이 띠를 보고 <span class="mono" style="font-size:inherit">qa/clips-review.md</span>에 판정을 적습니다.',
+  },
+}, (S) => {
+  const k = S.rect('#k'), t0 = S.rect('#t0'), t1 = S.rect('#t1'), t3 = S.rect('#t3');
+  // bracket over the drifting frames, in accent
+  const y = t1.y - 20;
+  S.line(t1.x, y + 12, t1.x, y, { accent: true });
+  S.line(t1.x, y, t3.x + t3.w, y, { accent: true });
+  S.line(t3.x + t3.w, y, t3.x + t3.w, y + 12, { accent: true });
+  // note centred over the bracket
+  const note = document.getElementById('note');
+  note.style.left = (t1.x + (t3.x + t3.w - t1.x) / 2 - note.offsetWidth / 2) + 'px';
+  note.style.top = (y - 14 - note.offsetHeight) + 'px';
+  // the matching pair, in ink
+  S.rectAt(k.x - 9, k.y - 9, t0.x + t0.w - k.x + 18, k.h + 18, { dash: true });
+});
+</script>
+</body>

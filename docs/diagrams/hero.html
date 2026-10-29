@@ -1,0 +1,82 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="size" content="1600x730">
+<title>hero</title>
+<link rel="stylesheet" href="uj.css">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="sketch.js"></script>
+<style>
+  .row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 56px; }
+  .col { width: 390px; }
+  .col.mid { width: 520px; }
+  .col .sub { margin-top: 6px; margin-bottom: 22px; min-height: 62px; }
+  .ref { height: 214px; padding: 26px 26px; display: flex; flex-direction: column; justify-content: space-between; }
+  .ref .mono { color: var(--fg); }
+  .steps { height: 214px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+  .step { width: 56px; height: 56px; display: grid; place-items: center; font: 700 24px/1 var(--mono); }
+  .media { height: 214px; }
+  .media img { height: 100%; object-fit: cover; }
+    #same { position: absolute; }
+</style>
+<body class="light" role="img" aria-label="A reference video becomes measured targets, seven gated stages turn them into a video, and the finished mp4 is judged against the same targets">
+<div class="frame">
+  <div class="title">motion-video-production</div>
+  <div class="lead" style="margin-top:10px" data-t="lead"></div>
+  <div class="row">
+    <div class="col">
+      <div class="name" data-t="a"></div><div class="sub" data-t="as"></div>
+      <div class="ref" id="ref">
+        <div class="mono">reference.mp4</div>
+        <div class="mono" style="color:var(--fg-muted)">cuts · holds · flow<br>blur · depth<br>grain · look</div>
+        <div class="mono">→ ref/targets.json</div>
+      </div>
+    </div>
+    <div class="col mid">
+      <div class="name" data-t="b"></div><div class="sub" data-t="bs"></div>
+      <div class="steps" id="steps">
+        <div class="step" id="s0">0</div><div class="step" id="s1">1</div><div class="step" id="s2">2</div>
+        <div class="step" id="s3">3</div><div class="step" id="s4">4</div><div class="step" id="s5">5</div><div class="step" id="s6">6</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="name" data-t="c"></div><div class="sub" data-t="cs"></div>
+      <div class="media" id="out"><img src="img/carry-3.0.png"></div>
+    </div>
+  </div>
+  <div style="height:96px"></div>
+  <span class="sub" id="same" data-t="same"></span>
+</div>
+<script>
+UJ.ready({
+  en: {
+    lead: 'An Agent Skill for 15–90 second motion graphics, promo and character videos.',
+    same: 'same analyzer, same targets',
+    a: 'Measure the reference', as: 'OpenCV turns “like this” into targets.',
+    b: 'Seven stages, seven gates', bs: 'A gate exits 0, or the agent fixes and reruns.',
+    c: 'Judge the mp4', cs: 'Measured against the same targets.',
+  },
+  ko: {
+    lead: '15~90초 모션 그래픽·홍보·캐릭터 영상을 만드는 Agent Skill입니다.',
+    same: '같은 분석기, 같은 목표값',
+    a: '레퍼런스를 잰다', as: 'OpenCV로 목표값을 뽑습니다.',
+    b: '7단계, 7개의 게이트', bs: '게이트가 0으로 끝나야 다음 단계로.',
+    c: 'mp4를 판정한다', cs: '같은 목표값으로 다시 잽니다.',
+  },
+}, (S) => {
+  S.box('#ref');
+  for (let i = 0; i < 7; i++) S.box('#s' + i);
+  for (let i = 0; i < 6; i++) S.link('#s' + i, '#s' + (i + 1), { gap: 4, head: 10, width: 2.5 });
+  // one BLOCK loop on stage 4, the motif used in every diagram below
+  const s = S.rect('#s4');
+  S.curve([[s.cx + 14, s.y - 8], [s.cx + 30, s.y - 52], [s.cx - 30, s.y - 52], [s.cx - 14, s.y - 10]], { accent: true, arrow: true, head: 12 });
+  S.link('#ref', '#steps', { gap: 18 });
+  S.link('#steps', '#out', { gap: 18 });
+  const o = S.rect('#out');
+  // targets travel to the final judgement
+  const r = S.rect('#ref'), low = r.y + r.h + 60;
+  S.curve([[r.cx, r.y + r.h + 14], [r.cx + 200, low], [o.cx - 200, low], [o.cx, o.y + o.h + 14]], { dash: true, arrow: true, head: 16, stroke: 'fg-muted', width: 2.5 });
+  const same = document.getElementById('same');
+  same.style.left = (800 - same.offsetWidth / 2) + 'px'; same.style.top = (low + 14) + 'px';
+});
+</script>
+</body>
