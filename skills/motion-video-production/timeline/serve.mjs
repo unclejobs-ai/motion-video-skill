@@ -19,6 +19,7 @@ const root = args.find((a) => !a.startsWith('--') && args[args.indexOf(a) - 1] !
 if (!root) { console.error('usage: node serve.mjs <project> [--port 4321] [--no-open]'); process.exit(2); }
 const port = Number(args[args.indexOf('--port') + 1]) || 4321;
 const p = open(root);
+const HOSTS = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
 const cache = join(p.root, 'qa', 'timeline', 'cache');
 mkdirSync(cache, { recursive: true });
 
@@ -36,13 +37,16 @@ function sync() {
 
 const state = () => {
   const m = media(p, doc);
-  return { name: basename(p.root), revision, doc, media: m, diagnostics: validate(doc, m), hasSkillGate: existsSync(join(SKILL, 'harness', 'gate.py')) };
+  return { name: basename(p.root), revision, doc, media: m, diagnostics: validate(doc, m) };
 };
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.mjs': 'text/javascript', '.js': 'text/javascript', '.json': 'application/json', '.mp4': 'video/mp4', '.mov': 'video/quicktime', '.webm': 'video/webm', '.wav': 'audio/wav', '.mp3': 'audio/mpeg', '.m4a': 'audio/mp4', '.png': 'image/png', '.jpg': 'image/jpeg' };
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
+  // Only this machine's browser tab: the Host check stops DNS rebinding, and requiring JSON on POST forces a CORS
+  // preflight (which this server never answers), so other websites cannot edit the project or start a build.
+  if (!HOSTS.has(req.headers.host) || (req.method === 'POST' && !String(req.headers['content-type']).startsWith('application/json'))) return send(res, 403);
   try {
     if (req.method === 'GET' && url.pathname === '/') return file(res, join(HERE, 'editor.html'));
     if (url.pathname === '/favicon.ico') return send(res, 204);
@@ -121,9 +125,10 @@ function file(res, abs, range) {
   const size = statSync(abs).size;
   const type = TYPES[extname(abs).toLowerCase()] || 'application/octet-stream';
   const m = range && /bytes=(\d*)-(\d*)/.exec(range);
-  if (m) {
-    const start = m[1] ? Number(m[1]) : size - Number(m[2]);
+  if (m && (m[1] || m[2])) {
+    const start = m[1] ? Number(m[1]) : Math.max(0, size - Number(m[2]));
     const end = m[1] && m[2] ? Math.min(Number(m[2]), size - 1) : size - 1;
+    if (start > end) { res.writeHead(416, { 'Content-Range': `bytes */${size}` }); return res.end(); }
     res.writeHead(206, { 'Content-Type': type, 'Content-Range': `bytes ${start}-${end}/${size}`, 'Accept-Ranges': 'bytes', 'Content-Length': end - start + 1, 'Cache-Control': 'no-cache' });
     return createReadStream(abs, { start, end }).pipe(res);
   }

@@ -46,30 +46,28 @@ cuts.forEach((c, i) => {
 });
 graph.push(`${cuts.map((_, i) => `[v${i}]`).join('')}concat=n=${cuts.length}:v=1:a=0[vout]`);
 
-const voices = [], music = [];
+const voices = [], music = [], steady = []; // music = ducks under voice, steady = music with duck: false
 doc.audio.forEach((a, k) => {
   const i = cuts.length + k, ms = Math.round(a.t * 1000);
   inputs.push('-ss', String(a.in), '-t', String(a.d), '-i', abs(a.file));
   const fades = [a.fadeIn > 0 && `afade=t=in:d=${a.fadeIn}`, a.fadeOut > 0 && `afade=t=out:st=${Math.max(0, a.d - a.fadeOut)}:d=${a.fadeOut}`].filter(Boolean);
   graph.push(`[${i}:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=${a.gain}dB${fades.map((f) => `,${f}`).join('')},adelay=${ms}:all=1[a${k}]`);
-  (a.kind === 'voice' ? voices : music).push({ label: `a${k}`, duck: a.duck !== false });
+  (a.kind === 'voice' ? voices : a.duck === false ? steady : music).push(`a${k}`);
 });
-const mix = (list, out) => graph.push(list.length === 1 ? `[${list[0].label}]anull[${out}]` : `${list.map((x) => `[${x.label}]`).join('')}amix=inputs=${list.length}:normalize=0[${out}]`);
-let audio;
-if (!voices.length && !music.length) {
-  graph.push(`anullsrc=r=48000:cl=stereo,atrim=duration=${total}[aout]`);
-  audio = 'aout';
-} else {
+const mix = (list, out) => graph.push(list.length === 1 ? `[${list[0]}]anull[${out}]` : `${list.map((x) => `[${x}]`).join('')}amix=inputs=${list.length}:normalize=0[${out}]`);
+let audio = 'aout';
+if (!doc.audio.length) graph.push(`anullsrc=r=48000:cl=stereo,atrim=duration=${total}[aout]`);
+else {
   const parts = [];
   if (voices.length) mix(voices, 'vo');
   if (music.length) mix(music, 'mu');
-  if (voices.length && music.length && music.some((m) => m.duck)) {
+  if (steady.length) { mix(steady, 'st'); parts.push('st'); }
+  if (voices.length && music.length) {
     // same ducking as scripts/mix-mux.sh: the voice keys a compressor on the music
     graph.push('[vo]asplit=2[vo1][key]', '[mu][key]sidechaincompress=threshold=0.03:ratio=5:attack=15:release=250:makeup=1[mud]');
     parts.push('vo1', 'mud');
   } else parts.push(...(voices.length ? ['vo'] : []), ...(music.length ? ['mu'] : []));
   graph.push(`${parts.map((x) => `[${x}]`).join('')}amix=inputs=${parts.length}:normalize=0,apad,atrim=duration=${total},loudnorm=I=-14:TP=-1.5:LRA=9,aresample=48000[aout]`);
-  audio = 'aout';
 }
 
 mkdirSync(join(p.root, 'out'), { recursive: true });

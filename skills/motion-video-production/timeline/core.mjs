@@ -26,16 +26,7 @@ export function normalize(raw) {
   const doc = clone(raw) || {};
   doc.fps ??= 30;
   for (const track of TRACKS) doc[track] = Array.isArray(doc[track]) ? doc[track] : [];
-  for (const track of TRACKS) {
-    const used = new Set(doc[track].map((x) => x.id).filter(Boolean));
-    let n = 1;
-    for (const x of doc[track]) {
-      if (x.id) continue;
-      while (used.has(PREFIX[track] + n)) n++;
-      x.id = PREFIX[track] + n;
-      used.add(x.id);
-    }
-  }
+  for (const track of TRACKS) for (const x of doc[track]) x.id ||= freshId(doc, track);
   for (const a of doc.audio) {
     a.kind ??= 'music';
     a.in ??= 0;
@@ -122,10 +113,9 @@ export function validate(doc, media = {}) {
   return out;
 }
 
-/** Nearest beat (or frame when beats are off) to t. */
-export function snap(doc, t, { beats = true } = {}) {
-  const step = beats ? beat(doc) : frame(doc);
-  return round(Math.max(0, Math.round(t / step) * step));
+/** Nearest beat to t. */
+export function snap(doc, t) {
+  return round(Math.max(0, Math.round(t / beat(doc)) * beat(doc)));
 }
 
 /**
