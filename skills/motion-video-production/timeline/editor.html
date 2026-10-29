@@ -95,7 +95,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .item .h:hover { background: rgba(250, 250, 247, .18); }
 .item .lab { position: absolute; left: 8px; right: 8px; top: 6px; font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; z-index: 1; }
 .item .sub { position: absolute; left: 8px; bottom: 5px; font: 500 10px/1 var(--mono); color: var(--ink-400); pointer-events: none; z-index: 1; }
-.cut { background-size: auto 100%; background-repeat: repeat-x; }
+.cut { background-size: auto 100%; }
 .cut .lab, .cut .sub { right: auto; max-width: calc(100% - 16px); background: rgba(10, 10, 9, .78); padding: 3px 6px; border-radius: 4px; }
 .cut .lab { top: 5px; } .cut .sub { bottom: 5px; color: var(--ink-300); }
 .text-item { background: var(--ink-700); }
@@ -267,7 +267,8 @@ function thumbStrip(c, s) {
   const h = 50, w = Math.round(h * 16 / 9), n = Math.max(1, Math.ceil(X(c.d) / w));
   const urls = [];
   for (let i = 0; i < Math.min(n, 12); i++) urls.push(`url('/api/thumb?src=${encodeURIComponent(c.src).replace(/'/g, '%27')}&t=${(s.at + (c.d * (c.rate ?? 1) * i) / n).toFixed(2)}')`);
-  return urls.join(',') + `;background-size:${w}px 100%;background-position:${urls.map((_, i) => `${i * w}px 0`).join(',')}`;
+  // one tile per frame; only the last layer repeats, to fill a strip longer than 12 tiles
+  return urls.join(',') + `;background-size:${w}px 100%;background-position:${urls.map((_, i) => `${i * w}px 0`).join(',')};background-repeat:${urls.map((_, i) => (i === urls.length - 1 ? 'repeat-x' : 'no-repeat')).join(',')}`;
 }
 
 function drawGrid(W) {
