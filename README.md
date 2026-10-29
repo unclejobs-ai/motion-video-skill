@@ -8,7 +8,7 @@
 
 An **Agent Skill** for making 15–90 second motion graphics, promo and character videos with music and voice, where **every stage is checked before the next one starts**. It ships a reference-video analyzer, seven stage gates and two render engines (Remotion, HyperFrames). Codex, Claude Code and other skill-capable runtimes use the same skill folder.
 
-**Jump to** · [Why gates](#why-gates) · [Quick start](#quick-start) · [Installation](#installation) · [What's inside](#whats-inside) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Seven consistency criteria](#seven-consistency-criteria) · [Gotchas](#gotchas) · [Reference docs](#reference-docs) · [Required tools](#required-tools) · [Known limitations](#known-limitations) · [Verification scope](#verification-scope)
+**Jump to** · [Why gates](#why-gates) · [Quick start](#quick-start) · [Installation](#installation) · [What's inside](#whats-inside) · [Timeline editor](#timeline-editor) · [Reference analysis](#reference-analysis) · [Workflow](#workflow) · [Harness](#harness) · [Seven consistency criteria](#seven-consistency-criteria) · [Gotchas](#gotchas) · [Reference docs](#reference-docs) · [Required tools](#required-tools) · [Known limitations](#known-limitations) · [Verification scope](#verification-scope)
 
 ## Why gates
 
@@ -108,8 +108,25 @@ The agent answers in your language. Gate output and most reference docs are writ
 | Voice and music | ElevenLabs and Fish Audio voices via the composio CLI, a procedural score on the timing | `vo.mjs`, `score.mjs` |
 | HyperFrames engine | Animates plain HTML/CSS pages with GSAP and renders them to mp4 | `engines/hyperframes/` |
 | Reference analysis | Takes a reference video apart with OpenCV into target numbers | `scripts/ref-analyze.py` |
+| Timeline editor | Picture, text, voice and music tracks in the browser; edits `edit.json`, rebuilds the mp4 | `timeline/` |
 
 The engine is swappable. Use Remotion when you need carry and wordcut, HyperFrames when the source material is web pages. The comparison is in [`references/engines.md`](skills/motion-video-production/references/engines.md).
+
+## Timeline editor
+
+The finished edit opens as four tracks: picture, text, voice and music. Move a cut point, retime or rewrite a caption, slide a line of dialogue, set gain and fades, then rebuild the mp4. No install beyond Node.js and ffmpeg.
+
+```bash
+node "$SKILL_ROOT/timeline/serve.mjs" "$PROJECT_ROOT"     # opens the editor in your browser
+```
+
+![Timeline editor: preview, inspector, and picture, text, voice and music tracks on a beat grid](docs/assets/timeline.png)
+
+- **One file, two editors.** The browser and the agent change the same `edit.json` through the same core (`timeline/apply.mjs` for the agent). Each sees the other's edit within two seconds; undo works on both.
+- **The gate is live.** The pill in the top bar runs the edit gate's timing checks on every change: cuts on the beat, no gaps, each line inside its cut. The item at fault turns orange.
+- **Build is the same as the agent's.** `timeline/build.mjs` cuts the sources frame-exact, mixes every sound with its gain and fades (music ducks under voice) and writes captions as a subtitle track and `out/captions.srt`.
+
+Format, ops and limits: [`timeline/README.md`](skills/motion-video-production/timeline/README.md).
 
 ## Reference analysis
 
@@ -237,6 +254,7 @@ skills/motion-video-production/        Skill folder to install (everything below
   templates/                ANALYSIS.md, STORY.md, BEATSHEET.md, MUSIC_BRIEF.md and more
   engines/remotion/         carry demo, wordcut template, render, voice and score pipeline
   engines/hyperframes/      HTML/GSAP carry demo
+  timeline/                 timeline editor (browser), apply.mjs (agent edits), build.mjs (edit.json -> mp4)
 ```
 
 ## Verification scope
