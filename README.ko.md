@@ -16,7 +16,7 @@ Codex, Claude Code와 다른 스킬 지원 런타임에서 같은 스킬 폴더�
 
 ![carry: 첫 줄이 아이리스 전환을 지나 다음 장면의 라벨로 이어지는 세 프레임](docs/assets/carry.ko.png)
 
-**바로 가기** · [왜 게이트인가](#왜-게이트인가) · [빠른 시작](#빠른-시작) · [설치](#설치) · [들어 있는 것](#들어-있는-것) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [캐릭터 일관성 7가지](#캐릭터-일관성-7가지) · [자주 겪는 함정](#자주-겪는-함정) · [참고 문서](#참고-문서) · [필요한 도구](#필요한-도구) · [알려진 한계](#알려진-한계) · [검증 범위](#검증-범위)
+**바로 가기** · [왜 게이트인가](#왜-게이트인가) · [빠른 시작](#빠른-시작) · [설치](#설치) · [들어 있는 것](#들어-있는-것) · [타임라인 편집기](#타임라인-편집기) · [레퍼런스 분석](#레퍼런스-분석) · [사용 흐름](#사용-흐름) · [하네스](#하네스) · [캐릭터 일관성 7가지](#캐릭터-일관성-7가지) · [자주 겪는 함정](#자주-겪는-함정) · [참고 문서](#참고-문서) · [필요한 도구](#필요한-도구) · [알려진 한계](#알려진-한계) · [검증 범위](#검증-범위)
 
 ## 왜 게이트인가
 
@@ -106,8 +106,25 @@ cp -r motion-video-skill/skills/motion-video-production ~/.claude/skills/
 | 목소리와 음악 | composio CLI로 ElevenLabs·Fish Audio 목소리, 타이밍에 맞춘 절차적 스코어 | `vo.mjs`, `score.mjs` |
 | HyperFrames 엔진 | HTML/CSS 페이지를 GSAP으로 움직여 mp4로 렌더해요 | `engines/hyperframes/` |
 | 레퍼런스 분석 | 레퍼런스 영상을 OpenCV로 분해해 목표값을 만들어요 | `scripts/ref-analyze.py` |
+| 타임라인 편집기 | 영상·텍스트·목소리·음악 트랙을 브라우저에서 고치고 `edit.json`에 저장, mp4 다시 빌드 | `timeline/` |
 
 엔진은 바꿔 끼울 수 있어요. carry와 wordcut이 필요하면 Remotion, 재료가 웹페이지라면 HyperFrames가 맞아요. 비교는 [`references/engines.md`](skills/motion-video-production/references/engines.md)에 있어요.
+
+## 타임라인 편집기
+
+완성된 편집을 영상·텍스트·목소리·음악 네 트랙으로 열어요. 컷 지점을 옮기고, 자막을 고치거나 위치를 바꾸고, 대사를 밀고, 게인과 페이드를 정한 뒤 mp4를 다시 만들어요. Node.js와 ffmpeg 말고는 설치할 게 없어요.
+
+```bash
+node "$SKILL_ROOT/timeline/serve.mjs" "$PROJECT_ROOT"     # 브라우저에서 편집기가 열려요
+```
+
+![타임라인 편집기: 미리보기, 속성 패널, 박 격자 위의 영상·텍스트·목소리·음악 트랙](docs/assets/timeline.png)
+
+- **파일 하나, 편집자 둘.** 브라우저와 에이전트가 같은 코어로 같은 `edit.json`을 고쳐요(에이전트는 `timeline/apply.mjs`). 서로 고친 내용이 2초 안에 보이고, 되돌리기도 돼요.
+- **게이트가 실시간이에요.** 위쪽 알약이 고칠 때마다 편집 게이트의 타이밍 검사를 돌려요. 컷이 박자 위에 있는지, 빈틈이 없는지, 대사가 컷 안에 있는지. 문제가 있는 항목은 주황색 테두리가 생겨요.
+- **빌드는 에이전트와 같아요.** `timeline/build.mjs`가 소스를 프레임 단위로 자르고, 소리마다 게인·페이드를 적용해 섞고(음악은 목소리 아래로 낮춰요), 자막을 미리보기와 같은 모양으로 화면에 새겨요(libass가 있는 ffmpeg 필요, macOS는 `brew install ffmpeg-full`).
+
+형식, op, 한계는 [`timeline/README.md`](skills/motion-video-production/timeline/README.md)에 있어요.
 
 ## 레퍼런스 분석
 
@@ -235,6 +252,7 @@ skills/motion-video-production/        설치하는 스킬 폴더 (아래 전체
   templates/                ANALYSIS.md, STORY.md, BEATSHEET.md, MUSIC_BRIEF.md 외
   engines/remotion/         carry 데모, wordcut 템플릿, 렌더·목소리·스코어 파이프라인
   engines/hyperframes/      HTML/GSAP carry 데모
+  timeline/                 타임라인 편집기(브라우저), apply.mjs(에이전트 편집), build.mjs(edit.json -> mp4)
 ```
 
 ## 검증 범위

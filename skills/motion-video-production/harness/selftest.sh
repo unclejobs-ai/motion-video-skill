@@ -147,5 +147,12 @@ else
   echo "skip ICC 회귀 사례 (PIL 없음)"
 fi
 
+# 타임라인 코어(편집기·에이전트 CLI·빌드가 같이 쓰는 순수 함수)
+if command -v node >/dev/null; then
+  if node --test "$HERE/../timeline/core.test.mjs" >/dev/null 2>&1; then echo "ok   타임라인 코어 테스트"; else echo "FAIL 타임라인 코어 테스트 (node --test timeline/core.test.mjs)"; fails=$((fails+1)); fi
+else
+  echo "skip 타임라인 코어 테스트 (node 없음)"
+fi
+
 echo "-- 셀프테스트 실패 $fails 건"
 (( fails == 0 ))
