@@ -36,7 +36,15 @@ The [Vercel skills CLI supported-agent list](https://github.com/vercel-labs/skil
 
 ## Manual installation and paths
 
-Use the manual Codex/Claude commands in either README when you do not want the Node.js installer. Copy the **entire** `motion-video-production` folder, not just `SKILL.md`. Other runtimes use their documented discovery path.
+Without the Node.js installer, clone and copy the **entire** `motion-video-production` folder, not just `SKILL.md`:
+
+```bash
+git clone https://github.com/unclejobs-ai/motion-video-skill.git
+mkdir -p ~/.agents/skills   # Codex; Claude Code uses ~/.claude/skills
+cp -r motion-video-skill/skills/motion-video-production ~/.agents/skills/
+```
+
+For one project only, copy into that project's `.agents/skills/` or `.claude/skills/`. Other runtimes use their documented discovery path. Do not install the same name through several paths in one runtime.
 
 Never run `npm ci` inside the installed skill folder: it is one shared copy, often a symlink target. Copy an engine into the output project and install it there:
 
@@ -66,6 +74,13 @@ For a personal Codex installation, set `SKILL_ROOT="$HOME/.agents/skills/motion-
 - If the runtime cannot view frame strips or contact sheets, the user must inspect them and provide actual review results. Never manufacture a `REVIEWED` record from measurements alone. Scripts cannot judge character deformation in later frames.
 - Use the provided `STORY.md` template's Korean field names and table headings: the current gate reads those names. Fill values in the user's language. For a non-Korean character description, include `#RRGGBB` codes alongside color names so the current color check can recognize them.
 - Remotion is a company-size licensed package (organizations of four or more employees need a Company License); HyperFrames is Apache-2.0. Voice automation (`vo.mjs`) needs the user's own composio CLI connection and spends their credits. Whisper transcription integration in `verify.sh` remains unverified. Check external service pricing and license terms immediately before work, as described in `NOTICE.md` and the licensing reference.
+
+## Known limitations
+
+- **The carry probe is Remotion-only.** It reads the boxes declared before rendering (`track.ts`). HyperFrames renders are measured on the mp4 with `verify.sh`, `gate.py final` and `gate.py ref`. There is no mp4-side carry measurement yet.
+- **The wordcut demo is an untuned first render.** Against the reference targets, `gate.py ref` blocks 10 of 12 metrics; grain, sharpness ratio and contrast are furthest off. Re-running `look-fit.mjs` and `plan.mjs` to close that gap is how the skill is meant to be used.
+- **A closing image drops the carry score to 0.00 (FAIL).** The only counted boundary is the one where the image covers the page, and it counts as bare; the other detected boundary is exempt as a declared cut. Turn that boundary into a carry to get out of FAIL.
+- **The full text of the GSAP license clauses was not verified.** GSAP 3.14.2, used by the HyperFrames demo, says in its README that it is free including commercial use. Before releasing a commercial video, check https://gsap.com/standard-license.
 
 ## Verification scope
 
