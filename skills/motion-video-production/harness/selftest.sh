@@ -55,11 +55,11 @@ expect() { # $1 이름  $2 기대 종료코드  $3 단계  $4 폴더  [$5 BLOCK 
 }
 
 mut() { # $1 복사본 이름  -> 정상 프로젝트를 복사하고 경로를 돌려준다
-  local B="$W/$1"; cp -R "$W/good" "$B"; echo "$B"
+  local B="$W/$1"; cp -pR "$W/good" "$B"; echo "$B"
 }
 
 make_base "$W/good"
-for s in story character keyframes audio edit clips final; do expect "정상 프로젝트 - $s" 0 "$s" "$W/good"; done
+for s in story character keyframes audio edit clips continuity final; do expect "정상 프로젝트 - $s" 0 "$s" "$W/good"; done
 
 # ---- story
 B=$(mut story_bad); sed -i.bak 's/음악 BPM: 144/음악 BPM: <000>/' "$B/STORY.md"; expect "STORY 빈칸 남음" 1 story "$B" S02
@@ -72,6 +72,7 @@ B=$(mut char_blank); printf '   \n' > "$B/character.txt"; expect "공백뿐인 c
 # ---- keyframes
 B=$(mut dup_key); cp "$B/key/01.png" "$B/key/02.png"; expect "중복 키프레임" 1 keyframes "$B" K02
 B=$(mut aspect); ff -f lavfi -i testsrc2=s=360x640:d=1 -frames:v 1 "$B/key/02.png"; expect "키프레임 화면비가 클립과 다름" 1 keyframes "$B" K03
+B=$(mut corrupt_key); printf 'not an image\n' > "$B/key/01.png"; expect "손상된 키프레임" 1 keyframes "$B" K05
 # ---- clips
 B=$(mut wrongstart); cp "$B/clip/02.mp4" "$B/clip/01.mp4"; expect "키프레임에서 시작하지 않는 클립" 1 clips "$B" V05
 B=$(mut nokey); cp "$B/clip/01.mp4" "$B/clip/extra.mp4"; expect "짝이 되는 키프레임이 없는 클립" 1 clips "$B" V05
@@ -82,10 +83,15 @@ B=$(mut review_ph); printf 'REVIEWED: <이름> <날짜>\n01: ok\n02: ok\n' > "$B
 B=$(mut review_noverdict); printf 'REVIEWED: selftest 2026-10-02\n01: ok\n' > "$B/qa/clips-review.md"; expect "클립 판정이 빠짐" 1 clips "$B" V09
 B=$(mut review_redo); printf 'REVIEWED: selftest 2026-10-02\n01: ok\n02: redo\n' > "$B/qa/clips-review.md"; expect "redo 판정이 남음" 1 clips "$B" V10
 B=$(mut short); ff -loop 1 -framerate 30 -i "$B/key/01.png" -t 0.5 -pix_fmt yuv420p "$B/clip/01.mp4"; expect "너무 짧은 클립" 1 clips "$B" V03
+B=$(mut stale_clip_review); touch -t 202001010000 "$B/qa/clips-review.md"; expect "클립 검수 기록이 소스보다 오래됨" 1 clips "$B" V11
+B=$(mut strip_failure); rm -f "$B/qa/strip-01.png"; mkdir "$B/qa/strip-01.png"; expect "스트립 생성 실패를 성공으로 보고하지 않음" 1 clips "$B" V07
+B=$(mut malformed_trim); printf 'REVIEWED: selftest 2026-10-08\n01: trim\n02: ok\n' > "$B/qa/clips-review.md"; expect "trim 구간 누락" 1 clips "$B" V12
 # ---- audio
 B=$(mut voice); echo '{"voice_id":"V1","lines":[{"id":"n1","voice_id":"V2","file":"audio/n1.wav"}]}' > "$B/voices.json"; expect "대사마다 다른 음성 ID" 1 audio "$B" A02
 B=$(mut nolines); echo '{"voice_id":"V1"}' > "$B/voices.json"; expect "대사 목록 없음" 1 audio "$B" A03
 B=$(mut noid); echo '{"voice_id":"V1","lines":[{"file":"audio/n1.wav"}]}' > "$B/voices.json"; expect "대사에 id 없음" 1 audio "$B" A03
+B=$(mut audio_array); echo '[]' > "$B/voices.json"; expect "음성 JSON 최상위 배열" 1 audio "$B" A01
+B=$(mut audio_bad_lines); echo '{"voice_id":"V1","lines":["wrong"]}' > "$B/voices.json"; expect "음성 대사 항목 타입 오류" 1 audio "$B" A03
 # ---- edit
 B=$(mut grid); sed -i.bak 's/"d":1.6667/"d":1.7/; s/"t":1.6667/"t":1.7/' "$B/edit.json"; expect "박 격자를 벗어난 컷 경계" 1 edit "$B" B02
 B=$(mut gap); sed -i.bak 's/"t":1.6667/"t":2.5/; s/"d":2.5/"d":1.6667/' "$B/edit.json"; expect "컷 사이 빈틈" 1 edit "$B" B03
@@ -101,6 +107,27 @@ B=$(mut nosrc); rm "$B/clip/02.mp4"; expect "src 클립 파일 없음" 1 edit "$
 B=$(mut overrun); sed -i.bak 's/clip:02@0.0/clip:02@2.5/' "$B/edit.json"; expect "클립 길이보다 뒤까지 사용" 1 edit "$B" B06
 B=$(mut zero); sed -i.bak 's/"d":2.5/"d":0/' "$B/edit.json"; expect "길이 0인 컷" 1 edit "$B" B01
 B=$(mut bpmstr); sed -i.bak 's/"bpm":144/"bpm":"144"/' "$B/edit.json"; expect "bpm 이 문자열" 1 edit "$B" B01
+B=$(mut missing_clips); rm -rf "$B/clip"; expect "clip 폴더 자체가 없음" 1 edit "$B" B06
+B=$(mut negative_rate); python3 - "$B/edit.json" <<'EOF'
+import json,sys; p=sys.argv[1]; e=json.load(open(p)); e['cuts'][0]['rate']=-1; json.dump(e,open(p,'w'))
+EOF
+expect "음수 재생 속도" 1 edit "$B" B01
+B=$(mut nan_rate); python3 - "$B/edit.json" <<'EOF'
+import json,sys; p=sys.argv[1]; e=json.load(open(p)); e['cuts'][0]['rate']=float('nan'); json.dump(e,open(p,'w'))
+EOF
+expect "유한하지 않은 재생 속도" 1 edit "$B" B01
+B=$(mut edit_array); echo '[]' > "$B/edit.json"; expect "편집 JSON 최상위 배열" 1 edit "$B" B01
+B=$(mut extreme_bpm); echo '{"fps":30,"bpm":1e308,"cuts":[{"t":0,"d":1000,"src":"clip:01@0"}]}' > "$B/edit.json"; expect "박 격자 계산 범위를 넘는 BPM" 1 edit "$B" B01
+B=$(mut trim_ok); printf 'REVIEWED: selftest 2026-10-08\n01: trim @1.2 for 2.0\n02: ok\n' > "$B/qa/clips-review.md"
+echo '{"fps":30,"bpm":120,"cuts":[{"t":0,"d":1,"src":"clip:01@1.2"}]}' > "$B/edit.json"
+expect "승인한 trim 구간 안에서 사용" 0 edit "$B"
+B=$(mut trim_out); printf 'REVIEWED: selftest 2026-10-08\n01: trim @1.2 for 2.0\n02: ok\n' > "$B/qa/clips-review.md"
+echo '{"fps":30,"bpm":120,"cuts":[{"t":0,"d":1,"src":"clip:01@0"}]}' > "$B/edit.json"
+expect "승인한 trim 구간 밖에서 사용" 1 edit "$B" B07
+B=$(mut trim_rate); printf 'REVIEWED: selftest 2026-10-08\n01: trim @1.2 for 2.0\n02: ok\n' > "$B/qa/clips-review.md"
+echo '{"fps":30,"bpm":120,"cuts":[{"t":0,"d":1.5,"src":"clip:01@1.2","rate":2}]}' > "$B/edit.json"
+expect "재생 속도를 반영해 trim 범위 초과 검사" 1 edit "$B" B07
+expect "존재하지 않는 프로젝트는 예외 없이 BLOCK" 1 story "$W/missing-project" G00
 # ---- final
 B=$(mut noreview); rm "$B/qa/review.md"; expect "최종본 검수 기록 없음" 1 final "$B" F07
 B=$(mut review_empty); printf 'REVIEWED: selftest 2026-10-02\n' > "$B/qa/review.md"; expect "본 결과가 없는 REVIEWED" 1 final "$B" F07
@@ -128,5 +155,6 @@ else
   echo "skip ICC 회귀 사례 (PIL 없음)"
 fi
 
+if ! python3 "$HERE/test_continuity.py"; then fails=$((fails+1)); fi
 echo "-- 셀프테스트 실패 $fails 건"
 (( fails == 0 ))

@@ -2,7 +2,7 @@
 """단계 게이트: 산출물을 측정해 PASS/BLOCK을 종료 코드로 판정한다.
 
 사용법:  python3 harness/gate.py <단계> [프로젝트폴더=.]
-단계:    story | character | keyframes | clips | audio | edit | final | all
+단계:    story | character | keyframes | clips | audio | edit | continuity | final | all
 종료 코드: 0 = 모든 검사 통과(WARN 허용), 1 = BLOCK 하나 이상, 2 = 사용법 오류
 보고서:  <프로젝트>/qa/gate-<단계>.txt 에 같은 내용을 저장한다.
 
@@ -17,10 +17,12 @@
 """
 import hashlib
 import json
+import math
 import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 SSIM_START = float(os.environ.get("GATE_SSIM_START", "0.55"))
@@ -60,7 +62,39 @@ REVIEW_LINE = re.compile(r"^REVIEWED:[ \t]+(?!<)\S+[ \t]+\d{4}-\d{2}-\d{2}", re.
 
 def reviewed(path):
     """REVIEWED: <이름> <YYYY-MM-DD> 줄이 있고 자리표시자(<...>)가 아니어야 한다."""
-    return path.exists() and bool(REVIEW_LINE.search(path.read_text(encoding="utf-8")))
+    return path.is_file() and bool(REVIEW_LINE.search(path.read_text(encoding="utf-8")))
+
+
+def number(value, minimum=0, inclusive=False):
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return False
+    try:
+        return math.isfinite(value) and (value >= minimum if inclusive else value > minimum)
+    except OverflowError:
+        return False
+
+
+def visual_stream(path):
+    streams = probe(path, "stream=width,height", "v:0").get("streams") or []
+    return bool(streams and number(streams[0].get("width")) and number(streams[0].get("height")))
+
+
+def verdict(text, name):
+    matches = re.findall(rf"^\s*{re.escape(name)}\s*:\s*(ok|trim|redo|replace)\b([^\n]*)$", text, re.M)
+    if len(matches) != 1:
+        return None, None
+    kind, detail = matches[0]
+    if kind != "trim":
+        return kind, None
+    m = re.fullmatch(r"\s*@([0-9]+(?:\.[0-9]+)?)\s+for\s+([0-9]+(?:\.[0-9]+)?)\s*", detail)
+    if not m:
+        return kind, None
+    offset, span = map(float, m.groups())
+    return kind, (offset, span) if number(offset, inclusive=True) and number(span) else None
+
+
+def review_fresh(path, dependencies):
+    return path.is_file() and all(p.is_file() and path.stat().st_mtime_ns >= p.stat().st_mtime_ns for p in dependencies)
 
 
 def run(cmd):
@@ -78,7 +112,11 @@ def probe(path, entries, stream=None):
 
 def duration(path):
     d = probe(path, "format=duration").get("format", {}).get("duration")
-    return float(d) if d else 0.0
+    try:
+        value = float(d)
+        return value if math.isfinite(value) and value > 0 else 0.0
+    except (ValueError, TypeError):
+        return 0.0
 
 
 def images(folder):
@@ -86,12 +124,16 @@ def images(folder):
 
 
 def load_json(path, r, cid):
-    if not path.exists():
+    if not path.is_file():
         r.block(cid, f"{path.name} 없음")
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as e:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(value, dict):
+            r.block(cid, f"{path.name} 최상위 값은 JSON 객체여야 함")
+            return None
+        return value
+    except (ValueError, OSError) as e:
         r.block(cid, f"{path.name} JSON 오류: {e}")
         return None
 
@@ -136,6 +178,8 @@ def g_character(root, r):
     r.check(not bad, "C02", "외형 고정문이 1개 문단(마크다운·빈칸 없음)", "외형 고정문에 줄바꿈, 마크다운 기호, 빈칸(<...>)이 있음 - 1개 문단 평문으로 쓸 것")
     r.check(len(t) >= 20, "C03", f"외형 고정문 {len(t)}자", "외형 고정문이 20자 미만")
     r.check(len(images(root / "sheet")) >= 1, "C04", "캐릭터 시트 이미지 있음", "sheet/ 에 캐릭터 시트 이미지 없음")
+    invalid = [p.name for p in images(root / "sheet") if not visual_stream(p)]
+    r.check(not invalid, "C06", "캐릭터 시트 이미지를 읽을 수 있음", f"읽을 수 없는 캐릭터 시트: {invalid}")
     r.check(bool(COLOR_RE.search(t)), "C05", "옷·머리 색이 적혀 있음", "외형 고정문에 색 표현이 없음 - 상의·하의 색을 적을 것")
 
 
@@ -148,6 +192,8 @@ def g_keyframes(root, r):
         seen.setdefault(hashlib.md5(k.read_bytes()).hexdigest(), []).append(k.name)
     dup = [v for v in seen.values() if len(v) > 1]
     r.check(not dup, "K02", "같은 파일 중복 없음", f"내용이 같은 키프레임 파일: {dup}")
+    invalid = [k.name for k in ks if not visual_stream(k)]
+    r.check(not invalid, "K05", "키프레임 이미지와 크기를 읽을 수 있음", f"손상되었거나 읽을 수 없는 키프레임: {invalid}")
     def aspect(path):
         st = (probe(path, "stream=width,height", "v:0").get("streams") or [{}])[0]
         return (st["width"] / st["height"]) if st.get("width") and st.get("height") else None
@@ -157,7 +203,9 @@ def g_keyframes(root, r):
         if c.exists():
             paired += 1
             ak, ac = aspect(k), aspect(c)
-            if ak and ac and abs(ak - ac) / ac > 0.03:
+            if not ac:
+                bad.append(f"{c.name} 영상 크기를 읽을 수 없음")
+            elif ak and abs(ak - ac) / ac > 0.03:
                 bad.append(f"{k.name} {ak:.2f} != 클립 {ac:.2f}")
     r.check(not bad, "K03", f"짝이 있는 키프레임 {paired}장의 화면비가 클립과 같음", f"키프레임과 클립의 화면비가 다름: {bad}")
     allr = {round(aspect(k) or 0, 2) for k in ks}
@@ -169,7 +217,10 @@ def ssim_at(clip, key, t):
     cmd = ["ffmpeg", "-hide_banner", "-v", "info", "-ss", f"{t}", "-i", str(clip), "-i", str(key),
            "-filter_complex", "[0:v]scale=320:180[a];[1:v]scale=320:180[b];[a][b]ssim",
            "-frames:v", "1", "-f", "null", "-"]
-    out = run(cmd).stderr
+    result = run(cmd)
+    if result.returncode:
+        return None
+    out = result.stderr
     m = re.search(r"All:([0-9.]+)", out)
     return float(m.group(1)) if m else None
 
@@ -196,7 +247,9 @@ def g_clips(root, r):
         frames = run(["ffprobe", "-v", "error", "-count_frames", "-select_streams", "v:0",
                       "-show_entries", "stream=nb_read_frames", "-of", "default=nw=1:nk=1", str(c)]).stdout.strip()
         num, den = (s.get("r_frame_rate") or "30/1").split("/")
-        fps = float(num) / float(den or 1)
+        fps = float(num) / float(den) if float(den) else 0
+        if not r.check(math.isfinite(fps) and fps > 0, "V04", f"{c.name} fps {fps:.2f}", f"{c.name} fps를 읽을 수 없음"):
+            continue
         want = round(fps * d)
         r.check(frames.isdigit() and abs(int(frames) - want) <= 1, "V04",
                 f"{c.name} 프레임 {frames}개", f"{c.name} 프레임 {frames}개, 기대 {want}개 - 끊긴 클립")
@@ -215,20 +268,26 @@ def g_clips(root, r):
                 f"{c.name} 시작 화면이 키프레임과 다름 SSIM {s0:.2f} < {SSIM_START}")
         worst = min([x for x in (ssim_at(c, key, t) for t in (1.0, 2.0, 3.0) if t < d - 0.2) if x is not None] or [1.0])
         r.ok("V06", f"{c.name} 뒤쪽 프레임 최저 SSIM {worst:.2f} (참고값: 움직임과 인물 변형을 구분하지 못함)")
-        strip = make_strip(root, c, key, d)
-        r.ok("V07", f"{c.name} 프레임 스트립 생성 -> {strip}  (키프레임, 0, 1.0, 1.5, 2.0, 3.0초 순서. 옷·안경·머리를 눈으로 비교)")
+        strip, error = make_strip(root, c, key, d)
+        r.check(strip is not None, "V07", f"{c.name} 프레임 스트립 생성 -> {strip}  (키프레임, 0, 1.0, 1.5, 2.0, 3.0초 순서. 옷·안경·머리를 눈으로 비교)",
+                f"{c.name} 프레임 스트립 생성 실패: {error}")
     rv = root / "qa" / "clips-review.md"
     if not r.check(reviewed(rv), "V08", "qa/clips-review.md 에 REVIEWED 기록 있음",
                    "프레임 스트립을 눈으로 본 뒤 qa/clips-review.md 에 'REVIEWED: <이름> <YYYY-MM-DD>' 줄을 적을 것"):
         return
     text = rv.read_text(encoding="utf-8")
+    dependencies = clips + [k for k in images(root / "key") if k.stem in {c.stem for c in clips}]
+    r.check(review_fresh(rv, dependencies), "V11", "클립 검수 기록이 클립·키프레임보다 최신임", "클립·키프레임 변경 후 눈 검수 기록이 갱신되지 않음")
     missing, unusable = [], []
     for c in clips:
-        m = re.search(rf"^\s*{re.escape(c.stem)}\s*:\s*(ok|trim|redo|replace)\b", text, re.M)
-        if not m:
+        kind, segment = verdict(text, c.stem)
+        if kind is None:
             missing.append(c.stem)
-        elif m.group(1) in ("redo", "replace"):
-            unusable.append(f"{c.stem}={m.group(1)}")
+        elif kind in ("redo", "replace"):
+            unusable.append(f"{c.stem}={kind}")
+        elif kind == "trim":
+            r.check(segment is not None and sum(segment) <= duration(c) + 0.05, "V12",
+                    f"{c.stem} trim 사용 구간이 클립 안에 있음", f"{c.stem}: trim @<시작초> for <양수 길이>가 없거나 클립 범위 밖임")
     r.check(not missing, "V09", "모든 클립에 판정(ok/trim/redo/replace)이 있음", f"판정이 없는 클립: {missing} - '<이름>: ok|trim|redo|replace' 줄을 적을 것")
     r.check(not unusable, "V10", "다시 만들거나 교체할 클립이 남아 있지 않음", f"redo/replace 판정이 남은 클립: {unusable}")
 
@@ -239,11 +298,24 @@ def make_strip(root, clip, key, d):
     for t in times:
         ins += ["-ss", f"{t}", "-i", str(clip)]
     n = len(times) + 1
-    fc = ";".join(f"[{i}:v]scale=384:216[v{i}]" for i in range(n)) + ";" + "".join(f"[v{i}]" for i in range(n)) + f"hstack={n}"
+    fc = ";".join(f"[{i}:v]scale=384:216:force_original_aspect_ratio=decrease,pad=384:216:(ow-iw)/2:(oh-ih)/2[v{i}]" for i in range(n)) + ";" + "".join(f"[v{i}]" for i in range(n)) + f"hstack={n}"
     out = root / "qa" / f"strip-{clip.stem}.png"
     out.parent.mkdir(exist_ok=True)
-    run(["ffmpeg", "-loglevel", "error", "-y", *ins, "-filter_complex", fc, "-frames:v", "1", str(out)])
-    return out.relative_to(root)
+    tmp = None
+    try:
+        fd, label = tempfile.mkstemp(prefix=".strip-", suffix=".png", dir=out.parent)
+        os.close(fd)
+        tmp = Path(label)
+        result = run(["ffmpeg", "-loglevel", "error", "-y", *ins, "-filter_complex", fc, "-frames:v", "1", str(tmp)])
+        if result.returncode or not visual_stream(tmp):
+            return None, result.stderr.strip()[-400:] or "출력 이미지를 읽을 수 없음"
+        os.replace(tmp, out)
+        return out.relative_to(root), ""
+    except OSError as e:
+        return None, str(e)
+    finally:
+        if tmp is not None and tmp.is_file():
+            tmp.unlink()
 
 
 def g_audio(root, r):
@@ -252,9 +324,10 @@ def g_audio(root, r):
         return
     vid = v.get("voice_id")
     r.check(bool(vid) and isinstance(vid, str) and not vid.startswith("<"), "A01", f"voice_id 1개 고정 ({vid})", "voices.json 에 voice_id 문자열이 없음")
-    lines = v.get("lines") or []
-    r.check(bool(lines) and all(ln.get("id") and ln.get("file") for ln in lines), "A03",
-            f"대사 {len(lines)}개, 모두 id와 file이 있음", "voices.json 의 lines 가 비었거나 id/file 이 없는 대사가 있음")
+    lines = v.get("lines")
+    if not r.check(isinstance(lines, list) and bool(lines) and all(isinstance(ln, dict) and isinstance(ln.get("id"), str) and ln["id"] and isinstance(ln.get("file"), str) and ln["file"] for ln in lines), "A03",
+            f"대사 {len(lines) if isinstance(lines, list) else 0}개, 모두 id와 file이 있음", "voices.json 의 lines 가 비었거나 id/file 이 없는 대사가 있음"):
+        return
     other = [ln.get("id") for ln in lines if ln.get("voice_id") not in (None, vid)]
     r.check(not other, "A02", "모든 대사가 같은 음성 ID", f"다른 음성 ID를 쓴 대사: {other}")
     for ln in lines:
@@ -272,19 +345,23 @@ def g_edit(root, r):
     if e is None:
         return
     bpm, fps = e.get("bpm"), e.get("fps", 30)
-    cuts = e.get("cuts") or []
-    num = lambda x: isinstance(x, (int, float)) and not isinstance(x, bool)
-    valid = (num(bpm) and bpm > 0 and num(fps) and fps > 0 and bool(cuts)
-             and all(isinstance(c, dict) and num(c.get("t")) and c["t"] >= 0 and num(c.get("d")) and c["d"] > 0 and isinstance(c.get("src"), str) for c in cuts))
-    if not r.check(valid, "B01", f"BPM {bpm}, fps {fps}, 컷 {len(cuts)}개", "edit.json 형식 오류: bpm·fps는 양수, cuts 의 각 컷은 t>=0, d>0, src 문자열이 필요"):
+    cuts = e.get("cuts")
+    valid = (number(bpm) and number(fps) and isinstance(cuts, list) and bool(cuts)
+             and all(isinstance(c, dict) and number(c.get("t"), inclusive=True) and number(c.get("d")) and number(c.get("rate", 1)) and number(c["t"] + c["d"], inclusive=True) and number(c["d"] * c.get("rate", 1)) and isinstance(c.get("src"), str) for c in cuts))
+    if not r.check(valid, "B01", f"BPM {bpm}, fps {fps}, 컷 {len(cuts) if isinstance(cuts, list) else 0}개", "edit.json 형식 오류: bpm·fps·d·rate는 유한 양수, cuts는 배열, t>=0, src 문자열이 필요"):
         return
     cuts = sorted(cuts, key=lambda c: c["t"])
     beat = 60.0 / bpm
     half = 0.5 / fps
+    if not r.check(number(beat) and number(half), "B01", "박·프레임의 시간폭이 유한함", "BPM·fps에서 유한한 시간폭을 계산할 수 없음"):
+        return
     bad = []
     for i, c in enumerate(cuts):
         for key, val in (("t", c["t"]), ("끝", c["t"] + c["d"])):
             q = val / beat
+            if not math.isfinite(q):
+                r.block("B01", "컷 경계를 박 격자로 계산할 수 없음: BPM 또는 시간값이 너무 큼")
+                return
             if abs(q - round(q)) * beat > half + 1e-6:
                 bad.append(f"컷{i+1}.{key}={val:.4f} -> {round(q)*beat:.4f}")
     r.check(not bad, "B02", "모든 컷 경계가 박 격자 위(반 프레임 이내)", f"박 격자를 벗어난 경계: {bad[:6]}")
@@ -294,8 +371,13 @@ def g_edit(root, r):
     dup = subprocess.run([sys.executable, str(Path(__file__).resolve().parent.parent / "scripts" / "dupcheck.py"), str(root / "edit.json")],
                          capture_output=True, text=True)
     r.check(dup.returncode == 0, "B04", "반복 컷 없음", "반복 컷: " + dup.stdout.strip().replace("\n", " / ")[:200])
-    vj = load_json(root / "voices.json", Report(), "-") or {}
-    ids = {ln.get("id"): ln for ln in (vj.get("lines") or [])}
+    vr = Report()
+    vj = load_json(root / "voices.json", vr, "B05") or {}
+    lines = vj.get("lines") or []
+    valid_lines = isinstance(lines, list) and all(isinstance(ln, dict) and isinstance(ln.get("id"), str) and isinstance(ln.get("file"), str) for ln in lines)
+    ids = {ln["id"]: ln for ln in lines} if valid_lines else {}
+    if any(c.get("line") for c in cuts) and (vr.blocks or not valid_lines):
+        r.block("B05", "컷 대사를 검사할 voices.json 형식이 올바르지 않음")
     for c in cuts:
         ln = c.get("line")
         if not ln:
@@ -307,10 +389,12 @@ def g_edit(root, r):
         r.check(dur <= c["d"] + 0.01, "B05", f"대사 {ln} {dur:.2f}초 <= 컷 {c['d']:.2f}초", f"대사 {ln} {dur:.2f}초가 컷 {c['d']:.2f}초보다 김 - 입 모양이 잘림")
     clip_dir = root / "clip"
     if not clip_dir.is_dir():
-        r.warn("B06", "clip/ 폴더가 없어 src 클립 파일과 사용 구간 검사를 건너뜀")
+        r.block("B06", "clip/ 폴더가 없어 src 클립 파일과 사용 구간을 검사할 수 없음")
     else:
+        rv = root / "qa/clips-review.md"
+        text = rv.read_text(encoding="utf-8") if reviewed(rv) else ""
         for c in cuts:
-            m = re.fullmatch(r"clip:([^@]+)@([0-9.]+)", c["src"])
+            m = re.fullmatch(r"clip:([^/@\\]+)@([0-9]+(?:\.[0-9]+)?)", c["src"])
             if not m:
                 r.block("B06", f"src 형식 오류 '{c['src']}' (clip:<이름>@<시작초>)")
                 continue
@@ -318,10 +402,16 @@ def g_edit(root, r):
             if not f.exists():
                 r.block("B06", f"src 클립 파일 없음: clip/{m.group(1)}.mp4")
                 continue
-            need = float(m.group(2)) + c["d"] * float(c.get("rate", 1.0))
+            offset = float(m.group(2))
+            need = offset + c["d"] * c.get("rate", 1.0)
             have = duration(f)
-            r.check(need <= have + 0.05, "B06", f"{f.name} 사용 구간 {need:.2f}초 <= 클립 {have:.2f}초",
+            r.check(math.isfinite(need) and have > 0 and visual_stream(f) and need <= have + 0.05, "B06", f"{f.name} 사용 구간 {need:.2f}초 <= 클립 {have:.2f}초",
                     f"{f.name} 은 {have:.2f}초인데 컷이 {need:.2f}초 지점까지 사용함 - 클립이 모자람")
+            kind, segment = verdict(text, m.group(1))
+            approved = kind == "ok" or (kind == "trim" and segment is not None and offset >= segment[0] - 1e-6 and need <= sum(segment) + 1e-6 and sum(segment) <= have + 0.05)
+            r.check(approved, "B07", f"{f.name} 눈 검수로 승인한 구간만 사용함", f"{f.name}의 사용 구간이 눈 검수에서 승인되지 않음 (ok 또는 trim @시작초 for 길이 필요)")
+            key = next((k for k in images(root / "key") if k.stem == m.group(1)), None)
+            r.check(review_fresh(rv, [f] + ([key] if key else [])), "B08", f"{f.name} 검수 기록이 최신임", f"{f.name}·키프레임 변경 후 클립 검수 기록이 갱신되지 않음")
 
 
 def g_final(root, r):
@@ -369,8 +459,15 @@ def g_final(root, r):
             "qa/review.md 가 out/final.mp4 보다 오래됨 - 최종본을 다시 렌더했다면 다시 보고 기록할 것")
 
 
+def g_continuity(root, r):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    from continuity import check_project
+    for level, cid, message in check_project(root):
+        r.add(level, cid, message)
+
+
 STAGES = {"story": g_story, "character": g_character, "keyframes": g_keyframes,
-          "clips": g_clips, "audio": g_audio, "edit": g_edit, "final": g_final}
+          "clips": g_clips, "audio": g_audio, "edit": g_edit, "continuity": g_continuity, "final": g_final}
 
 
 def main(argv):
@@ -379,11 +476,17 @@ def main(argv):
         return 2
     label = argv[2] if len(argv) > 2 else "."
     root = Path(label).resolve()
+    if not root.is_dir():
+        print(f"BLOCK G00  프로젝트 폴더가 없거나 디렉터리가 아님: {label}")
+        return 1
     names = list(STAGES) if argv[1] == "all" else [argv[1]]
     total_blocks = 0
     for name in names:
         r = Report()
-        STAGES[name](root, r)
+        try:
+            STAGES[name](root, r)
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, OverflowError) as e:
+            r.block("G00", f"입력 파일 또는 도구 오류: {type(e).__name__}: {e}")
         body = f"== gate {name} ({label})\n" + "\n".join(r.lines) + f"\n== {'BLOCK' if r.blocks else 'PASS'} {name}: BLOCK {r.blocks}개\n"
         print(body, end="")
         (root / "qa").mkdir(exist_ok=True)
