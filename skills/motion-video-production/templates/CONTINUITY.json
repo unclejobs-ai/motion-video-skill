@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "character_lock": "character.txt",
+  "reference_sheet": "sheet/character.png",
+  "style_lock": "Soft daylight, restrained color palette, consistent lens and rendering style.",
+  "scenes": [
+    {
+      "id": "01",
+      "start_keyframe": "key/01.png",
+      "end_keyframe": "key-end/01.png",
+      "clip": "clip/01.mp4",
+      "duration": 4,
+      "action": "The character walks toward the window and stops.",
+      "camera": "Medium shot, slow lateral tracking, eye level.",
+      "end_state": "Standing at the window, right hand resting on the sill.",
+      "screen_direction": "Left to right; face remains toward screen right.",
+      "transition_to_next": "match_cut"
+    },
+    {
+      "id": "02",
+      "start_keyframe": "key/02.png",
+      "clip": "clip/02.mp4",
+      "duration": 4,
+      "action": "The character looks out the window, then lifts the right hand.",
+      "camera": "Close-up from the same side of the action axis, locked camera.",
+      "end_state": "Right hand raised, gaze held outside the window.",
+      "screen_direction": "Face remains toward screen right.",
+      "transition_to_next": "hard_cut"
+    }
+  ]
+}
