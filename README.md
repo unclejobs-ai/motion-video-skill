@@ -6,7 +6,7 @@
 
 ![Measure the reference, pass seven gated stages, judge the mp4 against the same targets](docs/assets/hero.png)
 
-An Agent Skill for 15–90 second motion graphics, promo and character videos. The agent works in seven stages. After each stage a script checks the output, and the next stage waits until it passes.
+An Agent Skill for 15–90 second motion graphics, promo and character videos. The agent works in seven stages. After each stage a script checks the output, and the next stage waits until it passes. Final verification puts file measurements and review images in one table; a person still checks the picture and sound.
 
 Works in Codex, Claude Code and other runtimes that read Agent Skills.
 
@@ -48,6 +48,12 @@ The agent asks six questions first: where the video goes, length and aspect rati
 
 Exit code `0` means move on. Exit code `1` means fix the lines listed in `qa/gate-<stage>.txt` and run the gate again. Some things only eyes can judge, such as a face drifting a second into a clip. Those pass only after someone looks at the frame strips and writes a review.
 
+## How results are verified
+
+The verify table runs tests and carry first, then checks overlay timing, decoded frames, frame rate, resolution, A/V length, loudness and true peak. It reuses the stage gate's media checks and writes `qa/VERIFY.md` beside the video. Optional source footage enables a picture check near overlay joins.
+
+New checks start in **observe** mode: failures warn without blocking. Existing enforced checks still block. **LOOK** rows point to a contact sheet and last frame, not a machine pass. A person must inspect cuts, text and character consistency, listen to the mix, and record the review before the final gate passes. [Commands, limits and coverage](docs/verification.md).
+
 ## Try the demo
 
 This renders a 5-second typography clip with Remotion. It takes about 30 seconds.
@@ -81,6 +87,7 @@ The agent reads these as it needs them. Most are written in Korean, and gate out
 - [`references/`](skills/motion-video-production/references/): art direction, beat grid, consistency, providers, cost
 - [`references/gotchas.md`](skills/motion-video-production/references/gotchas.md): 29 known failure modes
 - [`docs/runtimes.md`](docs/runtimes.md): install paths, known limitations, what was tested
+- [`docs/verification.md`](docs/verification.md): the verification table, modes and tests
 
 ## License
 

@@ -73,7 +73,7 @@ For a personal Codex installation, set `SKILL_ROOT="$HOME/.agents/skills/motion-
 - Image/video/music/voice generation requires separately available services or tools. A web subscription does not imply API access. If tools are absent, the agent provides prompts and target filenames; the user generates and supplies the files.
 - If the runtime cannot view frame strips or contact sheets, the user must inspect them and provide actual review results. Never manufacture a `REVIEWED` record from measurements alone. Scripts cannot judge character deformation in later frames.
 - Use the provided `STORY.md` template's Korean field names and table headings: the current gate reads those names. Fill values in the user's language. For a non-Korean character description, include `#RRGGBB` codes alongside color names so the current color check can recognize them.
-- Remotion is a company-size licensed package (organizations of four or more employees need a Company License); HyperFrames is Apache-2.0. Voice automation (`vo.mjs`) needs the user's own composio CLI connection and spends their credits. Whisper transcription integration in `verify.sh` remains unverified. Check external service pricing and license terms immediately before work, as described in `NOTICE.md` and the licensing reference.
+- Remotion is a company-size licensed package (organizations of four or more employees need a Company License); HyperFrames is Apache-2.0. Voice automation (`vo.mjs`) needs the user's own composio CLI connection and spends their credits. The verifier does not run Whisper automatically; transcript comparison remains a separate task. Check external service pricing and license terms immediately before work, as described in `NOTICE.md` and the licensing reference.
 
 ## Known limitations
 
@@ -83,6 +83,8 @@ For a personal Codex installation, set `SKILL_ROOT="$HOME/.agents/skills/motion-
 - **The full text of the GSAP license clauses was not verified.** GSAP 3.14.2, used by the HyperFrames demo, says in its README that it is free including commercial use. Before releasing a commercial video, check https://gsap.com/standard-license.
 
 ## Verification scope
+
+The current verification command, observe/enforce modes and synthetic test coverage are in [verification.md](verification.md). The media gate is shared by both engines; a copied Remotion engine needs `--skill-root` (or exported `SKILL_ROOT`) to locate it. The historical installer/render checks below were not repeated for the verification update.
 
 Checks on 2026-10-25 (macOS, Node.js 24.20.0, Python 3.14.8), run on a `git archive` export of the committed branch so no local `node_modules` could ride along:
 

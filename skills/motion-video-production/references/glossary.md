@@ -45,9 +45,9 @@
 ## 화면과 출력
 
 - 첫 프레임·썸네일 프레임(first frame / thumbnail frame): 재생 전이나 피드에서 처음 보이는 한 장이에요. wordcut은 0프레임을 `frame0.mjs --check`로 판정하고, 홈페이지 템플릿은 마지막 프레임을 포스터로 써요(`references/brand-intro.md`).
-- 세이프 영역(safe area): 화면 가장자리에서 잘리거나 플랫폼 UI에 가려질 수 있어 글자를 두지 않는 안쪽 경계예요. 이 스킬에는 전용 검사가 없어요. 가장자리 색은 `verify.sh`가 재요.
+- 세이프 영역(safe area): 화면 가장자리에서 잘리거나 플랫폼 UI에 가려질 수 있어 글자를 두지 않는 안쪽 경계예요. 이 스킬에는 전용 검사가 없어요. 가장자리 잘림은 완성본을 직접 보고 확인해요.
 - 키프레임(keyframe): 이 스킬에서는 영상 생성의 시작 화면으로 쓰는 이미지 한 장이에요(3단계). 애니메이션 도구의 "값을 찍는 시점"과 다른 뜻이에요.
-- 컨택트 시트(contact sheet): 영상의 여러 시점을 한 장에 격자로 늘어놓은 이미지예요. `scripts/verify.sh`와 `scripts/clipsheet.sh`가 만들어요.
+- 컨택트 시트(contact sheet): 영상의 여러 시점을 한 장에 격자로 늘어놓은 이미지예요. `scripts/verify.sh`의 LOOK 행과 `scripts/clipsheet.sh`가 제공해요.
 - 크로마키(chroma key): 단색(초록) 배경을 지워 캐릭터만 떼어 내는 합성이에요. 이 스킬은 RGB 기준 `colorkey`를 쓰는 `scripts/key-plate.sh`로 해요.
 - 키네틱 타이포그래피(kinetic typography): 글자 자체가 움직이며 내용을 전하는 모션 그래픽이에요. wordcut 끝의 교과서 글자가 흩어지고 단어가 사전 표제어가 되는 구간, `productions/carry-demo`의 단어가 라벨이 되는 경계가 이것이에요.
 - 스크롤 연동 영상(scroll-scrubbed video): 스크롤 위치에 따라 영상의 재생 위치가 앞뒤로 움직이는 웹 기법이에요. 이 스킬의 홈페이지 템플릿은 쓰지 않고 자동 재생 반복을 써요. 쓰려면 `references/brand-intro.md`의 외부 라이브러리 규칙을 따라요.

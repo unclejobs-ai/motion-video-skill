@@ -6,7 +6,7 @@
 
 ![레퍼런스를 재고, 7단계 게이트를 거쳐, 같은 목표값으로 mp4를 판정하는 흐름](docs/assets/hero.ko.png)
 
-15~90초 모션 그래픽, 홍보 영상, 캐릭터 영상을 만드는 Agent Skill이에요. 에이전트가 7단계로 작업하고, 단계마다 스크립트가 결과를 검사해요. 통과해야 다음 단계로 넘어가요.
+15~90초 모션 그래픽, 홍보 영상, 캐릭터 영상을 만드는 Agent Skill이에요. 에이전트가 7단계로 작업하고, 단계마다 스크립트가 결과를 검사해요. 통과해야 다음 단계로 넘어가요. 완성본은 파일 측정값과 검수 이미지를 한 표로 모으고, 화면과 소리는 사람이 확인해요.
 
 Codex, Claude Code 등 Agent Skills를 읽는 런타임에서 쓸 수 있어요.
 
@@ -48,6 +48,12 @@ Node.js 24 이상, ffmpeg, Python 3, Bash가 필요해요. Windows에서는 WSL�
 
 종료 코드 `0`이면 다음 단계로 가요. `1`이면 `qa/gate-<단계>.txt`에 적힌 줄을 고치고 다시 돌려요. 클립 1초 뒤에 얼굴이 달라지는 것처럼 눈으로만 볼 수 있는 문제도 있어요. 이런 항목은 사람이 프레임 스트립을 보고 검토 기록을 남겨야 통과해요.
 
+## 결과를 검증하는 방법
+
+검증 표는 테스트와 carry부터 실행한 뒤 오버레이 타이밍, 디코딩한 프레임 수, 프레임률, 해상도, A/V 길이, 라우드니스와 true peak를 검사해요. 미디어 검사는 기존 단계 게이트를 재사용하고, 영상 옆 `qa/VERIFY.md`에 결과를 남겨요. 원본 영상을 주면 오버레이 이음새 주변의 그림도 비교해요.
+
+새 검사는 **observe** 모드로 시작해요. 실패해도 경고만 남기고, 기존 enforce 검사는 계속 진행을 막아요. **LOOK**은 컨택트 시트와 마지막 프레임의 경로이지 기계가 통과시킨 결과가 아니에요. 사람이 컷·글자·인물 일관성을 보고 믹스를 들은 뒤 검수 기록을 남겨야 최종 게이트를 통과해요. [명령, 기준과 검증 범위](docs/verification.md).
+
 ## 데모 돌려 보기
 
 Remotion으로 5초짜리 타이포그래피 영상을 렌더해요. 30초쯤 걸려요.
@@ -81,6 +87,7 @@ node pipeline/render.mjs carry-demo             # renders/carry-demo/picture.mp4
 - [`references/`](skills/motion-video-production/references/): 아트 디렉션, 박자 격자, 일관성, 도구, 비용
 - [`references/gotchas.md`](skills/motion-video-production/references/gotchas.md): 자주 겪는 실패 29가지
 - [`docs/runtimes.md`](docs/runtimes.md): 설치 경로, 알려진 한계, 검증 범위 (영어)
+- [`docs/verification.md`](docs/verification.md): 검증 표, 모드와 테스트 (영어)
 
 ## 라이선스
 
