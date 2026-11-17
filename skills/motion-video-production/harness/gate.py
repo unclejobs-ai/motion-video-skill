@@ -38,10 +38,12 @@ IMG = {".png", ".jpg", ".jpeg", ".webp"}
 class Report:
     def __init__(self):
         self.lines = []
+        self.checks = []
         self.blocks = 0
 
     def add(self, level, cid, msg):
         self.lines.append(f"{level:5} {cid}  {msg}")
+        self.checks.append({"level": level, "id": cid, "message": msg})
         if level == "BLOCK":
             self.blocks += 1
 
@@ -384,33 +386,41 @@ def g_edit(root, r):
                     f"{f.name} 은 {have:.2f}초인데 컷이 {need:.2f}초 지점까지 사용함 - 클립이 모자람")
 
 
-def g_final(root, r):
-    f = root / "out" / "final.mp4"
-    if not r.check(f.exists(), "F01", "out/final.mp4 있음", "out/final.mp4 없음"):
+def g_media(f, e, r):
+    """Shared final-file measurements. The table runner supplies an edit/production contract on stdin."""
+    if not r.check(f.is_file(), "F01", "영상 파일 있음", "영상 파일 없음"):
         return
-    e = (load_json(root / "edit.json", Report(), "-") or {})
-    fps = e.get("fps", 30)
     cuts = e.get("cuts", [])
     secs = max((c["t"] + c["d"] for c in cuts), default=None)
-    v = (probe(f, "stream=codec_type,width,height,r_frame_rate,duration").get("streams") or [])
+    v = (probe(f, "stream=codec_type,width,height,r_frame_rate,avg_frame_rate,duration").get("streams") or [])
     vid = next((s for s in v if s.get("codec_type") == "video"), {})
     aud = next((s for s in v if s.get("codec_type") == "audio"), None)
-    if secs:
-        got = run(["ffprobe", "-v", "error", "-count_frames", "-select_streams", "v:0", "-show_entries",
-                   "stream=nb_read_frames", "-of", "default=nw=1:nk=1", str(f)]).stdout.strip()
-        r.check(got.isdigit() and int(got) == round(fps * secs), "F02", f"프레임 {got}개 = {fps}fps x {secs:.2f}초",
-                f"프레임 {got}개, 기대 {round(fps*secs)}개 - 렌더가 끊겼거나 길이가 다름")
+    num, den = (vid.get("r_frame_rate") or "0/1").split("/")
+    stream_fps = float(num) / float(den or 1)
+    fps = e.get("fps", stream_fps)
+    secs = secs if secs is not None else float(vid.get("duration") or 0)
+    got = run(["ffprobe", "-v", "error", "-count_frames", "-select_streams", "v:0", "-show_entries",
+               "stream=nb_read_frames", "-of", "default=nw=1:nk=1", str(f)]).stdout.strip()
+    r.check(fps > 0 and secs > 0 and got.isdigit() and int(got) == round(fps * secs), "F02",
+            f"프레임 {got}개 = {fps}fps x {secs:.2f}초",
+            f"프레임 {got}개, 기대 {round(fps*secs)}개 - 렌더가 끊겼거나 길이가 다름")
     r.check(aud is not None, "F03", "오디오 스트림 있음", "오디오 스트림 없음")
     wh = (vid.get("width"), vid.get("height"))
-    want = (e.get("width", 1920), e.get("height", 1080))
+    want = (e.get("width", vid.get("width")), e.get("height", vid.get("height")))
     r.check(wh == want, "F04", f"해상도 {wh}", f"해상도 {wh}, 기대 {want}")
     num, den = (vid.get("r_frame_rate") or "0/1").split("/")
     got_fps = float(num) / float(den or 1)
     r.check(abs(got_fps - fps) < 0.01, "F08", f"fps {got_fps:g}", f"fps {got_fps:g}, edit.json 은 {fps}")
+    avg_num, avg_den = (vid.get("avg_frame_rate") or "0/1").split("/")
+    avg_fps = float(avg_num) / float(avg_den or 1)
+    (r.ok if abs(avg_fps - got_fps) < 0.01 else r.warn)("F11", f"일정 프레임률 참고: r={got_fps:g}, avg={avg_fps:g}")
     if aud is not None:
         vd, ad = float(vid.get("duration") or 0), float(aud.get("duration") or 0)
         r.check(abs(vd - ad) <= 0.1 and (not secs or abs(ad - secs) <= 1.5 / fps + 0.05), "F09",
                 f"오디오 {ad:.2f}초, 영상 {vd:.2f}초", f"오디오 {ad:.2f}초와 영상 {vd:.2f}초가 맞지 않음 - 오디오가 일찍 끝나거나 길이가 다름")
+
+
+def g_loudness(f, r):
     out = run(["ffmpeg", "-hide_banner", "-i", str(f), "-af", "ebur128=peak=true", "-f", "null", "-"]).stderr
     seg = out[out.rfind("Summary"):]
     li = re.search(r"I:\s+(-?[0-9.]+) LUFS", seg)
@@ -421,6 +431,15 @@ def g_final(root, r):
         r.check(float(tp.group(1)) <= TP_MAX, "F06", f"true peak {tp.group(1)} dBFS", f"true peak {tp.group(1)} dBFS > {TP_MAX}")
     else:
         r.block("F05", "라우드니스 측정 실패(오디오 없음?)")
+
+
+def g_final(root, r):
+    f = root / "out" / "final.mp4"
+    if not r.check(f.exists(), "F01", "out/final.mp4 있음", "out/final.mp4 없음"):
+        return
+    e = load_json(root / "edit.json", Report(), "-") or {}
+    g_media(f, {"fps": 30, "width": 1920, "height": 1080, **e}, r)
+    g_loudness(f, r)
     rv = root / "qa" / "review.md"
     ok = reviewed(rv) and len([ln for ln in rv.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("REVIEWED:")]) >= 1
     r.check(ok, "F07", "qa/review.md 에 REVIEWED 줄과 본 결과가 있음",
@@ -434,6 +453,24 @@ STAGES = {"ref": g_ref, "story": g_story, "character": g_character, "keyframes":
 
 
 def main(argv):
+    # Internal bridge for verify.mjs; existing final checks remain the source of truth.
+    if len(argv) == 4 and argv[1] == "media" and argv[3] in ("container", "audio"):
+        r = Report()
+        try:
+            e = json.load(sys.stdin)
+            if not isinstance(e, dict):
+                raise ValueError("expected a JSON object")
+            if argv[3] == "container":
+                g_media(Path(argv[2]), e, r)
+            else:
+                g_loudness(Path(argv[2]), r)
+        except (ValueError, TypeError, KeyError, ZeroDivisionError) as err:
+            r.block("F01", f"media contract/measurement error: {err}")
+        print(json.dumps({"checks": r.checks, "limits": {
+            "F05": f"{LUFS_TARGET} ± {LUFS_TOL} LUFS", "F06": f"≤ {TP_MAX} dBTP",
+            "F09": "A/V difference ≤ 0.1 s; audio within 1.5 frames + 0.05 s of expected length",
+        }}, ensure_ascii=False))
+        return 1 if r.blocks else 0
     if len(argv) < 2 or argv[1] not in (*STAGES, "all"):
         print(__doc__)
         return 2

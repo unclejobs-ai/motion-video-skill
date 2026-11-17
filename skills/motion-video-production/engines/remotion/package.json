@@ -12,7 +12,8 @@
     "test": "node --test 'motions/**/*.test.ts' 'pipeline/**/*.test.ts' 'productions/**/*.test.ts'",
     "typecheck": "tsc --noEmit",
     "render": "node pipeline/render.mjs",
-    "probe": "node pipeline/probe.mjs"
+    "probe": "node pipeline/probe.mjs",
+    "verify": "node pipeline/verify.mjs"
   },
   "dependencies": {
     "@fontsource/jetbrains-mono": "5.3.0",

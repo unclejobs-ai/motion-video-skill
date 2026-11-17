@@ -1,0 +1,21 @@
+{
+  "modes": {
+    "tests": "enforce",
+    "carry": "enforce",
+    "no-peek": "observe",
+    "card": "observe",
+    "bridge": "observe",
+    "picture-peek": "observe",
+    "cfr": "observe",
+    "frames": "enforce",
+    "audio-stream": "enforce",
+    "resolution": "enforce",
+    "fps": "enforce",
+    "av-length": "enforce",
+    "loudness": "enforce",
+    "true-peak": "enforce"
+  },
+  "timeline": { "joinGap": 2, "cardMax": 9, "bridgeMin": 3.5 },
+  "picture": { "peekDb": 18, "size": "344x216" },
+  "look": { "width": 390, "maxTiles": 60 }
+}
