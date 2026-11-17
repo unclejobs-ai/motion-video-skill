@@ -6,7 +6,7 @@
 
 ![Measure the reference, pass seven gated stages, judge the mp4 against the same targets](docs/assets/hero.png)
 
-An Agent Skill for 15–90 second motion graphics, promo and character videos. The agent works in seven stages. After each stage a script checks the output, and the next stage waits until it passes. Final verification puts file measurements and review images in one table; a person still checks the picture and sound.
+An Agent Skill for 15–90 second motion graphics, promo and character videos. The agent works in seven stages. After each stage a script checks the output, and the next stage waits until it passes. At the end, one table shows what was measured in the finished file; a person still looks at the picture and listens to the sound.
 
 Works in Codex, Claude Code and other runtimes that read Agent Skills.
 
@@ -50,9 +50,10 @@ Exit code `0` means move on. Exit code `1` means fix the lines listed in `qa/gat
 
 ## How results are verified
 
-The verify table runs tests and carry first, then checks overlay timing, decoded frames, frame rate, resolution, A/V length, loudness and true peak. It reuses the stage gate's media checks and writes `qa/VERIFY.md` beside the video. Optional source footage enables a picture check near overlay joins.
-
-New checks start in **observe** mode: failures warn without blocking. Existing enforced checks still block. **LOOK** rows point to a contact sheet and last frame, not a machine pass. A person must inspect cuts, text and character consistency, listen to the mix, and record the review before the final gate passes. [Commands, limits and coverage](docs/verification.md).
+`scripts/verify.sh` checks the finished video, final mix included, and prints one table, cheapest checks first. It saves the table as `qa/VERIFY.md` beside the video. [Commands, limits and coverage](docs/verification.md).
+- **The machine measures the file**: every frame decodes, frame rate and size are right, sound and picture have the same length, average loudness is near −14 LUFS and the loudest peak stays under −1 dBTP. For a Remotion production it also checks that something on screen carries over each scene change instead of a bare jump. Given a plan for graphics laid over filmed footage, it checks that the footage never flashes between two graphics and that no card stays over 9 seconds.
+- **A person checks what numbers can't**: cut timing, clipped text, a face that changes, how the mix sounds. For this the table links a contact sheet (small frames across the whole video) and the last frame. Those rows say LOOK, never PASS, and the final gate waits for a written review.
+- **New checks only warn at first** (`observe`). They block a run (`enforce`) only after they have been tried on real work.
 
 ## Try the demo
 
@@ -87,7 +88,6 @@ The agent reads these as it needs them. Most are written in Korean, and gate out
 - [`references/`](skills/motion-video-production/references/): art direction, beat grid, consistency, providers, cost
 - [`references/gotchas.md`](skills/motion-video-production/references/gotchas.md): 29 known failure modes
 - [`docs/runtimes.md`](docs/runtimes.md): install paths, known limitations, what was tested
-- [`docs/verification.md`](docs/verification.md): the verification table, modes and tests
 
 ## License
 

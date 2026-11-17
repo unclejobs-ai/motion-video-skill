@@ -25,13 +25,13 @@ The video must already exist and include the final mix. `--project` reads the ex
 | Order | Checks | Default |
 |---|---|---|
 | 0 | Engine tests, including synthetic timeline cases | enforce |
-| 1 | Carry; optional overlay joins, card holds and chapter bridges | carry enforce; new timeline checks observe |
-| 2 | Decoded frames, audio stream, resolution, fps, A/V length | existing gate checks enforce; new nominal/average rate comparison observe |
+| 1 | Carry (something on screen survives each scene change); optional overlay joins, card holds and chapter bridges | carry enforce; new timeline checks observe |
+| 2 | Decoded frames, audio stream, resolution, fps, audio/video length | existing gate checks enforce; new nominal/average rate comparison observe |
 | 3 | Integrated loudness and true peak | existing gate checks enforce |
 | 4 | Optional picture samples near joins, compared with bare footage | observe |
 | 5 | Contact sheet (at most 60 tiles) and last frame | LOOK, never PASS |
 
-New checks start in **observe**: a failure becomes WARN without changing the exit code. Promote them only after checking false positives on representative work. Modes and new thresholds live in `skills/motion-video-production/engines/remotion/pipeline/verify-limits.json`. Existing media calculations and audio limits stay in `harness/gate.py`: −14 ±1.5 LUFS, true peak ≤ −1 dBTP, A/V difference ≤0.1 s. Existing `GATE_LUFS`, `GATE_LUFS_TOL` and `GATE_TP_MAX` overrides still apply. Private-engine audio profiles and mix changes were not imported.
+New checks start in **observe**: a failure becomes WARN without changing the exit code. Promote them only after checking false positives on representative work. Modes and new thresholds live in `skills/motion-video-production/engines/remotion/pipeline/verify-limits.json`. Existing media calculations and audio limits stay in `harness/gate.py`: −14 ±1.5 LUFS, true peak ≤ −1 dBTP, A/V difference ≤0.1 s. Existing `GATE_LUFS`, `GATE_LUFS_TOL` and `GATE_TP_MAX` overrides still apply. One loudness target applies to every video; there are no per-format profiles.
 
 An enforced failure exits 1 and stops after its cost tier; `--all` continues through all tiers. Invalid inputs exit 2. WARN and SKIP are not proof that a check passed. `qa/VERIFY.md` beside the video records the command, commit, table, and video mtime/size. Re-run after re-encoding. It does not replace `qa/review.md`: the final gate still requires a real, fresh human review.
 
