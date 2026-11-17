@@ -6,7 +6,7 @@
 
 ![Measure the reference, pass seven gated stages, judge the mp4 against the same targets](docs/assets/hero.png)
 
-An Agent Skill for 15–90 second motion graphics, promo and character videos. The agent works in seven stages. After each stage a script checks the output, and the next stage waits until it passes.
+An Agent Skill for 15–90 second motion graphics, promo and character videos. The agent works in seven stages. After each stage a script checks the output, and the next stage waits until it passes. At the end, one table shows what was measured in the finished file; a person still looks at the picture and listens to the sound.
 
 Works in Codex, Claude Code and other runtimes that read Agent Skills.
 
@@ -47,6 +47,13 @@ The agent asks six questions first: where the video goes, length and aspect rati
 | 6. Edit | `edit`, `final` | Beat grid, cut continuity, dialogue length, loudness |
 
 Exit code `0` means move on. Exit code `1` means fix the lines listed in `qa/gate-<stage>.txt` and run the gate again. Some things only eyes can judge, such as a face drifting a second into a clip. Those pass only after someone looks at the frame strips and writes a review.
+
+## How results are verified
+
+`scripts/verify.sh` checks the finished video, final mix included, and prints one table, cheapest checks first. It saves the table as `qa/VERIFY.md` beside the video. [Commands, limits and coverage](docs/verification.md).
+- **The machine measures the file**: every frame decodes, frame rate and size are right, sound and picture have the same length, average loudness is near −14 LUFS and the loudest peak stays under −1 dBTP. For a Remotion production it also checks that something on screen carries over each scene change instead of a bare jump. Given a plan for graphics laid over filmed footage, it checks that the footage never flashes between two graphics and that no card stays over 9 seconds.
+- **A person checks what numbers can't**: cut timing, clipped text, a face that changes, how the mix sounds. For this the table links a contact sheet (small frames across the whole video) and the last frame. Those rows say LOOK, never PASS, and the final gate waits for a written review.
+- **New checks only warn at first** (`observe`). They block a run (`enforce`) only after they have been tried on real work.
 
 ## Try the demo
 

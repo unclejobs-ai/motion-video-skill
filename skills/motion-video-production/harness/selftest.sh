@@ -149,7 +149,8 @@ fi
 
 # 타임라인 코어(편집기·에이전트 CLI·빌드가 같이 쓰는 순수 함수)
 if command -v node >/dev/null; then
-  if node --test "$HERE/../timeline/core.test.mjs" >/dev/null 2>&1; then echo "ok   타임라인 코어 테스트"; else echo "FAIL 타임라인 코어 테스트 (node --test timeline/core.test.mjs)"; fails=$((fails+1)); fi
+  if node --test "$HERE/../timeline/core.test.mjs" "$HERE/"*.test.mjs; then echo "ok   타임라인·스킬 경로·검증 표 테스트"; else echo "FAIL 타임라인·스킬 경로·검증 표 테스트"; fails=$((fails+1)); fi
+  if (cd "$HERE/../engines/remotion" && npm test); then echo "ok   Remotion 엔진 테스트"; else echo "FAIL Remotion 엔진 테스트"; fails=$((fails+1)); fi
 else
   echo "skip 타임라인 코어 테스트 (node 없음)"
 fi

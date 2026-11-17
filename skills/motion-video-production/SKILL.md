@@ -140,7 +140,7 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 - 목소리는 대사를 먼저 생성하고 길이를 잰 뒤 타이밍을 정합니다(`pipeline/vo.mjs`, `pipeline/vo-assemble.mjs`, composio CLI. `references/providers.md`). 크레딧이 드므로 생성 전에 사용자에게 알립니다.
 - 음악은 `node pipeline/score.mjs productions/<id>`의 기본 스코어로 시작하거나, `templates/MUSIC_BRIEF.md`로 워커에게 맡깁니다.
 - 믹스와 mux는 `bash "$SKILL_ROOT/scripts/mix-mux.sh" <picture.mp4> <fps> <초> <music.wav> <vo.wav|-> <out.mp4>`로 합니다. 프레임 수가 맞을 때만 mux하고, 대사가 나올 때 음악을 낮춥니다.
-- 최종 확인은 `bash "$SKILL_ROOT/scripts/verify.sh" <mp4>`(`PRODUCTION=productions/<id>`를 주면 carry 검사도 함께)로 하고, 생성된 컨택트 시트를 직접 봅니다. 레퍼런스가 있으면 `gate.py ref`로 비교합니다.
+- 최종 확인은 `bash "$SKILL_ROOT/scripts/verify.sh" <mp4> --project "$PROJECT_ROOT"`로 합니다. Remotion은 `PRODUCTION=productions/<id>`를 더하면 carry도 함께 검사합니다. 테스트 → 계획 → 기존 미디어 게이트 → 이음새 그림 → LOOK 순서의 표와 영상 옆 `qa/VERIFY.md`가 생깁니다. 새 검사는 observe로 시작하며 WARN·SKIP은 통과 근거가 아닙니다. LOOK 이미지를 실제로 보고 검수 기록을 남긴 뒤 `gate.py final`을 실행합니다. 레퍼런스가 있으면 `gate.py ref`도 비교합니다. 계획 형식과 모드·한계는 `references/verification.md`에 있습니다.
 
 ### 타임라인 편집기 (조립 뒤 사람이 직접 고칠 때)
 - 만든 영상을 사용자가 타임라인으로 보고 고치게 하려면 `node "$SKILL_ROOT/timeline/serve.mjs" "$PROJECT_ROOT"`를 실행합니다. 브라우저에 영상·텍스트·목소리·음악 네 트랙이 뜹니다. Node 표준 라이브러리와 ffmpeg만 씁니다(설치 없음).
@@ -170,7 +170,7 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 - 눈으로 보지 않은 것을 통과로 보고하지 않습니다. "렌더가 끝났다"는 통과의 근거가 아닙니다.
 - 측정할 수 있는 것은 측정합니다: 프레임 수, 길이, 라우드니스(LUFS), true peak, 받아쓰기 일치 여부. 하네스가 있는 단계는 하네스의 종료 코드로 판정합니다.
 - 직접 들어 보지 않은 오디오를 들었다고 보고하지 않습니다. 받아쓰기와 라우드니스로 확인했다고 보고합니다.
-- 결과 보고에는 측정 수치, 고친 것, 남은 결함, 산출물 위치를 포함합니다.
+- 결과 보고에는 측정 수치, 고친 것, 남은 결함, 산출물 위치와 검사하지 못한 것(WARN·SKIP·눈 검수 여부)을 포함합니다. 같은 검사에서 세 번 고쳐도 실패하면 시도한 것과 남은 실패를 사용자에게 보고합니다.
 
 하네스 검사가 없는 실수는 `references/pitfalls.md`, 도구별 사용법은 `references/providers.md`를 참고합니다.
 
@@ -183,7 +183,7 @@ python3 "$SKILL_ROOT/harness/gate.py" <단계> "$PROJECT_ROOT"
 | `clipsheet.sh` | 프레임 시트(클립의 모든 프레임을 6x5 칸으로 배치) |
 | `key-plate.sh` | 초록 배경 -> 투명 PNG |
 | `mix-mux.sh` | 음악·대사 믹스와 프레임 수 게이트 mux |
-| `verify.sh` | 영상 측정, 반복 프레임, 가장자리 색, 컨택트 시트, 받아쓰기, 선택적 carry 검사 |
+| `verify.sh` | 기존 미디어 게이트·carry·오버레이 검사를 한 표로, 컨택트 시트·마지막 프레임과 VERIFY.md |
 | `beat-grid.py` | BPM 기준 박 길이·스냅 계산 |
 | `../harness/gate.py` | 단계별 통과 여부를 종료 코드로 판정 |
 | `../timeline/serve.mjs`, `apply.mjs`, `build.mjs` | 타임라인 편집기, 에이전트용 편집 CLI, edit.json → mp4 빌드 |

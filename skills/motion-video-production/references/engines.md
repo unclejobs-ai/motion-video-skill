@@ -39,7 +39,7 @@ Node.js 24 이상이 필요합니다(`.ts` 파일을 바로 실행). 모든 의�
 | 기본 스코어 | `node pipeline/score.mjs productions/<id>` → `productions/<id>/audio/score.wav` |
 | 목소리 | `node pipeline/vo.mjs productions/<id>/vo`, `node pipeline/vo-assemble.mjs productions/<id>/vo <초> productions/<id>/vo/cues.json` |
 | 믹스와 mux | `bash "$SKILL_ROOT/scripts/mix-mux.sh" <picture.mp4> <fps> <초> <score.wav> <vo_track.wav 또는 -> "$PROJECT_ROOT/out/final.mp4"` |
-| 측정 | `PRODUCTION=productions/<id> bash "$SKILL_ROOT/scripts/verify.sh" "$PROJECT_ROOT/out/final.mp4"` |
+| 검증 표 | `PRODUCTION=productions/<id> bash "$SKILL_ROOT/scripts/verify.sh" "$PROJECT_ROOT/out/final.mp4" --project "$PROJECT_ROOT"` |
 
 새 작품은 `productions/carry-demo/`를 복사해 시작합니다. 파일 구성: `timing.ts`(계약), `scene.ts`(시각 t의 순수 기하), `<이름>.tsx`(얇은 Remotion 호스트), `track.ts`(carry 검사가 읽는 상자), `BEATSHEET.md`(`templates/BEATSHEET.md`), `vo/`, `audio/`. 컴포지션은 `src/Root.tsx`에 등록합니다.
 
@@ -69,3 +69,5 @@ Node.js 24 이상이 필요합니다(`.ts` 파일을 바로 실행). 모든 의�
 | 렌더 | `npx hyperframes render --fps 30 --quality high -o renders/<이름>.mp4` |
 
 `index.html`의 루트 요소에 `data-composition-id`, `data-width`, `data-height`, `data-duration`을 두고, `gsap.timeline({ paused: true })`를 `window.__timelines["<컴포지션 ID>"]`에 등록합니다. 자세한 규칙은 `npx hyperframes docs compositions`, `npx hyperframes docs gsap`에 있습니다. 렌더한 mp4는 Remotion과 같은 `mix-mux.sh`, `verify.sh`, `gate.py ref`, `gate.py final`로 넘깁니다.
+
+검증 표는 기존 `harness/gate.py`의 미디어 계산을 재사용합니다. 복사한 Remotion 엔진에서는 `npm run verify -- --video <mp4> --skill-root "$SKILL_ROOT"`로도 실행합니다. 계획·원본 옵션, observe 모드, 눈 검수와 검사하지 않는 항목은 `references/verification.md`에 있습니다.

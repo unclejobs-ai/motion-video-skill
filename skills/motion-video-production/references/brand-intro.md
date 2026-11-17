@@ -29,7 +29,7 @@
 2. `productions/wordcut/data.ts`에 단어, 장면 문구, 끝 문구를 키워드로 채워요.
 3. 마무리 이미지를 엔진 폴더의 `public/closing.jpg`로 두고 `data.ts`의 `closing`을 `'closing.jpg'`로 바꿔요. 마지막 2초에 이미지로 넘어가 멈추고, 단어는 같은 자리에 남아요. 이미지가 페이지를 덮는 경계는 carry 검사에서 bare로 세져요. 데모에서는 세지는 경계가 이것 하나뿐이라 carry 점수가 0.00(FAIL)이에요. 단어가 같은 자리에 그대로 남으면 carry로 세지지 않으니, 이 경계에서 단어를 움직이거나 키워 carry로 바꿔야 FAIL을 벗어나요.
 4. 레퍼런스 분석이 있으면 `node productions/wordcut/plan.mjs ref/analysis.json <초>`로 타이밍을 뽑아요.
-5. `node productions/wordcut/render.mjs video 9x16`로 렌더하고, `drift.mjs`와 `verify.sh`로 재요. 레퍼런스가 있으면 `gate.py ref`로 비교해요.
+5. `node productions/wordcut/render.mjs video 9x16`로 렌더하고, `drift.mjs`와 `verify.sh <mp4> --project "$PROJECT_ROOT"`로 재요. 검증 표의 LOOK 이미지를 실제로 본 뒤 `gate.py final`도 통과해야 해요(`references/verification.md`). 레퍼런스가 있으면 `gate.py ref`로 비교해요.
 
 ## 5. 홈페이지 한 장
 
