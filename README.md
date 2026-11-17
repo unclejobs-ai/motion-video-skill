@@ -4,6 +4,8 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/unclejobs-ai/motion-video-skill?style=flat&color=ff5a14)](https://github.com/unclejobs-ai/motion-video-skill/stargazers) [![License: MIT](https://img.shields.io/badge/license-MIT-0a0a09)](LICENSE) [![Agent Skills](https://img.shields.io/badge/format-Agent%20Skills-5c5a52)](docs/runtimes.md)
 
+![A paper-craft character snaps a clapperboard shut and presents a three-frame filmstrip](docs/assets/hero-clip.gif)
+
 ![Measure the reference, pass seven gated stages, judge the mp4 against the same targets](docs/assets/hero.png)
 
 An Agent Skill for 15–90 second motion graphics, promo and character videos. The agent works in seven stages. After each stage a script checks the output, and the next stage waits until it passes. At the end, one table shows what was measured in the finished file; a person still looks at the picture and listens to the sound.
@@ -45,6 +47,10 @@ The agent asks six questions first: where the video goes, length and aspect rati
 | 4. Clips | `clips` | Duration, frame count, start-frame match, frame strips |
 | 5. Music and voice | `audio` | One voice ID, dialogue files |
 | 6. Edit | `edit`, `final` | Beat grid, cut continuity, dialogue length, loudness |
+
+![Three keyframes of the clip above: clapperboard open, shut, and the final pose](docs/assets/keyframes.png)
+
+The clip at the top is what stages 3 and 4 produce. The three keyframes were drawn first, and the video model filled only the motion between them.
 
 Exit code `0` means move on. Exit code `1` means fix the lines listed in `qa/gate-<stage>.txt` and run the gate again. Some things only eyes can judge, such as a face drifting a second into a clip. Those pass only after someone looks at the frame strips and writes a review.
 

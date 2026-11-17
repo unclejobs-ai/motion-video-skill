@@ -4,6 +4,8 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/unclejobs-ai/motion-video-skill?style=flat&color=ff5a14)](https://github.com/unclejobs-ai/motion-video-skill/stargazers) [![License: MIT](https://img.shields.io/badge/license-MIT-0a0a09)](LICENSE) [![Agent Skills](https://img.shields.io/badge/format-Agent%20Skills-5c5a52)](docs/runtimes.md)
 
+![종이 인형 캐릭터가 슬레이트를 치고 세 칸짜리 필름을 소개하는 6초 클립](docs/assets/hero-clip.gif)
+
 ![레퍼런스를 재고, 7단계 게이트를 거쳐, 같은 목표값으로 mp4를 판정하는 흐름](docs/assets/hero.ko.png)
 
 15~90초 모션 그래픽, 홍보 영상, 캐릭터 영상을 만드는 Agent Skill이에요. 에이전트가 7단계로 작업하고, 단계마다 스크립트가 결과를 검사해요. 통과해야 다음 단계로 넘어가요. 마지막에는 완성본을 잰 결과를 표 하나로 보여 주고, 화면과 소리는 사람이 직접 확인해요.
@@ -45,6 +47,10 @@ Node.js 24 이상, ffmpeg, Python 3, Bash가 필요해요. Windows에서는 WSL�
 | 4. 클립 | `clips` | 길이, 프레임 수, 첫 프레임 일치, 프레임 스트립 |
 | 5. 음악·목소리 | `audio` | 목소리 ID 하나, 대사 파일 |
 | 6. 편집 | `edit`, `final` | 박자 격자, 컷 연결, 대사 길이, 음량 |
+
+![위 클립의 키프레임 3장: 슬레이트를 연 모습, 닫은 모습, 마지막 자세](docs/assets/keyframes.png)
+
+맨 위 클립이 3·4단계의 결과예요. 키프레임 3장을 먼저 그리고, 영상 모델은 그 사이 움직임만 채웠어요.
 
 종료 코드 `0`이면 다음 단계로 가요. `1`이면 `qa/gate-<단계>.txt`에 적힌 줄을 고치고 다시 돌려요. 클립 1초 뒤에 얼굴이 달라지는 것처럼 눈으로만 볼 수 있는 문제도 있어요. 이런 항목은 사람이 프레임 스트립을 보고 검토 기록을 남겨야 통과해요.
 
